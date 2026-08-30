@@ -66,6 +66,15 @@
     .work-note { margin-top: 22px; padding: 22px 24px; border-left: 5px solid var(--blue); background: var(--paper-2); }
     .work-note h3 { margin: 0 0 8px; font-size: 18px; }
     .work-note p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
+    .downloads { margin-top: 28px; }
+    .downloads h3 { margin: 0 0 7px; font-size: 21px; }
+    .downloads > p { margin: 0 0 17px; color: var(--muted); line-height: 1.55; }
+    .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .download-card { display: flex; min-height: 180px; padding: 20px; border: 1px solid var(--ink); background: var(--white); flex-direction: column; align-items: flex-start; }
+    .download-card span { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .08em; }
+    .download-card strong { margin: 16px 0 7px; font-size: 18px; }
+    .download-card p { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .download-card .button { margin-top: auto; display: inline-flex; align-items: center; text-decoration: none; color: var(--ink); }
 
     .station-panel { display: none; border-top: 1px solid var(--ink); }
     .station-panel.active { display: block; }
@@ -187,7 +196,7 @@
       .hero .wrap, .station-head, .analysis-layout, .builder-layout { grid-template-columns: 1fr; }
       .hero-copy { padding-right: 0; }
       .hero-side { padding: 36px 0 55px; border-left: 0; border-top: 1px solid var(--ink); }
-      .station-tabs { grid-template-columns: 1fr; }
+      .station-tabs, .download-grid { grid-template-columns: 1fr; }
       .station-tab { min-height: 145px; }
       .station-tab strong { margin-top: 20px; }
       .station-head { gap: 18px; }
@@ -271,6 +280,30 @@
           <p>Die Eingabefelder dienen der Strukturierung und Orientierung; das Ausfüllen der Maske ist freiwillig. Ergebnisse können ebenso in einem eigenen Word-Dokument, in OneNote oder in einer anderen vertrauten Arbeitsumgebung festgehalten werden.</p>
           <p>Nach der Diagnose kann die KI außerdem gebeten werden, die entwickelten Aufgaben – etwa Rechenpäckchen, Hilfekarten und Lösungen – als Word- oder PDF-Datei auszugeben. Entscheidend ist, dass Diagnosehypothese, Förderziel, verwendete Aufgaben, fachliche Anpassungen und Erfolgskontrolle nachvollziehbar dokumentiert werden. Wer die Maske nutzt, kann den vollständigen Förderbaustein anschließend speichern oder ausdrucken.</p>
         </aside>
+        <section class="downloads" id="word-downloads" aria-labelledby="downloadTitle">
+          <h3 id="downloadTitle">Word-Handouts zum Herunterladen</h3>
+          <p>Wer lieber analog oder in Word arbeitet, kann das passende Handout direkt zum jeweiligen Arbeitsauftrag öffnen und ausfüllen.</p>
+          <div class="download-grid">
+            <article class="download-card">
+              <span>HANDOUT 1</span>
+              <strong>Prompt-Bibliothek</strong>
+              <p>Die Prompts als Word-Handout zum Markieren, Ergänzen und Weitergeben.</p>
+              <a class="button" href="Handout 1 - Prompt-Bibliothek Mathematik.docx" download>Word-Datei herunterladen</a>
+            </article>
+            <article class="download-card">
+              <span>HANDOUT 2</span>
+              <strong>Fehleranalyse</strong>
+              <p>Das Übungsblatt für Beobachtung, Deutung und didaktische Prüfung.</p>
+              <a class="button" href="Handout 2 - Fehleranalyse Uebungsblatt.docx" download>Word-Datei herunterladen</a>
+            </article>
+            <article class="download-card">
+              <span>HANDOUT 3</span>
+              <strong>Förderbaustein</strong>
+              <p>Die neue Arbeitsvorlage als Alternative zur digitalen Eingabemaske.</p>
+              <a class="button" href="Handout 3 - Foerderbaustein-Arbeitsvorlage.docx" download>Word-Datei herunterladen</a>
+            </article>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -358,7 +391,7 @@
                 <label class="wide">Möglicherweise betroffene Grundvorstellung <span style="font-weight:400">(optional)</span><input id="buildConception" type="text" placeholder="z. B. Anteil vom Ganzen oder Bedeutung des Nenners"></label>
                 <div class="ai-help">
                   <h4>Noch keine sichere Deutung?</h4>
-                  <p>Der folgende Prompt übernimmt die oben eingetragene Aufgabe und Schülerlösung. Die KI soll mögliche Fehlvorstellungen ausdrücklich nur als Hypothesen formulieren und passende Prüffragen entwickeln.</p>
+                  <p>Der folgende Prompt übernimmt die oben eingetragene Aufgabe und Schülerlösung. Die KI soll mögliche Fehlvorstellungen ausdrücklich nur als Hypothesen formulieren und passende Prüffragen entwickeln. Ihre Antwort trägt genau die Feldüberschriften dieser Maske und kann deshalb abschnittsweise hier oder in die Word-Vorlage kopiert werden.</p>
                   <button class="button primary" id="copyHypothesisPrompt" type="button">KI-Prompt zur Hypothesenbildung kopieren</button>
                 </div>
                 <label>Mini-Ziel 1<input id="buildGoal1" type="text" placeholder="z. B. 4 von 5 Aufgaben durch Zerlegen lösen"><small class="field-hint">Realistisches Beispiel: Das Kind löst 4 von 5 Aufgaben mit Zehnerübergang durch Zerlegen statt zählend.</small></label>
@@ -568,15 +601,29 @@ Trenne Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was
 Klasse / Stufe: ${context.grade}
 Thema / Leitidee: ${context.topic}
 Aufgabe und anonymisierte Schülerlösung: ${context.observation}
-${ownIdea ? `Meine vorläufige Vermutung: ${ownIdea}` : "Ich habe noch keine eigene Vermutung zur möglichen Fehlvorstellung."}
+${ownIdea ? `Meine vorläufige Vermutung: ${ownIdea}` : "Ich habe noch keine eigene Vermutung zur möglichen Fehlvorstellung. Entwickle in diesem Fall höchstens zwei plausible, klar unterscheidbare Hypothesen."}
 
-Arbeite in vier Schritten:
+Arbeite zunächst in vier Schritten:
 1. Beobachten: Beschreibe ausschließlich, was in der notierten Lösung sichtbar ist.
-2. Deuten: Formuliere höchstens zwei unterschiedliche Erklärungen und kennzeichne beide ausdrücklich als Hypothesen.
+2. Deuten: Prüfe meine Vermutung, sofern eine vorliegt. Formuliere insgesamt höchstens zwei unterschiedliche Erklärungen und kennzeichne beide ausdrücklich als Hypothesen.
 3. Prüfen: Entwickle zu jeder Hypothese eine kurze Rückfrage oder Kontrastaufgabe, mit der ich sie im Gespräch prüfen kann.
 4. Einordnen: Benenne zu jeder Hypothese die möglicherweise betroffene Grundvorstellung.
 
-Formuliere keine abschließende Diagnose aus einer einzelnen Lösung. Weise darauf hin, welche weiteren Informationen zur Klärung fehlen.`;
+Formuliere anschließend zwei vorläufige, realistische und beobachtbare Mini-Ziele, die zu den Hypothesen passen. Ein Ziel soll eine mathematische Handlung oder Strategie beschreiben, das andere eine Erklärung oder Darstellung. Formuliere keine abschließende Diagnose aus einer einzelnen Lösung.
+
+Gib deine Antwort als kopierfreundlichen Fließtext mit genau diesen Überschriften und in genau dieser Reihenfolge aus:
+
+KLASSE / STUFE
+THEMA / LEITIDEE
+AUFGABE UND BEOBACHTETE SCHÜLERLÖSUNG
+EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG
+MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG
+MINI-ZIEL 1
+MINI-ZIEL 2
+PRÜFFRAGEN / KONTRASTAUFGABEN
+FEHLENDE INFORMATIONEN UND NÄCHSTER PRÜFSCHRITT
+
+Wiederhole bei den ersten drei Überschriften meine Angaben. Trage unter „EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG“ die höchstens zwei Diagnosehypothesen ein und ordne sie unter „MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG“ eindeutig zu. Verwende keine Tabelle und keine zusätzlichen Überschriften. Weise am Schluss knapp darauf hin, dass Hypothesen und Mini-Ziele durch weitere Beobachtungen überprüft und gegebenenfalls angepasst werden müssen.`;
     }
 
     function modulePrompt(module) {
