@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Drei digitale Handouts zu Prompts, Fehleranalyse und Förderung im Mathematikunterricht.">
+  <title>Digitale Handouts | Mathematik & KI</title>
+  <style>
+    :root {
+      --ink: #141a18;
+      --paper: #ffffff;
+      --paper-2: #eef4ff;
+      --white: #ffffff;
+      --lime: #eaf2ff;
+      --coral: #4385f5;
+      --blue: #4385f5;
+      --cyan: #4385f5;
+      --muted: #545b66;
+      --line: #d8dde6;
+      --dark: #eef4ff;
+      --serif: Arial, Helvetica, sans-serif;
+      --sans: Arial, Helvetica, sans-serif;
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 16px; }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    ::selection { background: var(--lime); }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgba(244, 241, 233, .94); backdrop-filter: blur(14px); }
+    .topbar .wrap { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 12px; font-weight: 900; letter-spacing: .09em; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; background: var(--blue); color: white; font-family: var(--sans); font-size: 17px; font-weight: 900; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .status { min-height: 20px; color: var(--muted); font-size: 12px; font-weight: 750; }
+
+    .hero { border-bottom: 1px solid var(--ink); }
+    .hero .wrap { display: grid; grid-template-columns: 1.35fr .65fr; min-height: 450px; }
+    .hero-copy { padding: 80px 70px 70px 0; }
+    .eyebrow, .mini-label { margin: 0; font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    .eyebrow { color: var(--blue); }
+    h1 { margin: 20px 0 22px; max-width: 800px; font-family: var(--sans); font-size: clamp(42px, 6vw, 66px); font-weight: 800; line-height: 1.06; letter-spacing: -.025em; }
+    h1 em { color: var(--ink); font-weight: 800; font-style: normal; }
+    .hero-copy > p:last-child { max-width: 690px; color: var(--muted); font-size: 19px; line-height: 1.6; }
+    .hero-side { padding: 68px 0 68px 48px; border-left: 1px solid var(--ink); display: flex; flex-direction: column; justify-content: flex-end; }
+    .hero-side strong { font-family: var(--sans); font-size: 22px; line-height: 1.28; font-weight: 750; }
+    .hero-side p { color: var(--muted); line-height: 1.55; }
+    .privacy { margin-top: 24px; padding: 16px; border-left: 5px solid var(--blue); background: var(--paper-2); font-size: 13px; line-height: 1.5; }
+
+    .station-picker { padding: 48px 0 58px; }
+    .station-picker h2 { margin: 0 0 24px; font-family: var(--serif); font-size: 38px; font-weight: 400; }
+    .station-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .station-tab { min-height: 220px; padding: 24px; border: 1px solid var(--ink); background: transparent; text-align: left; transition: transform .15s, box-shadow .15s, background .15s; }
+    .station-tab:hover, .station-tab:focus-visible { border-color: var(--blue); background: #f8fbff; }
+    .station-tab.active { background: var(--paper-2); border-color: var(--blue); box-shadow: inset 0 5px 0 var(--blue); }
+    .station-tab span { display: block; font-family: var(--serif); font-size: 30px; }
+    .station-tab strong { display: block; margin: 35px 0 8px; font-size: 22px; }
+    .station-tab small { color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .station-tab .station-task { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink); }
+    .station-tab .station-task b { color: var(--blue); }
+    .work-note { margin-top: 22px; padding: 22px 24px; border-left: 5px solid var(--blue); background: var(--paper-2); }
+    .work-note h3 { margin: 0 0 8px; font-size: 18px; }
+    .work-note p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
+    .downloads { margin-top: 28px; }
+    .downloads h3 { margin: 0 0 7px; font-size: 21px; }
+    .downloads > p { margin: 0 0 17px; color: var(--muted); line-height: 1.55; }
+    .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .download-card { display: flex; min-height: 180px; padding: 20px; border: 1px solid var(--ink); background: var(--white); flex-direction: column; align-items: flex-start; }
+    .download-card span { color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: .08em; }
+    .download-card strong { margin: 16px 0 7px; font-size: 18px; }
+    .download-card p { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .download-card .button { margin-top: auto; display: inline-flex; align-items: center; text-decoration: none; color: var(--ink); }
+
+    .station-panel { display: none; border-top: 1px solid var(--ink); }
+    .station-panel.active { display: block; }
+    .station-head { padding: 70px 0 50px; display: grid; grid-template-columns: 120px 1fr 1fr; gap: 38px; align-items: start; }
+    .station-number { font-family: var(--sans); font-size: 16px; font-weight: 900; letter-spacing: .08em; color: var(--blue); }
+    .station-head h2 { margin: 0; font-family: var(--sans); font-size: clamp(38px, 5vw, 56px); font-weight: 800; line-height: 1.06; color: var(--ink); }
+    .station-head > p { margin: 6px 0 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
+    .station-body { padding-bottom: 90px; }
+
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 26px; }
+    .toolbar input { flex: 1 1 280px; min-height: 46px; padding: 10px 14px; border: 1px solid var(--ink); background: var(--white); }
+    .filter { min-height: 46px; padding: 10px 14px; border: 1px solid var(--ink); background: transparent; font-weight: 800; }
+    .filter.active { background: var(--ink); color: white; }
+
+    .prompt-list { display: grid; gap: 13px; }
+    .prompt-item { border: 1px solid var(--ink); background: var(--white); }
+    .prompt-item[hidden] { display: none; }
+    .prompt-summary { width: 100%; padding: 18px 20px; border: 0; background: transparent; display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 16px; text-align: left; }
+    .prompt-summary:hover { background: var(--paper-2); }
+    .prompt-id { font-family: var(--serif); font-size: 25px; color: var(--coral); }
+    .prompt-summary strong { font-size: 17px; }
+    .prompt-category { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .1em; }
+    .prompt-detail { display: none; padding: 0 20px 20px 90px; }
+    .prompt-item.open .prompt-detail { display: block; }
+    .prompt-detail textarea, .generated-prompt textarea { width: 100%; min-height: 130px; padding: 16px; border: 1px solid var(--ink); background: var(--paper); resize: vertical; line-height: 1.55; }
+    .prompt-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+    .prompt-actions small { color: var(--muted); }
+
+    .button { min-height: 42px; padding: 10px 16px; border: 1px solid var(--ink); background: transparent; font-weight: 850; }
+    .button:hover, .button:focus-visible { background: var(--lime); }
+    .button.primary { border-color: var(--ink); background: var(--ink); color: white; }
+    .button.primary:hover, .button.primary:focus-visible { background: var(--blue); border-color: var(--blue); }
+    .button.coral { background: var(--coral); color: var(--ink); }
+
+    .analysis-layout { display: grid; grid-template-columns: .86fr 1.14fr; gap: 34px; align-items: start; }
+    .case-list { display: grid; gap: 9px; }
+    .case-card { padding: 16px; border: 1px solid var(--ink); background: transparent; text-align: left; display: grid; grid-template-columns: 38px 1fr; gap: 12px; }
+    .case-card:hover, .case-card.active { background: var(--lime); }
+    .case-card span { font-family: var(--serif); font-size: 24px; }
+    .case-card strong { display: block; }
+    .case-card small { color: var(--muted); line-height: 1.4; }
+    .own-case { margin-top: 18px; padding: 18px; border: 1px solid var(--ink); background: var(--white); }
+    .own-case label, .form-grid label, .reflection-grid label { display: block; font-size: 12px; font-weight: 850; }
+    .own-case input, .form-grid input, .form-grid textarea, .reflection-grid textarea { width: 100%; margin-top: 7px; padding: 12px; border: 1px solid var(--ink); background: var(--white); }
+    .own-case label + label { margin-top: 12px; }
+    .generated-prompt { border: 1px solid #b8c9e7; border-left: 5px solid var(--blue); background: var(--dark); color: var(--ink); padding: 24px; }
+    .generated-prompt h3 { margin: 8px 0 17px; font-family: var(--serif); font-size: 31px; font-weight: 400; }
+    .generated-prompt textarea { color: var(--ink); background: var(--white); min-height: 275px; }
+    .generated-prompt .prompt-actions small { color: var(--muted); }
+    .reflection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 28px; }
+    .reflection-grid label { padding: 19px; border: 1px solid var(--ink); background: var(--white); }
+    .reflection-grid textarea { min-height: 115px; resize: vertical; }
+    .trainer { margin-top: 32px; border: 1px solid var(--ink); }
+    .trainer > button { width: 100%; padding: 17px 20px; border: 0; background: var(--paper-2); display: flex; justify-content: space-between; font-weight: 900; text-align: left; }
+    .trainer-content { display: none; padding: 22px; background: var(--white); }
+    .trainer.open .trainer-content { display: block; }
+    .trainer-content h4 { margin: 0 0 9px; font-size: 19px; }
+    .trainer-content p { color: var(--muted); line-height: 1.55; }
+    .didactic-note { margin-top: 18px; padding: 17px; border-left: 5px solid var(--blue); background: #eef0ff; line-height: 1.55; }
+
+    .builder-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
+    .form-card { padding: 24px; border: 1px solid var(--ink); background: var(--white); }
+    .form-card h3 { margin: 0 0 20px; font-family: var(--serif); font-size: 31px; font-weight: 400; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid label.wide { grid-column: 1 / -1; }
+    .form-grid textarea { min-height: 95px; resize: vertical; }
+    .form-grid textarea.long-output { min-height: 300px; }
+    .form-grid textarea.final-output { min-height: 380px; }
+    .module-list { display: grid; gap: 10px; }
+    .module-card { border: 1px solid var(--ink); background: var(--paper); }
+    .module-top { padding: 15px; display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: center; }
+    .module-top input { width: 20px; height: 20px; accent-color: var(--coral); }
+    .module-top strong { display: block; }
+    .module-top small { color: var(--muted); }
+    .module-prompt { display: none; padding: 0 15px 15px 55px; }
+    .module-card.selected .module-prompt { display: block; }
+    .module-prompt textarea { width: 100%; min-height: 135px; padding: 13px; border: 1px solid var(--ink); background: var(--white); resize: vertical; line-height: 1.5; }
+    .checklist { display: grid; gap: 10px; margin: 12px 0 20px; }
+    .checklist label { display: flex; align-items: flex-start; gap: 11px; padding: 12px; border: 1px solid var(--line); }
+    .checklist input { width: 19px; height: 19px; accent-color: var(--blue); }
+    .builder-footer { margin-top: 28px; padding: 23px; border: 1px solid #b8c9e7; border-left: 5px solid var(--blue); background: var(--paper-2); display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .builder-footer p { margin: 0; max-width: 700px; line-height: 1.5; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    footer { padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 20px; }
+
+    /* Nähe zur Gestaltung der Word-Handouts */
+    .topbar { background: rgba(255, 255, 255, .96); }
+    .hero .wrap { min-height: 330px; }
+    .hero-copy { padding-top: 58px; padding-bottom: 54px; }
+    .hero-side { padding-top: 48px; padding-bottom: 48px; }
+    .station-picker h2, .form-card h3, .generated-prompt h3, .sortLab h3, .canvasIntro h3 { font-family: var(--sans); font-weight: 750; }
+    .station-picker h2 { font-size: 30px; }
+    .station-tab span { color: var(--blue); font-family: var(--sans); font-size: 16px; font-weight: 900; letter-spacing: .08em; }
+    .station-head { border-bottom: 1px solid var(--line); }
+    .prompt-id { color: var(--blue); font-family: var(--sans); font-size: 18px; font-weight: 900; }
+    .button.primary { background: var(--blue); border-color: var(--blue); }
+    .button.coral { background: var(--blue); color: white; border-color: var(--blue); }
+    .filter.active { background: var(--blue); border-color: var(--blue); }
+    .case-card:hover, .case-card.active { background: var(--paper-2); border-color: var(--blue); }
+    .case-card span { font-family: var(--sans); color: var(--blue); font-size: 18px; font-weight: 900; }
+    .didactic-note { border-color: var(--blue); background: var(--paper-2); }
+    .ai-help { grid-column: 1 / -1; padding: 17px; border-left: 5px solid var(--blue); background: var(--paper-2); }
+    .ai-help h4 { margin: 0 0 7px; font-size: 17px; }
+    .ai-help p { margin: 0 0 13px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .field-hint { display: block; margin-top: 7px; color: var(--muted); font-weight: 400; line-height: 1.4; }
+    .print-summary { display: none; width: min(900px, calc(100% - 50px)); margin: 0 auto; padding: 48px 0; }
+    .print-summary h1 { font-size: 30px; border-bottom: 2px solid var(--blue); padding-bottom: 12px; }
+    .print-summary h2 { margin: 28px 0 8px; color: var(--blue); font-size: 20px; }
+    .print-summary p, .print-summary li { line-height: 1.55; }
+    .print-summary .print-note { padding: 14px; border-left: 4px solid var(--blue); background: var(--paper-2); }
+    .print-summary .print-preserve { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+    .print-summary .print-material { break-before: page; page-break-before: always; padding-top: 8px; }
+    .print-summary .print-material h1 { margin-top: 0; }
+    .print-summary .print-block { padding: 16px; border: 1px solid var(--line); }
+
+    @media (max-width: 900px) {
+      .hero .wrap, .station-head, .analysis-layout, .builder-layout { grid-template-columns: 1fr; }
+      .hero-copy { padding-right: 0; }
+      .hero-side { padding: 36px 0 55px; border-left: 0; border-top: 1px solid var(--ink); }
+      .station-tabs, .download-grid { grid-template-columns: 1fr; }
+      .station-tab { min-height: 145px; }
+      .station-tab strong { margin-top: 20px; }
+      .station-head { gap: 18px; }
+      .station-number { font-size: 14px; }
+    }
+
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 28px, 1180px); }
+      .topbar .wrap { min-height: 62px; }
+      .brand b { display: none; }
+      .hero-copy { padding: 55px 0 45px; }
+      h1 { font-size: 50px; }
+      .station-picker { padding: 35px 0 45px; }
+      .station-head { padding: 52px 0 35px; }
+      .prompt-summary { grid-template-columns: 42px 1fr; }
+      .prompt-category { grid-column: 2; }
+      .prompt-detail { padding-left: 20px; }
+      .reflection-grid, .form-grid { grid-template-columns: 1fr; }
+      .form-grid label.wide { grid-column: auto; }
+      .module-top { grid-template-columns: 28px 1fr; }
+      .module-top .button { grid-column: 2; justify-self: start; }
+      .module-prompt { padding-left: 15px; }
+      .builder-footer, footer .wrap { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media print {
+      .topbar, .station-picker, .button, .prompt-actions, .trainer > button { display: none !important; }
+      .station-panel { display: block !important; break-before: page; }
+      .station-panel:first-of-type { break-before: auto; }
+      .prompt-item, .trainer, .form-card { break-inside: avoid; }
+      .prompt-detail, .trainer-content, .module-prompt { display: block !important; }
+      body { background: white; }
+      .hero .wrap { min-height: auto; }
+      .hero-copy { padding: 38px 0; }
+      .hero-side { display: none; }
+      body.print-entry > header, body.print-entry > main, body.print-entry > footer { display: none !important; }
+      body.print-entry .print-summary { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand"><span class="brand-mark">∑</span><b>DIGITALE HANDOUTS · MATHEMATIK & KI</b></div>
+      <div class="top-actions"><span class="status" id="globalStatus" role="status" aria-live="polite"></span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-copy">
+          <p class="eyebrow">DEEPDIVEKI · LEHRKRÄFTEFORTBILDUNG</p>
+          <h1>Digitale Handouts <em>Mathematik & KI</em></h1>
+          <p>Prompt-Bibliothek, Fehleranalyse und Förderbaustein in einer eigenständigen Datei. Benötigte Prompts stehen unmittelbar bei der jeweiligen Aufgabe.</p>
+        </div>
+        <aside class="hero-side">
+          <strong>Die KI liefert einen Entwurf. Die fachliche und didaktische Entscheidung bleibt bei der Lehrkraft.</strong>
+          <p>Alle Eingaben bleiben ausschließlich in diesem Browser gespeichert und werden nicht versendet.</p>
+          <div class="privacy"><b>Datenschutz:</b> Nur fiktive oder vollständig anonymisierte Schülerlösungen verwenden. Ergebnisse und Aufgaben immer fachlich prüfen.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="station-picker" aria-labelledby="stationPickerTitle">
+      <div class="wrap">
+        <h2 id="stationPickerTitle">Handout auswählen</h2>
+        <div class="station-tabs" role="tablist" aria-label="Digitale Handouts">
+          <button class="station-tab active" type="button" role="tab" aria-selected="true" aria-controls="station1" id="tab1" data-station="station1">
+            <span>HANDOUT 1</span><strong>Prompt-Bibliothek</strong><small>14 editierbare Prompts für Aufgaben, Diagnose, Förderung und exakte Prüfung.</small><small class="station-task"><b>Arbeitsauftrag:</b> Einen passenden Prompt auswählen, anpassen und das Ergebnis fachlich prüfen.</small>
+          </button>
+          <button class="station-tab" type="button" role="tab" aria-selected="false" aria-controls="station2" id="tab2" data-station="station2">
+            <span>HANDOUT 2</span><strong>Fehleranalyse</strong><small>Eine fiktive oder eigene anonymisierte Schülerlösung untersuchen.</small><small class="station-task"><b>Arbeitsauftrag:</b> Beobachtung, mögliche Deutung und passende Prüffragen voneinander trennen.</small>
+          </button>
+          <button class="station-tab" type="button" role="tab" aria-selected="false" aria-controls="station3" id="tab3" data-station="station3">
+            <span>HANDOUT 3</span><strong>Förderbaustein</strong><small>Aus der Diagnosearbeit einen überprüfbaren Baustein für den Unterricht entwickeln.</small><small class="station-task"><b>Arbeitsauftrag:</b> Förderziel, Aufgaben, Anpassungen und Erfolgskontrolle nachvollziehbar festhalten.</small>
+          </button>
+        </div>
+        <aside class="work-note" aria-label="Hinweis zur Dokumentation">
+          <h3>Hinweis zur Dokumentation</h3>
+          <p>Die Eingabefelder dienen der Strukturierung und Orientierung; das Ausfüllen der Maske ist freiwillig. Ergebnisse können ebenso in einem eigenen Word-Dokument, in OneNote oder in einer anderen vertrauten Arbeitsumgebung festgehalten werden.</p>
+          <p>Nach der Diagnose kann die KI außerdem gebeten werden, die entwickelten Aufgaben – etwa Rechenpäckchen, Hilfekarten und Lösungen – als Word- oder PDF-Datei auszugeben. Entscheidend ist, dass Diagnosehypothese, Förderziel, verwendete Aufgaben, fachliche Anpassungen und Erfolgskontrolle nachvollziehbar dokumentiert werden. Wer die Maske nutzt, kann den vollständigen Förderbaustein anschließend speichern oder ausdrucken.</p>
+        </aside>
+        <section class="downloads" id="word-downloads" aria-labelledby="downloadTitle">
+          <h3 id="downloadTitle">Word-Handouts zum Herunterladen</h3>
+          <p>Wer lieber analog oder in Word arbeitet, kann das passende Handout direkt zum jeweiligen Arbeitsauftrag öffnen und ausfüllen.</p>
+          <div class="download-grid">
+            <article class="download-card">
+              <span>HANDOUT 1</span>
+              <strong>Prompt-Bibliothek</strong>
+              <p>Die Prompts als Word-Handout zum Markieren, Ergänzen und Weitergeben.</p>
+              <a class="button" href="Handout 1 - Prompt-Bibliothek Mathematik.docx" download>Word-Datei herunterladen</a>
+            </article>
+            <article class="download-card">
+              <span>HANDOUT 2</span>
+              <strong>Fehleranalyse</strong>
+              <p>Das Übungsblatt für Beobachtung, Deutung und didaktische Prüfung.</p>
+              <a class="button" href="Handout 2 - Fehleranalyse Uebungsblatt.docx" download>Word-Datei herunterladen</a>
+            </article>
+            <article class="download-card">
+              <span>HANDOUT 3</span>
+              <strong>Förderbaustein</strong>
+              <p>Die neue Arbeitsvorlage als Alternative zur digitalen Eingabemaske.</p>
+              <a class="button" href="Handout 3 - Foerderbaustein-Arbeitsvorlage.docx" download>Word-Datei herunterladen</a>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="station-panel active" id="station1" role="tabpanel" aria-labelledby="tab1">
+      <div class="wrap">
+        <div class="station-head">
+          <div class="station-number">HANDOUT 1</div>
+          <h2>Prompt-Bibliothek Mathematik</h2>
+          <p>Prompts öffnen, Platzhalter bearbeiten und direkt kopieren. Die Formulierungen aus dem Handout bleiben editierbar.</p>
+        </div>
+        <div class="station-body">
+          <div class="toolbar" aria-label="Prompt-Bibliothek filtern">
+            <input id="promptSearch" type="search" placeholder="Prompts durchsuchen …" aria-label="Prompts durchsuchen">
+            <button class="filter active" type="button" data-filter="alle">Alle</button>
+            <button class="filter" type="button" data-filter="A">Aufgaben</button>
+            <button class="filter" type="button" data-filter="B">Diagnose</button>
+            <button class="filter" type="button" data-filter="C">Förderung</button>
+            <button class="filter" type="button" data-filter="D">Prüfen</button>
+          </div>
+          <div class="prompt-list" id="promptList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="station-panel" id="station2" role="tabpanel" aria-labelledby="tab2" hidden>
+      <div class="wrap">
+        <div class="station-head">
+          <div class="station-number">HANDOUT 2</div>
+          <h2>Fehleranalyse: Übungsblatt</h2>
+          <p>Eine fiktive Lösung auswählen und die KI-Antwort anschließend fachlich prüfen. Eine einzelne Lösung erlaubt nur Diagnosehypothesen, keine abschließende Diagnose.</p>
+        </div>
+        <div class="station-body">
+          <div class="analysis-layout">
+            <div>
+              <p class="mini-label">FIKTIVE SCHÜLERLÖSUNG WÄHLEN</p>
+              <div class="case-list" id="caseList"></div>
+              <div class="own-case">
+                <p class="mini-label">ODER EIGENES ANONYMISIERTES BEISPIEL</p>
+                <label>Klasse / Stufe<input id="ownClass" type="text" placeholder="z. B. 7"></label>
+                <label>Aufgabe und falsche Lösung<input id="ownSolution" type="text" placeholder="z. B. 3/4 + 1/2 = 4/6"></label>
+                <button class="button" id="useOwnCase" type="button">Eigenes Beispiel verwenden</button>
+              </div>
+            </div>
+            <div class="generated-prompt">
+              <p class="mini-label">PROMPT ZUR GEWÄHLTEN AUFGABE</p>
+              <h3 id="selectedCaseTitle">Beispiel 1 · Klasse 1</h3>
+              <textarea id="analysisPrompt" aria-label="Prompt für die Fehleranalyse"></textarea>
+              <div class="prompt-actions">
+                <small>Den Prompt können Sie vor dem Kopieren bearbeiten.</small>
+                <button class="button coral" type="button" data-copy-target="analysisPrompt">Prompt kopieren</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="reflection-grid">
+            <label>Wo lag die KI fachlich richtig?<textarea id="reflectionRight" placeholder="Beobachtungen festhalten …"></textarea></label>
+            <label>Wo musste ich als Lehrkraft korrigieren oder nachfragen?<textarea id="reflectionCorrect" placeholder="Kritische Punkte festhalten …"></textarea></label>
+          </div>
+
+          <div class="trainer" id="trainerBox">
+            <button type="button" id="toggleTrainer" aria-expanded="false"><span>Mögliche fachliche Deutung</span><span>zur Orientierung öffnen +</span></button>
+            <div class="trainer-content" id="trainerContent"></div>
+          </div>
+          <div class="didactic-note"><b>Didaktischer Kern:</b> Fehler können regelhaft sein, müssen es aber nicht. Die KI kann mögliche Deutungen und Prüffragen liefern; erst weitere Aufgaben oder ein Gespräch helfen, zwischen konkurrierenden Hypothesen zu unterscheiden.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="station-panel" id="station3" role="tabpanel" aria-labelledby="tab3" hidden>
+      <div class="wrap">
+        <div class="station-head">
+          <div class="station-number">HANDOUT 3</div>
+          <h2>Förderbaustein-Vorlage</h2>
+          <p>Ausgangslage und Förderziel festhalten, einen Baustein wählen und den passenden Prompt direkt an dieser Stelle verwenden.</p>
+        </div>
+        <div class="station-body">
+          <div class="builder-layout">
+            <section class="form-card">
+              <h3>1 · Ausgangslage und Ziel</h3>
+              <div class="form-grid">
+                <label>Klasse / Stufe<input id="buildClass" type="text" placeholder="z. B. Klasse 4"></label>
+                <label>Thema / Leitidee<input id="buildTopic" type="text" placeholder="z. B. Zahl & Operation"></label>
+                <label class="wide">Aufgabe und beobachtete Schülerlösung<textarea id="buildObservation" placeholder="z. B. Aufgabe: 1/2 + 1/3; notiert wurde: 2/5. Nur anonymisierte oder fiktive Angaben."></textarea></label>
+                <label class="wide">Eigene Vermutung zur Fehlvorstellung <span style="font-weight:400">(optional)</span><textarea id="buildError" placeholder="z. B. Zähler und Nenner werden jeweils getrennt addiert. Das Feld kann leer bleiben."></textarea></label>
+                <label class="wide">Möglicherweise betroffene Grundvorstellung <span style="font-weight:400">(optional)</span><input id="buildConception" type="text" placeholder="z. B. Anteil vom Ganzen oder Bedeutung des Nenners"></label>
+                <div class="ai-help">
+                  <h4>Noch keine sichere Deutung?</h4>
+                  <p>Der folgende Prompt übernimmt die oben eingetragene Aufgabe und Schülerlösung. Die KI soll mögliche Fehlvorstellungen ausdrücklich nur als Hypothesen formulieren und passende Prüffragen entwickeln. Ihre Antwort trägt genau die Feldüberschriften dieser Maske und kann deshalb abschnittsweise hier oder in die Word-Vorlage kopiert werden.</p>
+                  <button class="button primary" id="copyHypothesisPrompt" type="button">KI-Prompt zur Hypothesenbildung kopieren</button>
+                </div>
+                <label>Mini-Ziel 1<input id="buildGoal1" type="text" placeholder="z. B. 4 von 5 Aufgaben durch Zerlegen lösen"><small class="field-hint">Realistisches Beispiel: Das Kind löst 4 von 5 Aufgaben mit Zehnerübergang durch Zerlegen statt zählend.</small></label>
+                <label>Mini-Ziel 2<input id="buildGoal2" type="text" placeholder="z. B. den Rechenweg mit Material erklären"><small class="field-hint">Realistisches Beispiel: Das Kind erklärt an Material, warum 8 + 5 als 10 + 3 gerechnet werden kann.</small></label>
+              </div>
+            </section>
+
+            <section class="form-card">
+              <h3>2 · Baustein wählen</h3>
+              <div class="module-list" id="moduleList"></div>
+            </section>
+
+            <section class="form-card">
+              <h3>3 · KI-Entwurf und Anpassung</h3>
+              <div class="form-grid">
+                <label class="wide">KI-Entwurf<textarea class="long-output" id="buildDraft" placeholder="Das vollständige Ergebnis der KI hier einfügen – einschließlich aller Aufgaben, Rechenpäckchen, Hilfen und Lösungen …"></textarea><small class="field-hint">Dieses Feld ist bewusst groß, damit auch längere Aufgabenserien vollständig sichtbar und bearbeitbar bleiben.</small></label>
+                <label class="wide">Meine fachlichen und didaktischen Anpassungen<textarea id="buildAdjustments" placeholder="Was muss am KI-Entwurf verändert werden – und warum?"></textarea></label>
+                <label class="wide">Überarbeitete Fassung / einsatzbereites Material<textarea class="final-output" id="buildFinal" placeholder="Hier die korrigierte Endfassung einfügen: vollständige Aufgaben, Rechenpäckchen, Hilfen und Lösungen, mit denen weitergearbeitet werden soll …"></textarea><small class="field-hint">Beim Drucken und Speichern wird diese Fassung zusätzlich als eigenes Arbeitsmaterial ausgegeben.</small></label>
+              </div>
+            </section>
+
+            <section class="form-card">
+              <h3>4 · Prüfung und Einsatz</h3>
+              <div class="checklist">
+                <label><input type="checkbox" data-check="results">Rechenergebnisse und Lösungen stimmen.</label>
+                <label><input type="checkbox" data-check="level">Aufgaben und Hilfen passen zum Lernstand.</label>
+                <label><input type="checkbox" data-check="language">Sprache, Darstellung und Kontext sind altersgerecht.</label>
+                <label><input type="checkbox" data-check="diagnosis">Der Baustein passt zur Diagnosehypothese.</label>
+                <label><input type="checkbox" data-check="privacy">Es werden keine personenbezogenen Daten verwendet.</label>
+              </div>
+              <div class="form-grid">
+                <label class="wide">Wann und wie im Unterricht?<textarea id="buildUse" placeholder="Sozialform, Dauer, Material, Zeitpunkt …"></textarea></label>
+                <label class="wide">Erfolgskontrolle<textarea id="buildSuccess" placeholder="Woran erkenne ich, dass das Ziel erreicht ist?"></textarea></label>
+              </div>
+            </section>
+          </div>
+
+          <div class="builder-footer">
+            <p><b>Merksatz:</b> Die KI liefert einen Entwurf. Die didaktische Verantwortung und die fachliche Endkontrolle bleiben bei Ihnen.</p>
+            <div class="button-row">
+              <button class="button" id="saveBuilder" type="button">Im Browser speichern</button>
+              <button class="button" id="downloadBuilder" type="button">Als Datei speichern</button>
+              <button class="button primary" id="copyBuilder" type="button">Förderbaustein kopieren</button>
+              <button class="button" id="printBuilder" type="button">Förderbaustein und Material drucken</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="print-summary" id="printSummary" aria-hidden="true"></section>
+
+  <footer>
+    <div class="wrap"><span>Digitale Arbeitsfassung der drei Mathematik-Handouts</span><span>Lokale Datei · keine automatische Datenübertragung</span></div>
+  </footer>
+
+  <script>
+    const prompts = [
+      { id: 1, category: "A", group: "Aufgaben & Übungen", title: "Differenzieren auf 3 Niveaus", text: "Erstelle zum Thema [z. B. schriftliche Subtraktion im ZR bis 1000] für Klasse [4] je 4 Aufgaben auf drei Niveaustufen (grundlegend / mittel / erweitert), mit Lösungen und je einem kurzen Hilfekarten-Tipp." },
+      { id: 2, category: "A", group: "Aufgaben & Übungen", title: "Rechenpäckchen / Übungsserie", text: "Erzeuge ein Rechenpäckchen mit 10 Aufgaben zum [kleinen Einmaleins, 7er-/8er-Reihe], mit steigender Schwierigkeit und einem separaten Lösungsblatt." },
+      { id: 3, category: "A", group: "Aufgaben & Übungen", title: "Sachaufgaben zu Grundvorstellungen", text: "Schreibe je eine Textaufgabe zur Subtraktion für die Grundvorstellungen Wegnehmen, Ergänzen und Vergleichen (Klasse 2)." },
+      { id: 4, category: "A", group: "Aufgaben & Übungen", title: "Sachaufgaben im Alltagskontext", text: "Erstelle 5 Sachaufgaben zum [Überschlagsrechnen] im Kontext [Einkaufen / Schulfest] für Klasse [X], mit Lösungswegen." },
+      { id: 5, category: "A", group: "Aufgaben & Übungen", title: "Arbeitsblatt als Datei", text: "Formatiere die Aufgaben als druckfertiges Arbeitsblatt mit Kopfzeile (Name/Datum/Klasse) und gib es als Word- oder PDF-Datei zum Download aus. Erstelle das Lösungsblatt separat." },
+      { id: 6, category: "B", group: "Diagnostizieren", title: "Fehleranalyse aus anonymer Schülerlösung", text: "Ein Kind rechnet [1/2 + 1/3 = 2/5]. Welche Fehlvorstellung könnte dahinterstecken? Formuliere höchstens zwei Diagnosehypothesen, erkläre den sichtbaren Fehler kindgerecht und gib zu jeder Hypothese eine kurze Prüffrage oder Kontrastaufgabe. Schlage erst danach 2 passende Übungen vor." },
+      { id: 7, category: "B", group: "Diagnostizieren", title: "Diagnose-Interviewleitfaden", text: "Erstelle 8 Diagnosefragen für ein kurzes Mathe-Gespräch mit einem Kind, um herauszufinden, ob es tragfähige Grundvorstellungen zur [Division] hat. Ordne jeder Frage kurz zu, was mit ihr geprüft werden soll." },
+      { id: 8, category: "B", group: "Diagnostizieren", title: "Standortbestimmung erstellen", text: "Entwirf eine schriftliche Standortbestimmung mit 10 Aufgaben zum [Operationsverständnis Multiplikation] für Klasse [3]. Ergänze einen Erwartungshorizont: Welche Kompetenz oder Vorstellung soll jede Aufgabe sichtbar machen?" },
+      { id: 9, category: "B", group: "Diagnostizieren", title: "Diagnosematerial mit typischen Fehlern", text: "Erstelle 6 [Additionsaufgaben mit Zehnerübergang] mit typischen Fehllösungen als Multiple-Choice. Ergänze zu jeder falschen Antwort eine mögliche, ausdrücklich als Hypothese gekennzeichnete Denkweise." },
+      { id: 10, category: "C", group: "Erklären & Fördern", title: "Kindgerechte Erklärung (E–I–S)", text: "Erkläre [den Zehnerübergang bei 8 + 5] für ein Kind der [1.] Klasse in einfacher Sprache: mit einer Handlung, einem Bild-Vorschlag und der Rechnung (Handlung – Bild – Symbol). Ergänze eine kurze Frage, mit der die Vorstellung des Kindes geprüft werden kann." },
+      { id: 11, category: "C", group: "Erklären & Fördern", title: "Förderplan-Baustein", text: "Formuliere aus dieser anonymen Fehlerbeschreibung [zählendes Rechnen, kein sicherer Zehnerübergang] drei konkrete Förderziele und passende Übungsformate für 4 Wochen, mit kurzer Erfolgskontrolle." },
+      { id: 12, category: "C", group: "Erklären & Fördern", title: "Sprachsensible Vereinfachung", text: "Vereinfache diese Textaufgabe sprachlich für Kinder mit geringen Deutschkenntnissen, ohne den mathematischen Gehalt zu verändern. Benenne anschließend, welche sprachlichen Hürden du verändert hast." },
+      { id: 13, category: "C", group: "Erklären & Fördern", title: "Elterntipps", text: "Formuliere kurze, konkrete Übungstipps für Eltern, deren Kind [den Zehnerübergang] noch nicht sicher beherrscht. Vermeide Fachsprache und ergänze ein Beispiel für eine fünfminütige Übung." },
+      { id: 14, category: "D", group: "Exakt rechnen lassen", title: "Musterlösung mit geprüftem Ergebnis", text: "Löse diese Aufgabe Schritt für Schritt und nutze ein Rechenwerkzeug wie Code-Interpreter oder Datenanalyse, um das Ergebnis exakt zu prüfen. Trenne Rechenweg, Ergebnisprüfung und didaktische Erklärung deutlich." }
+    ];
+
+    const cases = [
+      { id: 1, grade: "1", task: "15 − 7 = ?", solution: "15 − 7 = 12", title: "Zehnerübergang", trainer: "Mögliche Hypothese: Das Kind rechnet nach dem Wegdenken des Zehners 7 − 5 = 2 und setzt die 1 wieder davor. Zu prüfen sind Wegnehmen, Zerlegen und der Zehnerübergang. Eine einzelne Lösung reicht nicht als Beleg." },
+      { id: 2, grade: "2", task: "Schreibe die Zahl „sechzehn“", solution: "61", title: "Stellenwert und Zahlwort", trainer: "Mögliche Hypothese: Zehner und Einer werden entsprechend der gehörten Reihenfolge vertauscht. Zu prüfen sind Stellenwertverständnis, Zahlwortstruktur und die Verbindung von Menge, Zahlwort und Ziffernschreibweise." },
+      { id: 3, grade: "3", task: "503 − 78 = ?", solution: "503 − 78 = 575", title: "Entbündeln bei der Subtraktion", trainer: "Mögliche Hypothese: An einzelnen Stellen wird jeweils die kleinere von der größeren Ziffer abgezogen. Zu prüfen sind Bündeln, Entbündeln und die Bedeutung der Stellenwerte." },
+      { id: 4, grade: "4", task: "6 · 7 = ?", solution: "6 · 7 = 13", title: "Operationsverständnis Multiplikation", trainer: "Mögliche Hypothese: Das Malzeichen wird übersehen oder als Pluszeichen gedeutet. Zu prüfen ist, ob Multiplikation als gleich große Gruppen, wiederholtes Addieren oder Anordnung verstanden wird." },
+      { id: 5, grade: "6", task: "1/2 + 1/3 = ?", solution: "1/2 + 1/3 = 2/5", title: "Bruchaddition", trainer: "Sichtbar ist die getrennte Addition von Zähler und Nenner. Mögliche Hypothesen betreffen die Bedeutung des Nenners, gleich große Teile und das Erweitern. Eine Plausibilitätsfrage ist hilfreich: Kann das Ergebnis kleiner als 1/2 sein?" },
+      { id: 6, grade: "5", task: "3,5 + 12 = ?", solution: "3,5 + 12 = 4,7", title: "Stellenwert bei Dezimalzahlen", trainer: "Mögliche Hypothese: 12 wird als 1,2 verarbeitet oder die Ziffern werden ohne Stellenwertbezug zusammengeführt. Zu prüfen sind Kommaausrichtung und die Bedeutung von Einern und Zehnteln." }
+    ];
+
+    const modules = [
+      { id: "diff", promptId: 1, title: "Differenziert", subtitle: "Aufgaben auf drei Niveaus" },
+      { id: "practice", promptId: 2, title: "Üben", subtitle: "Rechenpäckchen oder adaptive Serie" },
+      { id: "explain", promptId: 10, title: "Erklären", subtitle: "Handlung – Bild – Symbol" },
+      { id: "material", promptId: 5, title: "Material", subtitle: "Arbeitsblatt als Datei" },
+      { id: "plan", promptId: 11, title: "Förderplan", subtitle: "Ziele und Übungen für vier Wochen" }
+    ];
+
+    const globalStatus = document.getElementById("globalStatus");
+    let statusTimer;
+    let currentCase = cases[0];
+    let activeFilter = "alle";
+
+    function announce(message) {
+      globalStatus.textContent = message;
+      window.clearTimeout(statusTimer);
+      statusTimer = window.setTimeout(() => { globalStatus.textContent = ""; }, 2200);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const helper = document.createElement("textarea");
+        helper.value = text;
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand("copy");
+        helper.remove();
+      }
+      announce("In die Zwischenablage kopiert ✓");
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" })[character]);
+    }
+
+    function printValue(value) {
+      return escapeHtml(value || "—").replace(/\n/g, "<br>");
+    }
+
+    function renderPromptLibrary() {
+      const promptList = document.getElementById("promptList");
+      promptList.innerHTML = prompts.map(prompt => `
+        <article class="prompt-item" data-category="${prompt.category}" data-search="${(prompt.title + " " + prompt.text).toLowerCase()}">
+          <button class="prompt-summary" type="button" aria-expanded="false">
+            <span class="prompt-id">${String(prompt.id).padStart(2, "0")}</span>
+            <strong>${prompt.title}</strong>
+            <span class="prompt-category">${prompt.category} · ${prompt.group}</span>
+          </button>
+          <div class="prompt-detail">
+            <textarea id="prompt-${prompt.id}" aria-label="Prompt ${prompt.id}: ${prompt.title}">${prompt.text}</textarea>
+            <div class="prompt-actions"><small>Platzhalter in eckigen Klammern ersetzen.</small><button class="button primary" type="button" data-copy-target="prompt-${prompt.id}">Prompt kopieren</button></div>
+          </div>
+        </article>`).join("");
+
+      promptList.querySelectorAll(".prompt-summary").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = button.closest(".prompt-item");
+          item.classList.toggle("open");
+          button.setAttribute("aria-expanded", String(item.classList.contains("open")));
+        });
+      });
+    }
+
+    function filterPrompts() {
+      const query = document.getElementById("promptSearch").value.trim().toLowerCase();
+      document.querySelectorAll(".prompt-item").forEach(item => {
+        const categoryMatch = activeFilter === "alle" || item.dataset.category === activeFilter;
+        const searchMatch = !query || item.dataset.search.includes(query);
+        item.hidden = !(categoryMatch && searchMatch);
+      });
+    }
+
+    function analysisPromptFor(item) {
+      return `Hier ist die Lösung eines Kindes aus Klasse ${item.grade}: ${item.task} – notiert wurde: „${item.solution}“.
+
+1. Beschreibe zunächst ausschließlich, was in der Lösung sichtbar ist.
+2. Formuliere höchstens zwei mögliche Erklärungen des Denkwegs und kennzeichne sie ausdrücklich als Hypothesen.
+3. Benenne zu jeder Hypothese die möglicherweise betroffene Grundvorstellung.
+4. Schlage zu jeder Hypothese eine gezielte Rückfrage oder kurze Kontrastaufgabe für ein Diagnosegespräch vor.
+5. Gib erst anschließend zwei mögliche Übungen an. Begründe jeweils, zu welcher Hypothese sie passen.
+
+Trenne Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was die Lehrkraft fachlich selbst kontrollieren muss.`;
+    }
+
+    function setCurrentCase(item) {
+      currentCase = item;
+      document.querySelectorAll(".case-card").forEach(card => card.classList.toggle("active", Number(card.dataset.caseId) === item.id));
+      document.getElementById("selectedCaseTitle").textContent = item.id ? `Beispiel ${item.id} · Klasse ${item.grade}` : `Eigenes Beispiel · Klasse ${item.grade}`;
+      document.getElementById("analysisPrompt").value = analysisPromptFor(item);
+      document.getElementById("trainerContent").innerHTML = `<h4>Mögliche Antwort · ${item.title || "Eigenes Beispiel"}</h4><p>${item.trainer || "Für eigene Beispiele gibt es keine vorformulierte Antwort. Formulieren Sie mindestens zwei denkbare Hypothesen und planen Sie eine Prüffrage, mit der sich diese unterscheiden lassen."}</p>`;
+    }
+
+    function renderCases() {
+      const list = document.getElementById("caseList");
+      list.innerHTML = cases.map(item => `
+        <button class="case-card ${item.id === 1 ? "active" : ""}" type="button" data-case-id="${item.id}">
+          <span>${String(item.id).padStart(2, "0")}</span><span><strong>${item.task}</strong><small>Klasse ${item.grade} · ${item.solution}</small></span>
+        </button>`).join("");
+      list.querySelectorAll(".case-card").forEach(card => card.addEventListener("click", () => setCurrentCase(cases.find(item => item.id === Number(card.dataset.caseId)))));
+      setCurrentCase(cases[0]);
+    }
+
+    function getBuilderContext() {
+      return {
+        grade: document.getElementById("buildClass").value || "[Klasse / Stufe]",
+        topic: document.getElementById("buildTopic").value || "[Thema / Leitidee]",
+        observation: document.getElementById("buildObservation").value || "[Aufgabe und anonymisierte Schülerlösung]",
+        error: document.getElementById("buildError").value || "[noch keine eigene Vermutung]",
+        conception: document.getElementById("buildConception").value || "[noch nicht geklärt]",
+        goals: [document.getElementById("buildGoal1").value, document.getElementById("buildGoal2").value].filter(Boolean).join("; ") || "[konkrete Förderziele]"
+      };
+    }
+
+    function hypothesisPrompt() {
+      const context = getBuilderContext();
+      const ownIdea = document.getElementById("buildError").value.trim();
+      return `Du unterstützt mich bei einer vorsichtigen Fehleranalyse im Mathematikunterricht.
+
+Klasse / Stufe: ${context.grade}
+Thema / Leitidee: ${context.topic}
+Aufgabe und anonymisierte Schülerlösung: ${context.observation}
+${ownIdea ? `Meine vorläufige Vermutung: ${ownIdea}` : "Ich habe noch keine eigene Vermutung zur möglichen Fehlvorstellung. Entwickle in diesem Fall höchstens zwei plausible, klar unterscheidbare Hypothesen."}
+
+Arbeite zunächst in vier Schritten:
+1. Beobachten: Beschreibe ausschließlich, was in der notierten Lösung sichtbar ist.
+2. Deuten: Prüfe meine Vermutung, sofern eine vorliegt. Formuliere insgesamt höchstens zwei unterschiedliche Erklärungen und kennzeichne beide ausdrücklich als Hypothesen.
+3. Prüfen: Entwickle zu jeder Hypothese eine kurze Rückfrage oder Kontrastaufgabe, mit der ich sie im Gespräch prüfen kann.
+4. Einordnen: Benenne zu jeder Hypothese die möglicherweise betroffene Grundvorstellung.
+
+Formuliere anschließend zwei vorläufige, realistische und beobachtbare Mini-Ziele, die zu den Hypothesen passen. Ein Ziel soll eine mathematische Handlung oder Strategie beschreiben, das andere eine Erklärung oder Darstellung. Formuliere keine abschließende Diagnose aus einer einzelnen Lösung.
+
+Gib deine Antwort als kopierfreundlichen Fließtext mit genau diesen Überschriften und in genau dieser Reihenfolge aus:
+
+KLASSE / STUFE
+THEMA / LEITIDEE
+AUFGABE UND BEOBACHTETE SCHÜLERLÖSUNG
+EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG
+MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG
+MINI-ZIEL 1
+MINI-ZIEL 2
+PRÜFFRAGEN / KONTRASTAUFGABEN
+FEHLENDE INFORMATIONEN UND NÄCHSTER PRÜFSCHRITT
+
+Wiederhole bei den ersten drei Überschriften meine Angaben. Trage unter „EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG“ die höchstens zwei Diagnosehypothesen ein und ordne sie unter „MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG“ eindeutig zu. Verwende keine Tabelle und keine zusätzlichen Überschriften. Weise am Schluss knapp darauf hin, dass Hypothesen und Mini-Ziele durch weitere Beobachtungen überprüft und gegebenenfalls angepasst werden müssen.`;
+    }
+
+    function modulePrompt(module) {
+      const context = getBuilderContext();
+      const base = prompts.find(prompt => prompt.id === module.promptId).text;
+      return `Ausgangslage:
+Klasse / Stufe: ${context.grade}
+Thema / Leitidee: ${context.topic}
+Aufgabe und beobachtete Schülerlösung: ${context.observation}
+Eigene vorläufige Vermutung: ${context.error}
+Möglicherweise betroffene Grundvorstellung: ${context.conception}
+Förderziel(e): ${context.goals}
+
+Arbeitsauftrag:
+${base}
+
+Prüfe am Ende ausdrücklich, ob Aufgaben, Hilfen und Darstellung zur beschriebenen Diagnosehypothese und zu den Förderzielen passen. Trenne Material und Lösungen.`;
+    }
+
+    function renderModules() {
+      const list = document.getElementById("moduleList");
+      list.innerHTML = modules.map(module => `
+        <article class="module-card" data-module="${module.id}">
+          <div class="module-top">
+            <input type="checkbox" id="module-${module.id}" aria-label="${module.title} auswählen">
+            <label for="module-${module.id}"><strong>${module.title}</strong><small>${module.subtitle} · Prompt ${module.promptId}</small></label>
+            <button class="button" type="button" data-module-copy="${module.id}">Prompt kopieren</button>
+          </div>
+          <div class="module-prompt"><textarea id="module-text-${module.id}" aria-label="Prompt für ${module.title}"></textarea></div>
+        </article>`).join("");
+
+      list.querySelectorAll(".module-card").forEach(card => {
+        const checkbox = card.querySelector("input");
+        const module = modules.find(item => item.id === card.dataset.module);
+        checkbox.addEventListener("change", () => {
+          card.classList.toggle("selected", checkbox.checked);
+          card.querySelector("textarea").value = modulePrompt(module);
+        });
+      });
+    }
+
+    function refreshSelectedModulePrompts() {
+      document.querySelectorAll(".module-card.selected").forEach(card => {
+        const module = modules.find(item => item.id === card.dataset.module);
+        card.querySelector("textarea").value = modulePrompt(module);
+      });
+    }
+
+    function builderSummary() {
+      const context = getBuilderContext();
+      const selected = modules.filter(module => document.getElementById(`module-${module.id}`).checked).map(module => module.title).join(", ") || "noch nicht gewählt";
+      const checks = [...document.querySelectorAll("[data-check]")].map(input => `${input.checked ? "✓" : "○"} ${input.parentElement.textContent.trim()}`).join("\n");
+      return `FÖRDERBAUSTEIN MATHEMATIK
+
+1. AUSGANGSLAGE
+Klasse / Stufe: ${context.grade}
+Thema / Leitidee: ${context.topic}
+Aufgabe und beobachtete Schülerlösung: ${context.observation}
+Eigene Vermutung zur Fehlvorstellung: ${context.error}
+Betroffene Grundvorstellung: ${context.conception}
+
+2. FÖRDERZIELE
+${context.goals}
+
+3. GEWÄHLTE BAUSTEINE
+${selected}
+
+4. KI-ENTWURF
+${document.getElementById("buildDraft").value || "[noch offen]"}
+
+5. MEINE ANPASSUNGEN
+${document.getElementById("buildAdjustments").value || "[noch offen]"}
+
+6. ÜBERARBEITETE FASSUNG / EINSATZBEREITES MATERIAL
+${document.getElementById("buildFinal").value || document.getElementById("buildDraft").value || "[noch offen]"}
+
+7. FACHLICHE PRÜFUNG
+${checks}
+
+8. EINSATZ
+Wann / wie: ${document.getElementById("buildUse").value || "[noch offen]"}
+Erfolgskontrolle: ${document.getElementById("buildSuccess").value || "[noch offen]"}`;
+    }
+
+    function printBuilderEntries() {
+      const context = {
+        grade: document.getElementById("buildClass").value,
+        topic: document.getElementById("buildTopic").value,
+        observation: document.getElementById("buildObservation").value,
+        error: document.getElementById("buildError").value,
+        conception: document.getElementById("buildConception").value,
+        goals: [document.getElementById("buildGoal1").value, document.getElementById("buildGoal2").value].filter(Boolean).join("; ")
+      };
+      const selected = modules.filter(module => document.getElementById(`module-${module.id}`).checked);
+      const checks = [...document.querySelectorAll("[data-check]")];
+      const draft = document.getElementById("buildDraft").value;
+      const adjustments = document.getElementById("buildAdjustments").value;
+      const finalMaterial = document.getElementById("buildFinal").value;
+      document.getElementById("printSummary").innerHTML = `
+        <p class="eyebrow">DEEPDIVEKI · LEHRKRÄFTEFORTBILDUNG</p>
+        <h1>Förderbaustein-Vorlage · Eigene Einträge</h1>
+        <h2>1 · Ausgangslage</h2>
+        <p><b>Klasse / Stufe:</b> ${printValue(context.grade)}<br>
+        <b>Thema / Leitidee:</b> ${printValue(context.topic)}<br>
+        <b>Aufgabe und beobachtete Schülerlösung:</b> ${printValue(context.observation)}<br>
+        <b>Eigene Vermutung zur Fehlvorstellung:</b> ${printValue(context.error)}<br>
+        <b>Möglicherweise betroffene Grundvorstellung:</b> ${printValue(context.conception)}</p>
+        <h2>2 · Förderziele</h2>
+        <p>${printValue(context.goals)}</p>
+        <h2>3 · Gewählte Bausteine</h2>
+        ${selected.length ? `<ul>${selected.map(module => `<li>${escapeHtml(module.title)} – ${escapeHtml(module.subtitle)}</li>`).join("")}</ul>` : "<p>—</p>"}
+        <h2>4 · KI-Entwurf</h2>
+        <div class="print-preserve">${printValue(draft)}</div>
+        <h2>5 · Meine Anpassungen</h2>
+        <div class="print-preserve">${printValue(adjustments)}</div>
+        <h2>6 · Überarbeitete Fassung / einsatzbereites Material</h2>
+        <div class="print-preserve">${printValue(finalMaterial || draft)}</div>
+        <h2>7 · Fachliche Prüfung</h2>
+        <ul>${checks.map(input => `<li>${input.checked ? "☑" : "☐"} ${escapeHtml(input.parentElement.textContent.trim())}</li>`).join("")}</ul>
+        <h2>8 · Einsatz</h2>
+        <p><b>Wann / wie:</b> ${printValue(document.getElementById("buildUse").value)}<br>
+        <b>Erfolgskontrolle:</b> ${printValue(document.getElementById("buildSuccess").value)}</p>
+        <p class="print-note"><b>Merksatz:</b> Die KI liefert einen Entwurf – die didaktische Verantwortung bleibt bei der Lehrkraft.</p>
+        <section class="print-material">
+          <p class="eyebrow">MATERIAL ZUM WEITERARBEITEN</p>
+          <h1>KI-Ergebnis und überarbeitete Fassung</h1>
+          <h2>KI-Rohentwurf</h2>
+          <div class="print-block print-preserve">${printValue(draft)}</div>
+          <h2>Korrigierte / einsatzbereite Fassung</h2>
+          <div class="print-block print-preserve">${printValue(finalMaterial || draft)}</div>
+        </section>`;
+      document.body.classList.add("print-entry");
+      window.print();
+    }
+
+    function downloadBuilder() {
+      const topic = document.getElementById("buildTopic").value.trim() || "Mathematik";
+      const safeTopic = topic.replace(/[^a-zA-Z0-9äöüÄÖÜß-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "Mathematik";
+      const content = `${builderSummary()}\n\n${"=".repeat(60)}\nMATERIAL ZUM WEITERARBEITEN\n${"=".repeat(60)}\n\nKI-ROHENTWURF\n${document.getElementById("buildDraft").value || "[noch offen]"}\n\nKORRIGIERTE / EINSATZBEREITE FASSUNG\n${document.getElementById("buildFinal").value || document.getElementById("buildDraft").value || "[noch offen]"}`;
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Foerderbaustein-${safeTopic}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      saveBuilder();
+      announce("Förderbaustein mit Aufgaben gespeichert ✓");
+    }
+
+    function saveBuilder() {
+      const data = {};
+      document.querySelectorAll("#station3 input, #station3 textarea").forEach(input => {
+        if (!input.id) return;
+        data[input.id] = input.type === "checkbox" ? input.checked : input.value;
+      });
+      localStorage.setItem("digitale-handouts-foerderbaustein", JSON.stringify(data));
+      announce("Zwischenstand lokal gespeichert ✓");
+    }
+
+    function restoreBuilder() {
+      const raw = localStorage.getItem("digitale-handouts-foerderbaustein");
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        Object.entries(data).forEach(([id, value]) => {
+          const input = document.getElementById(id);
+          if (!input) return;
+          if (input.type === "checkbox") input.checked = Boolean(value);
+          else input.value = String(value);
+          const card = input.closest(".module-card");
+          if (card) card.classList.toggle("selected", input.checked);
+        });
+        refreshSelectedModulePrompts();
+      } catch { /* fehlerhafte lokale Daten werden ignoriert */ }
+    }
+
+    document.querySelectorAll(".station-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".station-tab").forEach(item => {
+          const active = item === tab;
+          item.classList.toggle("active", active);
+          item.setAttribute("aria-selected", String(active));
+        });
+        document.querySelectorAll(".station-panel").forEach(panel => {
+          const active = panel.id === tab.dataset.station;
+          panel.classList.toggle("active", active);
+          panel.hidden = !active;
+        });
+        history.replaceState(null, "", `#${tab.dataset.station}`);
+        document.getElementById(tab.dataset.station).scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    document.addEventListener("click", event => {
+      const copyButton = event.target.closest("[data-copy-target]");
+      if (copyButton) copyText(document.getElementById(copyButton.dataset.copyTarget).value);
+      const moduleButton = event.target.closest("[data-module-copy]");
+      if (moduleButton) {
+        const module = modules.find(item => item.id === moduleButton.dataset.moduleCopy);
+        const card = moduleButton.closest(".module-card");
+        const checkbox = card.querySelector("input");
+        checkbox.checked = true;
+        card.classList.add("selected");
+        card.querySelector("textarea").value = modulePrompt(module);
+        copyText(card.querySelector("textarea").value);
+      }
+    });
+
+    document.getElementById("promptSearch").addEventListener("input", filterPrompts);
+    document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll(".filter").forEach(item => item.classList.toggle("active", item === button));
+      filterPrompts();
+    }));
+
+    document.getElementById("useOwnCase").addEventListener("click", () => {
+      const grade = document.getElementById("ownClass").value.trim();
+      const solution = document.getElementById("ownSolution").value.trim();
+      if (!grade || !solution) { announce("Bitte Klasse und Beispiel ergänzen."); return; }
+      setCurrentCase({ id: 0, grade, task: solution.split("=")[0]?.trim() || "Eigene Aufgabe", solution, title: "Eigenes Beispiel", trainer: "" });
+    });
+
+    document.getElementById("toggleTrainer").addEventListener("click", () => {
+      const trainer = document.getElementById("trainerBox");
+      trainer.classList.toggle("open");
+      const open = trainer.classList.contains("open");
+      document.getElementById("toggleTrainer").setAttribute("aria-expanded", String(open));
+      document.getElementById("toggleTrainer").lastElementChild.textContent = open ? "Orientierung schließen −" : "zur Orientierung öffnen +";
+    });
+
+    document.querySelectorAll("#station3 input, #station3 textarea").forEach(input => input.addEventListener("input", refreshSelectedModulePrompts));
+    document.getElementById("copyHypothesisPrompt").addEventListener("click", () => {
+      if (!document.getElementById("buildObservation").value.trim()) { announce("Bitte zuerst Aufgabe und Schülerlösung eintragen."); return; }
+      copyText(hypothesisPrompt());
+    });
+    document.getElementById("saveBuilder").addEventListener("click", saveBuilder);
+    document.getElementById("downloadBuilder").addEventListener("click", downloadBuilder);
+    document.getElementById("copyBuilder").addEventListener("click", () => copyText(builderSummary()));
+    document.getElementById("printBuilder").addEventListener("click", printBuilderEntries);
+    window.addEventListener("afterprint", () => document.body.classList.remove("print-entry"));
+
+    renderPromptLibrary();
+    renderCases();
+    renderModules();
+    restoreBuilder();
+
+    const initialStation = ["station1", "station2", "station3"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "station1";
+    if (initialStation !== "station1") document.querySelector(`[data-station="${initialStation}"]`).click();
+  </script>
+</body>
+</html>
