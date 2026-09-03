@@ -6,6 +6,8 @@ Dieses Repository enthält die eigenständige HTML-Fassung der drei digitalen Ha
 2. Fehleranalyse: Übungsblatt
 3. Förderbaustein-Vorlage
 
+Die zusätzliche Seite **tools.html** bündelt die in der Fortbildung genannten KI- und Mathematik-Tools, kennzeichnet deren Kostenmodell und verlinkt direkt zu den Anbietern.
+
 Zusätzlich stehen alle drei Handouts als Word-Dateien zur Verfügung. Die Word-Vorlage zum Förderbaustein kann alternativ zur digitalen Eingabemaske verwendet werden und enthält ausreichend Platz für KI-Entwürfe, fachliche Anpassungen und das einsatzbereite Material.
 
 ## Verwendung

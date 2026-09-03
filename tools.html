@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Orientierung zu KI- und Mathematik-Tools für Lehrkräfte: Einsatzmöglichkeiten, Kostenmodelle und direkte Anbieterlinks.">
+  <title>Tool-Übersicht | Mathematik & KI</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #596273;
+      --blue: #4385f5;
+      --blue-soft: #eef4ff;
+      --green: #17734b;
+      --green-soft: #eaf7f0;
+      --amber: #9a5a00;
+      --amber-soft: #fff5df;
+      --rose: #a83a3a;
+      --rose-soft: #fff0f0;
+      --line: #d8dde6;
+      --paper: #ffffff;
+      --panel: #f7f9fc;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
+    .topbar .wrap { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 12px; font-weight: 900; letter-spacing: .09em; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: #fff; background: var(--blue); font-size: 17px; }
+    .nav-link { padding: 10px 13px; border: 1px solid var(--line); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .nav-link:hover, .nav-link:focus-visible { border-color: var(--blue); background: var(--blue-soft); }
+
+    .hero { border-bottom: 1px solid var(--ink); }
+    .hero .wrap { padding: 68px 0 58px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 64px; align-items: end; }
+    .eyebrow { margin: 0; color: var(--blue); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 18px 0; max-width: 760px; font-size: clamp(42px, 6vw, 66px); line-height: 1.03; letter-spacing: -.03em; }
+    .lead { margin: 0; max-width: 750px; color: var(--muted); font-size: 19px; line-height: 1.55; }
+    .hero-note { padding: 20px 0 4px 24px; border-left: 5px solid var(--blue); }
+    .hero-note strong { display: block; font-size: 19px; line-height: 1.35; }
+    .hero-note p { margin: 9px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    .controls { padding: 34px 0 20px; }
+    .search { width: 100%; min-height: 52px; padding: 13px 16px; border: 1px solid var(--ink); background: #fff; }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+    .filter { min-height: 42px; padding: 9px 14px; border: 1px solid var(--line); background: #fff; font-weight: 800; cursor: pointer; }
+    .filter:hover, .filter:focus-visible, .filter.active { border-color: var(--blue); color: #fff; background: var(--blue); }
+    .result-count { margin: 13px 0 0; color: var(--muted); font-size: 13px; }
+
+    .legend { margin: 8px 0 28px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
+    .legend strong { font-size: 14px; }
+    .legend span { color: var(--muted); font-size: 13px; }
+    .badge { display: inline-flex; align-items: center; min-height: 27px; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 900; letter-spacing: .03em; }
+    .free { color: var(--green); background: var(--green-soft); }
+    .freemium { color: var(--amber); background: var(--amber-soft); }
+    .paid { color: var(--rose); background: var(--rose-soft); }
+
+    .section { padding: 12px 0 46px; }
+    .section-head { margin-bottom: 18px; display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
+    .section h2 { margin: 0; font-size: 28px; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 14px; }
+    .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .tool { min-height: 260px; padding: 20px; border: 1px solid var(--ink); background: #fff; display: flex; flex-direction: column; }
+    .tool[hidden] { display: none; }
+    .tool-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .tool-id { width: 42px; height: 42px; display: grid; place-items: center; color: #fff; background: var(--ink); font-weight: 900; }
+    .tool h3 { margin: 18px 0 8px; font-size: 22px; }
+    .tool p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.52; }
+    .tags { margin: 14px 0 18px; display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag { padding: 5px 8px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 750; }
+    .tool-link { margin-top: auto; min-height: 42px; padding: 10px 13px; border: 1px solid var(--ink); display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; font-weight: 850; }
+    .tool-link:hover, .tool-link:focus-visible { border-color: var(--blue); color: #fff; background: var(--blue); }
+    .tool-link::after { content: "↗"; font-size: 17px; }
+
+    .check { margin: 10px 0 54px; padding: 24px; border-left: 5px solid var(--blue); background: var(--blue-soft); }
+    .check h2 { margin: 0 0 13px; font-size: 22px; }
+    .check ol { margin: 0; padding-left: 21px; display: grid; gap: 9px; color: var(--muted); line-height: 1.5; }
+    .check b { color: var(--ink); }
+    footer { padding: 25px 0 38px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.5; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 28px; }
+
+    @media (max-width: 900px) {
+      .hero .wrap { grid-template-columns: 1fr; gap: 32px; }
+      .hero-note { max-width: 720px; }
+      .tool-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 28px, 1160px); }
+      .brand b { display: none; }
+      .hero .wrap { padding: 48px 0 42px; }
+      h1 { font-size: 46px; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .section-head, footer .wrap { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand"><span class="brand-mark">∑</span><b>MATHEMATIK & KI · TOOL-ÜBERSICHT</b></div>
+      <a class="nav-link" href="Digitale%20Handouts%20Mathematik.html">Zu den digitalen Handouts</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow">Orientierung für die Praxisphase</p>
+          <h1>Welches Tool passt zu meiner Aufgabe?</h1>
+          <p class="lead">Anbieter direkt öffnen, Unterschiede wahrnehmen und Ergebnisse an einem eigenen Unterrichtsbeispiel vergleichen.</p>
+        </div>
+        <aside class="hero-note">
+          <strong>Kostenstatus ist nicht gleich schulische Freigabe.</strong>
+          <p>Vor dem Einsatz mit realen Lerndaten gelten die Regelungen der eigenen Schule beziehungsweise des Schulträgers.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Tools filtern">
+      <div class="wrap">
+        <input class="search" id="search" type="search" placeholder="Tool oder Einsatzzweck suchen …" aria-label="Tool suchen">
+        <div class="filter-row" role="group" aria-label="Kostenmodell">
+          <button class="filter active" type="button" data-cost="all">Alle</button>
+          <button class="filter" type="button" data-cost="free">Komplett kostenlos</button>
+          <button class="filter" type="button" data-cost="freemium">Teilweise kostenlos</button>
+          <button class="filter" type="button" data-cost="paid">Kostenpflichtig / Lizenz</button>
+        </div>
+        <p class="result-count" id="resultCount" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="legend">
+        <strong>Kennzeichnung:</strong>
+        <span><b class="badge free">kostenlos</b> Kernangebot ohne Bezahlung nutzbar</span>
+        <span><b class="badge freemium">teilweise kostenlos</b> Gratiszugang mit Grenzen oder Zusatzabo</span>
+        <span><b class="badge paid">Lizenz</b> regulär kostenpflichtig; ggf. Schul- oder Landeszugang</span>
+      </div>
+    </div>
+
+    <section class="section" data-section>
+      <div class="wrap">
+        <div class="section-head"><h2>Allgemeine KI-Assistenten</h2><p>Für Erklärungen, Varianten, Diagnosehypothesen und Materialentwürfe</p></div>
+        <div class="tool-grid">
+          <article class="tool" data-cost="freemium" data-search="chatgpt openai erklären differenzieren aufgaben bilder dateien">
+            <div class="tool-top"><span class="tool-id">C</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>ChatGPT</h3><p>Vielseitiger Dialogassistent für Erklärungen, Aufgabenvarianten, Rückfragen und die Arbeit mit Dateien oder Bildern.</p>
+            <div class="tags"><span class="tag">Dialog</span><span class="tag">Dateien</span><span class="tag">Differenzierung</span></div>
+            <a class="tool-link" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="claude anthropic text analyse material dateien feedback">
+            <div class="tool-top"><span class="tool-id">A</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Claude</h3><p>Stark bei längeren Texten, strukturierten Entwürfen und der Analyse bereitgestellter Materialien.</p>
+            <div class="tags"><span class="tag">Textarbeit</span><span class="tag">Dateien</span><span class="tag">Feedback</span></div>
+            <a class="tool-link" href="https://claude.ai/" target="_blank" rel="noopener">Claude öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="gemini google multimodal bilder dateien google workspace">
+            <div class="tool-top"><span class="tool-id">G</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Google Gemini</h3><p>Allgemeiner KI-Assistent mit Anbindung an Google-Dienste und multimodalen Eingaben.</p>
+            <div class="tags"><span class="tag">Dialog</span><span class="tag">Google</span><span class="tag">Multimodal</span></div>
+            <a class="tool-link" href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="microsoft copilot suche schreiben bilder office">
+            <div class="tool-top"><span class="tool-id">M</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Microsoft Copilot</h3><p>KI-Chat für Recherche und Entwürfe; erweiterte Funktionen hängen vom Microsoft-Zugang ab.</p>
+            <div class="tags"><span class="tag">Dialog</span><span class="tag">Recherche</span><span class="tag">Microsoft</span></div>
+            <a class="tool-link" href="https://copilot.microsoft.com/" target="_blank" rel="noopener">Copilot öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="perplexity recherche quellen aktuelle informationen learn mode">
+            <div class="tool-top"><span class="tool-id">P</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Perplexity</h3><p>KI-gestützte Recherche mit verlinkten Quellen; geeignet zum Gegenprüfen aktueller Informationen.</p>
+            <div class="tags"><span class="tag">Recherche</span><span class="tag">Quellen</span><span class="tag">Lernmodus</span></div>
+            <a class="tool-link" href="https://www.perplexity.ai/" target="_blank" rel="noopener">Perplexity öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="notebooklm google quellen dokumente audio lernmaterial">
+            <div class="tool-top"><span class="tool-id">N</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>NotebookLM</h3><p>Arbeitet quellengebunden mit eigenen Dokumenten und kann daraus Übersichten, Fragen oder Audiozusammenfassungen erzeugen.</p>
+            <div class="tags"><span class="tag">Eigene Quellen</span><span class="tag">Zusammenfassen</span><span class="tag">Audio</span></div>
+            <a class="tool-link" href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM öffnen</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section>
+      <div class="wrap">
+        <div class="section-head"><h2>Für Unterrichtsplanung und Materialien</h2><p>Vorgegebene Arbeitsabläufe für Lehrkräfte</p></div>
+        <div class="tool-grid">
+          <article class="tool" data-cost="freemium" data-search="magicschool lehrkräfte unterrichtsplanung differenzierung quiz feedback">
+            <div class="tool-top"><span class="tool-id">MS</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>MagicSchool</h3><p>Sammlung spezialisierter Lehrkraft-Tools für Planung, Differenzierung, Quiz und Feedback.</p>
+            <div class="tags"><span class="tag">Lehrkraft-Tools</span><span class="tag">Planung</span><span class="tag">Feedback</span></div>
+            <a class="tool-link" href="https://www.magicschool.ai/" target="_blank" rel="noopener">MagicSchool öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="eduaide lehrkräfte lesson planning material assessment pädagogik">
+            <div class="tool-top"><span class="tool-id">EA</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Eduaide</h3><p>Werkzeugsammlung zur Unterrichtsplanung und Materialerstellung mit pädagogisch strukturierten Vorlagen.</p>
+            <div class="tags"><span class="tag">Planung</span><span class="tag">Material</span><span class="tag">Assessment</span></div>
+            <a class="tool-link" href="https://www.eduaide.ai/" target="_blank" rel="noopener">Eduaide öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="fobizz schule datenschutz klassenraum ki assistenz deutschland">
+            <div class="tool-top"><span class="tool-id">F</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>fobizz</h3><p>Deutsche Plattform mit KI-Assistenz, Unterrichtstools und digitalen Klassenräumen; Zugänge können regional lizenziert sein.</p>
+            <div class="tags"><span class="tag">Schule</span><span class="tag">Klassenraum</span><span class="tag">Deutschland</span></div>
+            <a class="tool-link" href="https://fobizz.com/de/" target="_blank" rel="noopener">fobizz öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="to teach arbeitsblatt aufgaben unterrichtsplanung h5p differenzierung">
+            <div class="tool-top"><span class="tool-id">TT</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>to teach</h3><p>Erstellt Aufgaben, Arbeitsblätter und Unterrichtsplanungen; kostenlose Nutzung ist mengenmäßig begrenzt.</p>
+            <div class="tags"><span class="tag">Arbeitsblätter</span><span class="tag">H5P</span><span class="tag">Planung</span></div>
+            <a class="tool-link" href="https://to-teach.ai/" target="_blank" rel="noopener">to teach öffnen</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section>
+      <div class="wrap">
+        <div class="section-head"><h2>Mathematik: Rechnen, Darstellen und Üben</h2><p>Zum Prüfen, Visualisieren und für adaptive Übungsphasen</p></div>
+        <div class="tool-grid">
+          <article class="tool" data-cost="freemium" data-search="wolfram alpha mathematik rechnen schrittweise lösungen visualisieren">
+            <div class="tool-top"><span class="tool-id">W</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Wolfram|Alpha</h3><p>Rechen- und Wissenssystem für überprüfbare Berechnungen und Darstellungen; Schritt-für-Schritt-Lösungen sind Pro-Funktion.</p>
+            <div class="tags"><span class="tag">Berechnen</span><span class="tag">Prüfen</span><span class="tag">Darstellen</span></div>
+            <a class="tool-link" href="https://www.wolframalpha.com/" target="_blank" rel="noopener">Wolfram|Alpha öffnen</a>
+          </article>
+          <article class="tool" data-cost="free" data-search="geogebra mathematik geometrie algebra grafik visualisieren kostenlos">
+            <div class="tool-top"><span class="tool-id">G</span><span class="badge free">kostenlos</span></div>
+            <h3>GeoGebra</h3><p>Dynamische Mathematiksoftware für Geometrie, Algebra, Funktionen, Statistik und interaktive Darstellungen.</p>
+            <div class="tags"><span class="tag">Visualisieren</span><span class="tag">Explorieren</span><span class="tag">Mathematik</span></div>
+            <a class="tool-link" href="https://www.geogebra.org/" target="_blank" rel="noopener">GeoGebra öffnen</a>
+          </article>
+          <article class="tool" data-cost="free" data-search="desmos graphing calculator mathematik funktionen visualisieren aktivität kostenlos">
+            <div class="tool-top"><span class="tool-id">D</span><span class="badge free">kostenlos</span></div>
+            <h3>Desmos</h3><p>Kostenlose Graphik- und Geometriewerkzeuge für Funktionen, Zusammenhänge und explorative Aufgaben.</p>
+            <div class="tags"><span class="tag">Funktionen</span><span class="tag">Graphen</span><span class="tag">Exploration</span></div>
+            <a class="tool-link" href="https://www.desmos.com/" target="_blank" rel="noopener">Desmos öffnen</a>
+          </article>
+          <article class="tool" data-cost="freemium" data-search="photomath mathematik kamera rechnen lösungsweg schrittweise">
+            <div class="tool-top"><span class="tool-id">PM</span><span class="badge freemium">teilweise kostenlos</span></div>
+            <h3>Photomath</h3><p>Erfasst Aufgaben per Kamera und zeigt Lösungswege; nützlich als Gegenstand kritischer Lösungsvergleiche.</p>
+            <div class="tags"><span class="tag">Kamera</span><span class="tag">Lösungswege</span><span class="tag">Vergleichen</span></div>
+            <a class="tool-link" href="https://photomath.com/" target="_blank" rel="noopener">Photomath öffnen</a>
+          </article>
+          <article class="tool" data-cost="paid" data-search="bettermarks adaptiv mathematik üben diagnose schullizenz">
+            <div class="tool-top"><span class="tool-id">B</span><span class="badge paid">Lizenz</span></div>
+            <h3>bettermarks</h3><p>Adaptives Mathematik-Lernsystem für Übungen und Rückmeldungen; Nutzung üblicherweise über Klassen-, Schul- oder Landeslizenz.</p>
+            <div class="tags"><span class="tag">Adaptives Üben</span><span class="tag">Diagnose</span><span class="tag">Schullizenz</span></div>
+            <a class="tool-link" href="https://de.bettermarks.com/" target="_blank" rel="noopener">bettermarks öffnen</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section class="check">
+        <h2>Vor dem Unterrichtseinsatz kurz prüfen</h2>
+        <ol>
+          <li><b>Freigabe:</b> Ist das Tool durch Schule oder Schulträger zugelassen?</li>
+          <li><b>Daten:</b> Keine identifizierbaren Schülerdaten in nicht freigegebene Systeme eingeben.</li>
+          <li><b>Fachlichkeit:</b> Rechenwege, Begriffe, Darstellungen und Aufgabenlösungen kontrollieren.</li>
+          <li><b>Lernwirksamkeit:</b> Hilft das Ergebnis beim Denken – oder nimmt es den Denkprozess vorweg?</li>
+        </ol>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Kostenmodelle nach den öffentlich sichtbaren Anbieterinformationen, Stand 3. September 2026. Angebote und regionale Zugänge können sich ändern.</span>
+      <span>Die Auswahl ist eine Orientierung, keine Empfehlung oder Datenschutzfreigabe.</span>
+    </div>
+  </footer>
+
+  <script>
+    const search = document.getElementById('search');
+    const filters = [...document.querySelectorAll('.filter')];
+    const tools = [...document.querySelectorAll('.tool')];
+    const sections = [...document.querySelectorAll('[data-section]')];
+    const resultCount = document.getElementById('resultCount');
+    let cost = 'all';
+
+    function applyFilters() {
+      const query = search.value.trim().toLocaleLowerCase('de');
+      let visible = 0;
+      tools.forEach(tool => {
+        const matchesCost = cost === 'all' || tool.dataset.cost === cost;
+        const matchesSearch = !query || tool.dataset.search.toLocaleLowerCase('de').includes(query) || tool.textContent.toLocaleLowerCase('de').includes(query);
+        tool.hidden = !(matchesCost && matchesSearch);
+        if (!tool.hidden) visible += 1;
+      });
+      sections.forEach(section => {
+        section.hidden = !section.querySelector('.tool:not([hidden])');
+      });
+      resultCount.textContent = `${visible} ${visible === 1 ? 'Tool' : 'Tools'} sichtbar`;
+    }
+
+    filters.forEach(button => button.addEventListener('click', () => {
+      cost = button.dataset.cost;
+      filters.forEach(item => item.classList.toggle('active', item === button));
+      applyFilters();
+    }));
+    search.addEventListener('input', applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>
