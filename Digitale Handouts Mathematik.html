@@ -280,6 +280,7 @@
         <aside class="work-note" aria-label="Hinweis zur Dokumentation">
           <h3>Hinweis zur Dokumentation</h3>
           <p>Die Eingabefelder dienen der Strukturierung und Orientierung; das Ausfüllen der Maske ist freiwillig. Ergebnisse können ebenso in einem eigenen Word-Dokument, in OneNote oder in einer anderen vertrauten Arbeitsumgebung festgehalten werden.</p>
+          <p><b>Zwei sinnvolle Ebenen:</b> Für die praktische Planung genügt zunächst ein konkretes Aufgabenziel, etwa „zwei ungleichnamige Brüche addieren und den Rechenweg erklären“. Der weiterführende Bezug zu einer basalen Kompetenz oder Grundvorstellung ist hilfreich, bleibt bei einer einzelnen Schülerlösung aber eine vorsichtige fachliche Einordnung.</p>
           <p>Nach der Diagnose kann die KI außerdem gebeten werden, die entwickelten Aufgaben – etwa Rechenpäckchen, Hilfekarten und Lösungen – als Word- oder PDF-Datei auszugeben. Entscheidend ist, dass Diagnosehypothese, Förderziel, verwendete Aufgaben, fachliche Anpassungen und Erfolgskontrolle nachvollziehbar dokumentiert werden. Wer die Maske nutzt, kann den vollständigen Förderbaustein anschließend speichern oder ausdrucken.</p>
         </aside>
         <section class="downloads" id="word-downloads" aria-labelledby="downloadTitle">
@@ -335,7 +336,7 @@
         <div class="station-head">
           <div class="station-number">HANDOUT 2</div>
           <h2>Fehleranalyse: Übungsblatt</h2>
-          <p>Eine fiktive Lösung auswählen und die KI-Antwort anschließend fachlich prüfen. Eine einzelne Lösung erlaubt nur Diagnosehypothesen, keine abschließende Diagnose.</p>
+          <p>Eine fiktive Lösung auswählen, zuerst das konkrete Aufgabenziel bestimmen und die KI-Antwort anschließend fachlich prüfen. Eine einzelne Lösung erlaubt nur Diagnosehypothesen, keine abschließende Diagnose.</p>
         </div>
         <div class="station-body">
           <div class="analysis-layout">
@@ -389,8 +390,9 @@
                 <label>Klasse / Stufe<input id="buildClass" type="text" placeholder="z. B. Klasse 4"></label>
                 <label>Thema / Leitidee<input id="buildTopic" type="text" placeholder="z. B. Zahl & Operation"></label>
                 <label class="wide">Aufgabe und beobachtete Schülerlösung<textarea id="buildObservation" placeholder="z. B. Aufgabe: 1/2 + 1/3; notiert wurde: 2/5. Nur anonymisierte oder fiktive Angaben."></textarea></label>
+                <label class="wide">Konkretes Aufgabenziel<input id="buildTaskGoal" type="text" placeholder="z. B. zwei ungleichnamige Brüche addieren und den Rechenweg erklären"><small class="field-hint">Diese einfache, unterrichtsnahe Beschreibung genügt zunächst. Sie muss noch keine wissenschaftliche Kompetenzzuordnung enthalten.</small></label>
                 <label class="wide">Eigene Vermutung zur Fehlvorstellung <span style="font-weight:400">(optional)</span><textarea id="buildError" placeholder="z. B. Zähler und Nenner werden jeweils getrennt addiert. Das Feld kann leer bleiben."></textarea></label>
-                <label class="wide">Möglicherweise betroffene Grundvorstellung <span style="font-weight:400">(optional)</span><input id="buildConception" type="text" placeholder="z. B. Anteil vom Ganzen oder Bedeutung des Nenners"></label>
+                <label class="wide">Möglicher Bezug zu einer basalen Kompetenz oder Grundvorstellung <span style="font-weight:400">(optional)</span><input id="buildConception" type="text" placeholder="z. B. gleich große Teile desselben Ganzen verstehen"><small class="field-hint">Nur eintragen, wenn die Zuordnung fachlich begründet werden kann. Andernfalls darf das Feld offenbleiben oder als Hypothese formuliert werden.</small></label>
                 <div class="ai-help">
                   <h4>Noch keine sichere Deutung?</h4>
                   <p>Der folgende Prompt übernimmt die oben eingetragene Aufgabe und Schülerlösung. Die KI soll mögliche Fehlvorstellungen ausdrücklich nur als Hypothesen formulieren und passende Prüffragen entwickeln. Ihre Antwort trägt genau die Feldüberschriften dieser Maske und kann deshalb abschnittsweise hier oder in die Word-Vorlage kopiert werden.</p>
@@ -453,17 +455,17 @@
 
   <script>
     const prompts = [
-      { id: 1, category: "A", group: "Aufgaben & Übungen", title: "Differenzieren auf 3 Niveaus", text: "Erstelle zum Thema [z. B. schriftliche Subtraktion im ZR bis 1000] für Klasse [4] je 4 Aufgaben auf drei Niveaustufen (grundlegend / mittel / erweitert), mit Lösungen und je einem kurzen Hilfekarten-Tipp." },
+      { id: 1, category: "A", group: "Aufgaben & Übungen", title: "Differenzieren mit gemeinsamem Aufgabenziel", text: "Konkretes Aufgabenziel: [z. B. zwei ungleichnamige Brüche addieren und den Rechenweg erklären]. Erstelle für Klasse [6] je 4 Aufgaben mit unterschiedlicher Unterstützung und Komplexität. Das gemeinsame Aufgabenziel bleibt erhalten. Variiere Darstellung, Hilfen, Zahlen und Anzahl der Schritte. Ergänze Lösungen und je einen kurzen Hilfekarten-Tipp." },
       { id: 2, category: "A", group: "Aufgaben & Übungen", title: "Rechenpäckchen / Übungsserie", text: "Erzeuge ein Rechenpäckchen mit 10 Aufgaben zum [kleinen Einmaleins, 7er-/8er-Reihe], mit steigender Schwierigkeit und einem separaten Lösungsblatt." },
       { id: 3, category: "A", group: "Aufgaben & Übungen", title: "Sachaufgaben zu Grundvorstellungen", text: "Schreibe je eine Textaufgabe zur Subtraktion für die Grundvorstellungen Wegnehmen, Ergänzen und Vergleichen (Klasse 2)." },
       { id: 4, category: "A", group: "Aufgaben & Übungen", title: "Sachaufgaben im Alltagskontext", text: "Erstelle 5 Sachaufgaben zum [Überschlagsrechnen] im Kontext [Einkaufen / Schulfest] für Klasse [X], mit Lösungswegen." },
       { id: 5, category: "A", group: "Aufgaben & Übungen", title: "Arbeitsblatt als Datei", text: "Formatiere die Aufgaben als druckfertiges Arbeitsblatt mit Kopfzeile (Name/Datum/Klasse) und gib es als Word- oder PDF-Datei zum Download aus. Erstelle das Lösungsblatt separat." },
-      { id: 6, category: "B", group: "Diagnostizieren", title: "Fehleranalyse aus anonymer Schülerlösung", text: "Ein Kind rechnet [1/2 + 1/3 = 2/5]. Welche Fehlvorstellung könnte dahinterstecken? Formuliere höchstens zwei Diagnosehypothesen, erkläre den sichtbaren Fehler kindgerecht und gib zu jeder Hypothese eine kurze Prüffrage oder Kontrastaufgabe. Schlage erst danach 2 passende Übungen vor." },
+      { id: 6, category: "B", group: "Diagnostizieren", title: "Fehleranalyse aus anonymer Schülerlösung", text: "Ein Kind rechnet [1/2 + 1/3 = 2/5]. Formuliere zuerst ein konkretes Aufgabenziel. Beschreibe dann nur das sichtbare Vorgehen und entwickle höchstens zwei Diagnosehypothesen. Gib zu jeder Hypothese eine kurze Prüffrage oder Kontrastaufgabe. Ordne eine basale Kompetenz oder Grundvorstellung nur vorläufig zu, wenn sich der Bezug fachlich begründen lässt. Schlage erst danach 2 passende Übungen zum konkreten Aufgabenziel vor." },
       { id: 7, category: "B", group: "Diagnostizieren", title: "Diagnose-Interviewleitfaden", text: "Erstelle 8 Diagnosefragen für ein kurzes Mathe-Gespräch mit einem Kind, um herauszufinden, ob es tragfähige Grundvorstellungen zur [Division] hat. Ordne jeder Frage kurz zu, was mit ihr geprüft werden soll." },
       { id: 8, category: "B", group: "Diagnostizieren", title: "Standortbestimmung erstellen", text: "Entwirf eine schriftliche Standortbestimmung mit 10 Aufgaben zum [Operationsverständnis Multiplikation] für Klasse [3]. Ergänze einen Erwartungshorizont: Welche Kompetenz oder Vorstellung soll jede Aufgabe sichtbar machen?" },
       { id: 9, category: "B", group: "Diagnostizieren", title: "Diagnosematerial mit typischen Fehlern", text: "Erstelle 6 [Additionsaufgaben mit Zehnerübergang] mit typischen Fehllösungen als Multiple-Choice. Ergänze zu jeder falschen Antwort eine mögliche, ausdrücklich als Hypothese gekennzeichnete Denkweise." },
       { id: 10, category: "C", group: "Erklären & Fördern", title: "Kindgerechte Erklärung (E–I–S)", text: "Erkläre [den Zehnerübergang bei 8 + 5] für ein Kind der [1.] Klasse in einfacher Sprache: mit einer Handlung, einem Bild-Vorschlag und der Rechnung (Handlung – Bild – Symbol). Ergänze eine kurze Frage, mit der die Vorstellung des Kindes geprüft werden kann." },
-      { id: 11, category: "C", group: "Erklären & Fördern", title: "Förderplan-Baustein", text: "Formuliere aus dieser anonymen Fehlerbeschreibung [zählendes Rechnen, kein sicherer Zehnerübergang] drei konkrete Förderziele und passende Übungsformate für 4 Wochen, mit kurzer Erfolgskontrolle." },
+      { id: 11, category: "C", group: "Erklären & Fördern", title: "Förderplan-Baustein", text: "Konkretes Aufgabenziel: [z. B. Additionsaufgaben mit Zehnerübergang durch Zerlegen lösen]. Formuliere aus der anonymen Beobachtung [zählendes Rechnen] zwei realistische Mini-Ziele und passende Übungsformate. Eine mögliche basale Verstehensgrundlage darfst du als Hypothese benennen, aber nicht aus einer einzelnen Lösung als gesichert darstellen. Ergänze eine kurze Erfolgskontrolle mit einer ähnlichen und einer leicht veränderten Aufgabe." },
       { id: 12, category: "C", group: "Erklären & Fördern", title: "Sprachsensible Vereinfachung", text: "Vereinfache diese Textaufgabe sprachlich für Kinder mit geringen Deutschkenntnissen, ohne den mathematischen Gehalt zu verändern. Benenne anschließend, welche sprachlichen Hürden du verändert hast." },
       { id: 13, category: "C", group: "Erklären & Fördern", title: "Elterntipps", text: "Formuliere kurze, konkrete Übungstipps für Eltern, deren Kind [den Zehnerübergang] noch nicht sicher beherrscht. Vermeide Fachsprache und ergänze ein Beispiel für eine fünfminütige Übung." },
       { id: 14, category: "D", group: "Exakt rechnen lassen", title: "Musterlösung mit geprüftem Ergebnis", text: "Löse diese Aufgabe Schritt für Schritt und nutze ein Rechenwerkzeug wie Code-Interpreter oder Datenanalyse, um das Ergebnis exakt zu prüfen. Trenne Rechenweg, Ergebnisprüfung und didaktische Erklärung deutlich." }
@@ -557,13 +559,14 @@
     function analysisPromptFor(item) {
       return `Hier ist die Lösung eines Kindes aus Klasse ${item.grade}: ${item.task} – notiert wurde: „${item.solution}“.
 
-1. Beschreibe zunächst ausschließlich, was in der Lösung sichtbar ist.
-2. Formuliere höchstens zwei mögliche Erklärungen des Denkwegs und kennzeichne sie ausdrücklich als Hypothesen.
-3. Benenne zu jeder Hypothese die möglicherweise betroffene Grundvorstellung.
-4. Schlage zu jeder Hypothese eine gezielte Rückfrage oder kurze Kontrastaufgabe für ein Diagnosegespräch vor.
-5. Gib erst anschließend zwei mögliche Übungen an. Begründe jeweils, zu welcher Hypothese sie passen.
+1. Formuliere zuerst ein einfaches, konkretes Aufgabenziel: Was soll das Kind bei genau dieser Aufgabe tun und erklären können?
+2. Beschreibe anschließend ausschließlich, was in der Lösung sichtbar ist.
+3. Formuliere höchstens zwei mögliche Erklärungen des Denkwegs und kennzeichne sie ausdrücklich als Hypothesen.
+4. Ordne nur dann eine möglicherweise betroffene basale Kompetenz oder Grundvorstellung zu, wenn die Zuordnung fachlich begründet werden kann. Kennzeichne auch diese Zuordnung als vorläufig.
+5. Schlage zu jeder Hypothese eine gezielte Rückfrage oder kurze Kontrastaufgabe für ein Diagnosegespräch vor.
+6. Gib erst anschließend zwei mögliche Übungen an. Begründe jeweils, wie sie das konkrete Aufgabenziel unterstützen.
 
-Trenne Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was die Lehrkraft fachlich selbst kontrollieren muss.`;
+Trenne Aufgabenziel, Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was die Lehrkraft fachlich selbst kontrollieren muss.`;
     }
 
     function setCurrentCase(item) {
@@ -589,6 +592,7 @@ Trenne Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was
         grade: document.getElementById("buildClass").value || "[Klasse / Stufe]",
         topic: document.getElementById("buildTopic").value || "[Thema / Leitidee]",
         observation: document.getElementById("buildObservation").value || "[Aufgabe und anonymisierte Schülerlösung]",
+        taskGoal: document.getElementById("buildTaskGoal").value || "[konkretes Aufgabenziel]",
         error: document.getElementById("buildError").value || "[noch keine eigene Vermutung]",
         conception: document.getElementById("buildConception").value || "[noch nicht geklärt]",
         goals: [document.getElementById("buildGoal1").value, document.getElementById("buildGoal2").value].filter(Boolean).join("; ") || "[konkrete Förderziele]"
@@ -603,13 +607,15 @@ Trenne Beobachtung, Deutung, Prüfung und Förderung klar. Weise darauf hin, was
 Klasse / Stufe: ${context.grade}
 Thema / Leitidee: ${context.topic}
 Aufgabe und anonymisierte Schülerlösung: ${context.observation}
+Konkretes Aufgabenziel: ${context.taskGoal}
 ${ownIdea ? `Meine vorläufige Vermutung: ${ownIdea}` : "Ich habe noch keine eigene Vermutung zur möglichen Fehlvorstellung. Entwickle in diesem Fall höchstens zwei plausible, klar unterscheidbare Hypothesen."}
 
-Arbeite zunächst in vier Schritten:
-1. Beobachten: Beschreibe ausschließlich, was in der notierten Lösung sichtbar ist.
-2. Deuten: Prüfe meine Vermutung, sofern eine vorliegt. Formuliere insgesamt höchstens zwei unterschiedliche Erklärungen und kennzeichne beide ausdrücklich als Hypothesen.
-3. Prüfen: Entwickle zu jeder Hypothese eine kurze Rückfrage oder Kontrastaufgabe, mit der ich sie im Gespräch prüfen kann.
-4. Einordnen: Benenne zu jeder Hypothese die möglicherweise betroffene Grundvorstellung.
+Arbeite zunächst in fünf Schritten:
+1. Aufgabenziel klären: Übernimm mein konkretes Aufgabenziel. Falls ich keines angegeben habe, formuliere ein einfaches Ziel für genau diese Aufgabe.
+2. Beobachten: Beschreibe ausschließlich, was in der notierten Lösung sichtbar ist.
+3. Deuten: Prüfe meine Vermutung, sofern eine vorliegt. Formuliere insgesamt höchstens zwei unterschiedliche Erklärungen und kennzeichne beide ausdrücklich als Hypothesen.
+4. Prüfen: Entwickle zu jeder Hypothese eine kurze Rückfrage oder Kontrastaufgabe, mit der ich sie im Gespräch prüfen kann.
+5. Fachlich einordnen: Benenne nur dann eine möglicherweise betroffene basale Kompetenz oder Grundvorstellung, wenn sich der Bezug begründen lässt. Kennzeichne die Zuordnung ausdrücklich als vorläufig. Eine offene Zuordnung ist zulässig.
 
 Formuliere anschließend zwei vorläufige, realistische und beobachtbare Mini-Ziele, die zu den Hypothesen passen. Ein Ziel soll eine mathematische Handlung oder Strategie beschreiben, das andere eine Erklärung oder Darstellung. Formuliere keine abschließende Diagnose aus einer einzelnen Lösung.
 
@@ -618,14 +624,15 @@ Gib deine Antwort als kopierfreundlichen Fließtext mit genau diesen Überschrif
 KLASSE / STUFE
 THEMA / LEITIDEE
 AUFGABE UND BEOBACHTETE SCHÜLERLÖSUNG
+KONKRETES AUFGABENZIEL
 EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG
-MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG
+MÖGLICHER BEZUG ZU EINER BASALEN KOMPETENZ ODER GRUNDVORSTELLUNG
 MINI-ZIEL 1
 MINI-ZIEL 2
 PRÜFFRAGEN / KONTRASTAUFGABEN
 FEHLENDE INFORMATIONEN UND NÄCHSTER PRÜFSCHRITT
 
-Wiederhole bei den ersten drei Überschriften meine Angaben. Trage unter „EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG“ die höchstens zwei Diagnosehypothesen ein und ordne sie unter „MÖGLICHERWEISE BETROFFENE GRUNDVORSTELLUNG“ eindeutig zu. Verwende keine Tabelle und keine zusätzlichen Überschriften. Weise am Schluss knapp darauf hin, dass Hypothesen und Mini-Ziele durch weitere Beobachtungen überprüft und gegebenenfalls angepasst werden müssen.`;
+Wiederhole bei den ersten vier Überschriften meine Angaben. Trage unter „EIGENE VERMUTUNG ZUR FEHLVORSTELLUNG“ die höchstens zwei Diagnosehypothesen ein. Eine Zuordnung zur basalen Kompetenz oder Grundvorstellung darf offenbleiben und muss als vorläufig gekennzeichnet sein. Verwende keine Tabelle und keine zusätzlichen Überschriften. Weise am Schluss knapp darauf hin, dass Hypothesen und Mini-Ziele durch weitere Beobachtungen überprüft und gegebenenfalls angepasst werden müssen.`;
     }
 
     function modulePrompt(module) {
@@ -635,8 +642,9 @@ Wiederhole bei den ersten drei Überschriften meine Angaben. Trage unter „EIGE
 Klasse / Stufe: ${context.grade}
 Thema / Leitidee: ${context.topic}
 Aufgabe und beobachtete Schülerlösung: ${context.observation}
+Konkretes Aufgabenziel: ${context.taskGoal}
 Eigene vorläufige Vermutung: ${context.error}
-Möglicherweise betroffene Grundvorstellung: ${context.conception}
+Möglicher Bezug zu einer basalen Kompetenz oder Grundvorstellung: ${context.conception}
 Förderziel(e): ${context.goals}
 
 Arbeitsauftrag:
@@ -684,8 +692,9 @@ Prüfe am Ende ausdrücklich, ob Aufgaben, Hilfen und Darstellung zur beschriebe
 Klasse / Stufe: ${context.grade}
 Thema / Leitidee: ${context.topic}
 Aufgabe und beobachtete Schülerlösung: ${context.observation}
+Konkretes Aufgabenziel: ${context.taskGoal}
 Eigene Vermutung zur Fehlvorstellung: ${context.error}
-Betroffene Grundvorstellung: ${context.conception}
+Möglicher Bezug zu einer basalen Kompetenz oder Grundvorstellung: ${context.conception}
 
 2. FÖRDERZIELE
 ${context.goals}
@@ -715,6 +724,7 @@ Erfolgskontrolle: ${document.getElementById("buildSuccess").value || "[noch offe
         grade: document.getElementById("buildClass").value,
         topic: document.getElementById("buildTopic").value,
         observation: document.getElementById("buildObservation").value,
+        taskGoal: document.getElementById("buildTaskGoal").value,
         error: document.getElementById("buildError").value,
         conception: document.getElementById("buildConception").value,
         goals: [document.getElementById("buildGoal1").value, document.getElementById("buildGoal2").value].filter(Boolean).join("; ")
@@ -731,8 +741,9 @@ Erfolgskontrolle: ${document.getElementById("buildSuccess").value || "[noch offe
         <p><b>Klasse / Stufe:</b> ${printValue(context.grade)}<br>
         <b>Thema / Leitidee:</b> ${printValue(context.topic)}<br>
         <b>Aufgabe und beobachtete Schülerlösung:</b> ${printValue(context.observation)}<br>
+        <b>Konkretes Aufgabenziel:</b> ${printValue(context.taskGoal)}<br>
         <b>Eigene Vermutung zur Fehlvorstellung:</b> ${printValue(context.error)}<br>
-        <b>Möglicherweise betroffene Grundvorstellung:</b> ${printValue(context.conception)}</p>
+        <b>Möglicher Bezug zu einer basalen Kompetenz oder Grundvorstellung:</b> ${printValue(context.conception)}</p>
         <h2>2 · Förderziele</h2>
         <p>${printValue(context.goals)}</p>
         <h2>3 · Gewählte Bausteine</h2>
