@@ -1,6 +1,6 @@
 # Digitale Handouts Mathematik und KI
 
-Begleitmaterial für die Praxisphasen einer Lehrkräftefortbildung. Die Veröffentlichung dieser Überarbeitung wurde am 2026-11-04 ausdrücklich freigegeben. Technischer Prüfstand: [Testbericht](docs/TESTBERICHT.md).
+Begleitmaterial für die Praxisphasen einer Lehrkräftefortbildung. Die am 2026-11-04 ausdrücklich freigegebene Überarbeitung ist veröffentlicht: [Digitale Handouts öffnen](https://alftanner2000.github.io/digitale-handouts-mathematik/). Technischer Prüfstand: [Testbericht](docs/TESTBERICHT.md).
 
 1. **Handout 1 – Hypothesenbildung · Praxisphase 1:** mit Aufgabe und vorliegender oder ausdrücklich fiktiver Schülerlösung beginnen. Das Aufgabenziel darf zunächst offenbleiben; der Prompt bittet dann um einen Zielvorschlag. Beobachtung von Deutung trennen, höchstens zwei vorläufige Hypothesen und einen Prüfschritt sichern. Keine Förderübungen in dieser Phase.
 2. **Handout 2 – Förderbaustein entwickeln · Praxisphase 2:** einen Fall übernehmen oder unabhängig mit Aufgabe und Schülerlösung neu beginnen, bei Bedarf zunächst die KI-Diagnosehilfe nutzen. Geprüfte Ausgangslage beziehungsweise Arbeitsannahme kennzeichnen, ein enges Förderziel und ein Format wählen, Material fachlich prüfen.

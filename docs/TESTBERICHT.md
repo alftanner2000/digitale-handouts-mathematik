@@ -128,4 +128,8 @@ Alle 23 Tool-Einträge und die vorhandene Individualisierungs-Vertiefung bleiben
 
 ## Veröffentlichung und Rückkehr
 
-Der Produktionsbranch und die geprüfte Sicherungsreferenz bleiben beim Ausgangs-Commit `d25d1e184d6f71e3228391b3fc682dd15fed6c20`. Diese Entwicklungsfassung wurde nicht nach `main` übernommen, nicht auf GitHub Pages veröffentlicht und nicht als Entwicklungsbranch gepusht. Sicherung, Prüfsummen und nicht destruktive Rückkehr: [SICHERUNG-UND-RUECKKEHR.md](SICHERUNG-UND-RUECKKEHR.md).
+Die ausdrücklich freigegebene Fassung wurde am 2026-11-04 als Commit `de145e8e9515c5c1b2f5f2a57ac6b93296fa0139` zunächst auf `codex/handouts-praxisphasen` und anschließend ohne Force-Push per Fast-Forward auf `main` veröffentlicht. GitHub Pages meldete für genau diesen Commit `built`; der zugehörige Lauf `41922934147` war erfolgreich. Die über die öffentliche Pages-Adresse ausgelieferten Dateien `index.html`, alle vier CSS/JS-Begleitdateien und die drei neuen Word-Handouts wurden anschließend anhand ihrer SHA-256-Prüfsummen mit dem lokal geprüften Stand verglichen: alle acht identisch. Das war eine HTTP-/Dateiprüfung, keine zusätzliche Live-Browserprüfung.
+
+Die Sicherungsreferenz `backup/vor-handout-umbau-2026-11-04` wurde nach dem Hochladen erneut auf GitHub überprüft: unverändert auf `d25d1e184d6f71e3228391b3fc682dd15fed6c20`. Das ursprüngliche lokale main-Arbeitsverzeichnis wurde nicht überschrieben. Sicherung, Prüfsummen und nicht destruktive Rückkehr: [SICHERUNG-UND-RUECKKEHR.md](SICHERUNG-UND-RUECKKEHR.md).
+
+Die letzten UI-Arbeiten wurden durch einen gesperrten Mac unterbrochen. Offen bleiben die in der Folienzuordnung dokumentierte Bereinigung doppelter Objekte auf Folie 36 sowie die visuelle Prüfung des neuen H3-Druckdialogs. Diese Grenzen betreffen nicht die erfolgreich geprüften H3-Speicher-/Archivabläufe oder die öffentliche Bereitstellung der Dateien.
