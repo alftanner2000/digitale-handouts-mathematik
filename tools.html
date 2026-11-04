@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Orientierung zu KI- und Mathematik-Tools für Lehrkräfte: Einsatzmöglichkeiten, Kostenmodelle und direkte Anbieterlinks.">
-  <title>Tool-Übersicht | Mathematik & KI</title>
+  <meta name="description" content="Handout 3: Tools nach Unterrichtszweck mit konkreten Prüffragen, Anbieterlinks und historischen Zugangshinweisen.">
+  <title>Handout 3 · Tool-Übersicht | Mathematik & KI</title>
   <style>
     :root {
       --ink: #111827;
@@ -33,6 +33,8 @@
     .topbar .wrap { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
     .brand { display: flex; align-items: center; gap: 11px; font-size: 12px; font-weight: 900; letter-spacing: .09em; }
     .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: #fff; background: var(--blue); font-size: 17px; }
+    .handout-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
     .nav-link { padding: 10px 13px; border: 1px solid var(--line); text-decoration: none; font-size: 13px; font-weight: 800; }
     .nav-link:hover, .nav-link:focus-visible { border-color: var(--blue); background: var(--blue-soft); }
 
@@ -72,6 +74,10 @@
     .tool h3 { margin: 18px 0 8px; font-size: 22px; }
     .tool p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.52; }
     .tool .tool-example { margin-top: 12px; }
+    .tool .tool-check { margin: 14px 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink); }
+    .tool .tool-cost { font-size: 12px; }
+    .cost-note { flex-basis: 100%; line-height: 1.5; }
+    @media print { .topbar, .controls { display: none; } .tool { break-inside: avoid; } .tool-grid { grid-template-columns: 1fr 1fr; } .hero .wrap { padding: 24px 0; } }
     .tool .tool-cost { margin-bottom: 10px; }
     .tool .tool-source { margin-bottom: 18px; font-size: 12px; }
     .tool-source a { text-underline-offset: 3px; }
@@ -107,7 +113,11 @@
   <header class="topbar">
     <div class="wrap">
       <div class="brand"><span class="brand-mark">∑</span><b>MATHEMATIK & KI · TOOL-ÜBERSICHT</b></div>
-      <a class="nav-link" href="Digitale%20Handouts%20Mathematik.html">Zu den digitalen Handouts</a>
+      <nav class="handout-nav" aria-label="Digitale Handouts">
+        <a class="nav-link" href="index.html#hypothesen">Handout 1: Hypothesenbildung</a>
+        <a class="nav-link" href="index.html#foerderbaustein">Handout 2: Förderbaustein</a>
+        <a class="nav-link" href="index.html#bibliothek">Handout 3: Bibliothek</a>
+      </nav>
     </div>
   </header>
 
@@ -115,9 +125,9 @@
     <section class="hero">
       <div class="wrap">
         <div>
-          <p class="eyebrow">Orientierung für die Praxisphase</p>
+          <p class="eyebrow">Handout 3 · Tool- und Promptbibliothek · offene Vertiefung</p>
           <h1>Welches Tool passt zu meiner Aufgabe?</h1>
-          <p class="lead">Anbieter direkt öffnen, Unterschiede wahrnehmen und Ergebnisse an einem eigenen Unterrichtsbeispiel vergleichen.</p>
+          <p class="lead">Eine Unterrichtsaufgabe wählen, ein passendes Werkzeug erproben und das Ergebnis mit der konkreten Prüffrage vergleichen. Die <a href="index.html#bibliothek">bearbeitbaren Prompts in Handout 3</a> und die <a href="individualisierung.html">Vertiefung zur Individualisierung</a> ergänzen diese Übersicht.</p>
         </div>
         <aside class="hero-note">
           <strong>Kostenstatus ist nicht gleich schulische Freigabe.</strong>
@@ -129,11 +139,13 @@
     <section class="controls" aria-label="Tools filtern">
       <div class="wrap">
         <input class="search" id="search" type="search" placeholder="Tool oder Einsatzzweck suchen …" aria-label="Tool suchen">
-        <div class="filter-row" role="group" aria-label="Kostenmodell">
-          <button class="filter active" type="button" data-cost="all">Alle</button>
-          <button class="filter" type="button" data-cost="free">Komplett kostenlos</button>
-          <button class="filter" type="button" data-cost="freemium">Teilweise kostenlos</button>
-          <button class="filter" type="button" data-cost="paid">Kostenpflichtig / Lizenz</button>
+        <div class="filter-row" role="group" aria-label="Unterrichtszweck">
+          <button class="filter active" type="button" data-purpose="all" aria-pressed="true">Alle Zwecke</button>
+          <button class="filter" type="button" data-purpose="dialog" aria-pressed="false">Erklären &amp; Quellen prüfen</button>
+          <button class="filter" type="button" data-purpose="material" aria-pressed="false">Material vorbereiten</button>
+          <button class="filter" type="button" data-purpose="mathematik" aria-pressed="false">Rechnen &amp; Darstellen</button>
+          <button class="filter" type="button" data-purpose="feedback" aria-pressed="false">Rückmeldung &amp; Quiz</button>
+          <button class="filter" type="button" data-purpose="gestaltung" aria-pressed="false">Visuell aufbereiten</button>
         </div>
         <p class="result-count" id="resultCount" aria-live="polite"></p>
       </div>
@@ -141,56 +153,61 @@
 
     <div class="wrap">
       <div class="legend">
-        <strong>Kennzeichnung:</strong>
-        <span><b class="badge free">kostenlos</b> Kernangebot ohne Bezahlung nutzbar</span>
-        <span><b class="badge freemium">teilweise kostenlos</b> Gratiszugang mit Grenzen oder Zusatzabo</span>
-        <span><b class="badge paid">Lizenz</b> regulär kostenpflichtig; ggf. Schul- oder Landeszugang</span>
+        <strong>Zugangshinweise aus dem bisherigen Bestand:</strong>
+        <span class="cost-note">Alle farbigen Kostenlabels und Zugangsnotizen stammen aus September 2026. Sie sind historische Orientierung und wurden hier nicht als aktuelle Tarifangaben bestätigt. Aktuelle Kosten, Kontingente, Altersbedingungen und schulische Freigabe vor einem Einsatz beim Anbieter beziehungsweise bei der zuständigen Stelle prüfen. Ein erreichbarer Link bestätigt keine dieser Bedingungen.</span>
       </div>
     </div>
 
-    <section class="section" data-section>
+    <section class="section" data-section id="dialog">
       <div class="wrap">
-        <div class="section-head"><h2>Allgemeine KI-Assistenten</h2><p>Für Erklärungen, Varianten, Diagnosehypothesen und Materialentwürfe</p></div>
+        <div class="section-head"><h2>Erklären, recherchieren und Quellen prüfen</h2><p>Für Erklärungen, Varianten, Diagnosehypothesen und Materialentwürfe</p></div>
         <div class="tool-grid">
-          <article class="tool" data-cost="freemium" data-search="chatgpt openai erklären differenzieren aufgaben bilder dateien">
-            <div class="tool-top"><span class="tool-id">C</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="chatgpt openai erklären differenzieren aufgaben bilder dateien">
+            <div class="tool-top"><span class="tool-id">C</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>ChatGPT</h3><p>Vielseitiger Dialogassistent für Erklärungen, Aufgabenvarianten, Rückfragen und die Arbeit mit Dateien oder Bildern.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Trennt der Entwurf beim Bruchfehler ½ + ⅓ = ⅖ die beobachtbare Rechnung von einer ungesicherten Vermutung über den Denkweg?</p>
             <div class="tags"><span class="tag">Dialog</span><span class="tag">Dateien</span><span class="tag">Differenzierung</span></div>
             <a class="tool-link" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="claude anthropic text analyse material dateien feedback">
-            <div class="tool-top"><span class="tool-id">A</span><span class="badge freemium">teilweise kostenlos</span></div>
-            <h3>Claude</h3><p>Stark bei längeren Texten, strukturierten Entwürfen und der Analyse bereitgestellter Materialien.</p>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="claude anthropic text analyse material dateien feedback">
+            <div class="tool-top"><span class="tool-id">A</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
+            <h3>Claude</h3><p>Für die Bearbeitung längerer Texte, strukturierte Entwürfe und die Analyse bereitgestellter Materialien.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Bleiben beim Überarbeiten eines Fördertexts Ziel und tatsächlich bekannte Kinderäußerungen erhalten, ohne neue Beobachtungen zu erfinden?</p>
             <div class="tags"><span class="tag">Textarbeit</span><span class="tag">Dateien</span><span class="tag">Feedback</span></div>
             <a class="tool-link" href="https://claude.ai/" target="_blank" rel="noopener">Claude öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="gemini google multimodal bilder dateien google workspace">
-            <div class="tool-top"><span class="tool-id">G</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="gemini google multimodal bilder dateien google workspace">
+            <div class="tool-top"><span class="tool-id">G</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Google Gemini</h3><p>Allgemeiner KI-Assistent mit Anbindung an Google-Dienste und multimodalen Eingaben.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Zeigen vorgeschlagene Bruchdarstellungen dasselbe Ganze und gleich große Teile, und passen Beschriftung und Rechnung zusammen?</p>
             <div class="tags"><span class="tag">Dialog</span><span class="tag">Google</span><span class="tag">Multimodal</span></div>
             <a class="tool-link" href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="microsoft copilot suche schreiben bilder office">
-            <div class="tool-top"><span class="tool-id">M</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="microsoft copilot suche schreiben bilder office">
+            <div class="tool-top"><span class="tool-id">M</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Microsoft Copilot</h3><p>KI-Chat für Recherche und Entwürfe; erweiterte Funktionen hängen vom Microsoft-Zugang ab.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Stützt die angegebene Originalquelle die konkrete fachliche Aussage, oder führt der Link nur zu einem verwandten Thema?</p>
             <div class="tags"><span class="tag">Dialog</span><span class="tag">Recherche</span><span class="tag">Microsoft</span></div>
             <a class="tool-link" href="https://copilot.microsoft.com/" target="_blank" rel="noopener">Copilot öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="perplexity recherche quellen aktuelle informationen learn mode">
-            <div class="tool-top"><span class="tool-id">P</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="perplexity recherche quellen aktuelle informationen learn mode">
+            <div class="tool-top"><span class="tool-id">P</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Perplexity</h3><p>KI-gestützte Recherche mit verlinkten Quellen; geeignet zum Gegenprüfen aktueller Informationen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Belegt die verlinkte Studie tatsächlich Lernen ohne KI-Hilfe oder lediglich bessere Leistung während der Nutzung?</p>
             <div class="tags"><span class="tag">Recherche</span><span class="tag">Quellen</span><span class="tag">Lernmodus</span></div>
             <a class="tool-link" href="https://www.perplexity.ai/" target="_blank" rel="noopener">Perplexity öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="there's an ai for that theresanaiforthat tool suche katalog verzeichnis orientierung">
-            <div class="tool-top"><span class="tool-id">T</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="there's an ai for that theresanaiforthat tool suche katalog verzeichnis orientierung">
+            <div class="tool-top"><span class="tool-id">T</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>There’s An AI For That</h3><p>Suchkatalog für KI-Anwendungen nach Aufgabe. Die gefundenen Drittanbieter müssen einzeln auf Datenschutz, Kosten und fachliche Eignung geprüft werden.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Erfüllt das gefundene Werkzeug meinen konkreten Unterrichtszweck, und habe ich seine Anbieterbedingungen unabhängig vom Katalog geprüft?</p>
             <div class="tags"><span class="tag">Tool-Suche</span><span class="tag">Katalog</span><span class="tag">Orientierung</span></div>
             <a class="tool-link" href="https://theresanaiforthat.com/" target="_blank" rel="noopener">Tool-Finder öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="notebooklm google quellen dokumente audio lernmaterial">
-            <div class="tool-top"><span class="tool-id">N</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="dialog" data-cost="freemium" data-search="notebooklm google quellen dokumente audio lernmaterial">
+            <div class="tool-top"><span class="tool-id">N</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>NotebookLM</h3><p>Arbeitet quellengebunden mit eigenen Dokumenten und kann daraus Übersichten, Fragen oder Audiozusammenfassungen erzeugen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Lässt sich jede zentrale Aussage in den bereitgestellten Quellen wiederfinden, und sind Zitat, Seite und Schlussfolgerung passend zugeordnet?</p>
             <div class="tags"><span class="tag">Eigene Quellen</span><span class="tag">Zusammenfassen</span><span class="tag">Audio</span></div>
             <a class="tool-link" href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM öffnen</a>
           </article>
@@ -198,87 +215,98 @@
       </div>
     </section>
 
-    <section class="section" data-section>
+    <section class="section" data-section id="material">
       <div class="wrap">
         <div class="section-head"><h2>Für Unterrichtsplanung und Materialien</h2><p>Vorgegebene Arbeitsabläufe für Lehrkräfte</p></div>
         <div class="tool-grid">
-          <article class="tool" data-cost="freemium" data-search="magicschool lehrkräfte unterrichtsplanung differenzierung quiz feedback">
-            <div class="tool-top"><span class="tool-id">MS</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="material" data-cost="freemium" data-search="magicschool lehrkräfte unterrichtsplanung differenzierung quiz feedback">
+            <div class="tool-top"><span class="tool-id">MS</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>MagicSchool</h3><p>Sammlung spezialisierter Lehrkraft-Tools für Planung, Differenzierung, Quiz und Feedback.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Variieren die Aufgaben Hilfen und Darstellungen am gleichen Lernziel, statt lediglich kleinere oder größere Zahlen einzusetzen?</p>
             <div class="tags"><span class="tag">Lehrkraft-Tools</span><span class="tag">Planung</span><span class="tag">Feedback</span></div>
             <a class="tool-link" href="https://www.magicschool.ai/" target="_blank" rel="noopener">MagicSchool öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="eduaide lehrkräfte lesson planning material assessment pädagogik">
-            <div class="tool-top"><span class="tool-id">EA</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="material" data-cost="freemium" data-search="eduaide lehrkräfte lesson planning material assessment pädagogik">
+            <div class="tool-top"><span class="tool-id">EA</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Eduaide</h3><p>Werkzeugsammlung zur Unterrichtsplanung und Materialerstellung mit pädagogisch strukturierten Vorlagen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Passt jede Aufgabe zum beobachtbaren Förderziel, und enthält der Entwurf eine neue Aufgabe zur selbstständigen Kontrolle ohne KI?</p>
             <div class="tags"><span class="tag">Planung</span><span class="tag">Material</span><span class="tag">Assessment</span></div>
             <a class="tool-link" href="https://www.eduaide.ai/" target="_blank" rel="noopener">Eduaide öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="fobizz schule datenschutz klassenraum ki assistenz deutschland">
-            <div class="tool-top"><span class="tool-id">F</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="material" data-cost="freemium" data-search="fobizz schule datenschutz klassenraum ki assistenz deutschland">
+            <div class="tool-top"><span class="tool-id">F</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>fobizz</h3><p>Deutsche Plattform mit KI-Assistenz, Unterrichtstools und digitalen Klassenräumen; Zugänge können regional lizenziert sein.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Wartet der vorbereitete Lernchat nach einer passenden Frage auf den eigenen Versuch, und kann ich bei zu weitgehenden Hilfen eingreifen?</p>
             <div class="tags"><span class="tag">Schule</span><span class="tag">Klassenraum</span><span class="tag">Deutschland</span></div>
             <a class="tool-link" href="https://fobizz.com/de/" target="_blank" rel="noopener">fobizz öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="to teach arbeitsblatt aufgaben unterrichtsplanung h5p differenzierung">
-            <div class="tool-top"><span class="tool-id">TT</span><span class="badge freemium">teilweise kostenlos</span></div>
-            <h3>to teach</h3><p>Erstellt Aufgaben, Arbeitsblätter und Unterrichtsplanungen; kostenlose Nutzung ist mengenmäßig begrenzt.</p>
+          <article class="tool" data-purpose="material" data-cost="freemium" data-search="to teach arbeitsblatt aufgaben unterrichtsplanung h5p differenzierung">
+            <div class="tool-top"><span class="tool-id">TT</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
+            <h3>to teach</h3><p>Für Entwürfe von Aufgaben, Arbeitsblättern und Unterrichtsplanungen. Aktuelle Zugangsbedingungen beim Anbieter prüfen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Sind Aufgaben, Lösungsschlüssel und Darstellungen fachlich richtig, und ist die ausgewiesene Schwierigkeit am Lernziel begründet?</p>
             <div class="tags"><span class="tag">Arbeitsblätter</span><span class="tag">H5P</span><span class="tag">Planung</span></div>
             <a class="tool-link" href="https://to-teach.ai/" target="_blank" rel="noopener">to teach öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="diffit differenzierung lesetexte sprache arbeitsblatt">
-            <div class="tool-top"><span class="tool-id">DI</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="material" data-cost="freemium" data-search="diffit differenzierung lesetexte sprache arbeitsblatt">
+            <div class="tool-top"><span class="tool-id">DI</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Diffit</h3><p>Passt Texte und Aufgaben an Lernstand und Sprache an. Ausgangspunkt können eigene Texte, PDFs oder ein Thema sein.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Einen Sachtext in zwei Lesestufen mit passenden Verständnisfragen vorbereiten.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Erleichtert die Textfassung das Lesen, ohne mathematische Beziehungen, Bedingungen oder den Begründungsauftrag zu verändern?</p>
             <div class="tags"><span class="tag">Differenzierung</span><span class="tag">Lesen</span><span class="tag">Material</span></div>
-            <p class="tool-cost">Dauerhaft kostenlose Basisversion. Zusätzliche Export- und Ausrichtungsfunktionen benötigen eine Lizenz.</p>
-            <p class="tool-source"><a href="https://web.diffit.me/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Dauerhaft kostenlose Basisversion. Zusätzliche Export- und Ausrichtungsfunktionen benötigen eine Lizenz.</p>
+            <p class="tool-source"><a href="https://web.diffit.me/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://web.diffit.me/" target="_blank" rel="noopener">Diffit öffnen</a>
           </article>
-          <article class="tool" data-cost="paid" data-search="schulki schulki klassenraum lernchat dialog rollen">
-            <div class="tool-top"><span class="tool-id">SK</span><span class="badge paid">Lizenz</span></div>
+          <article class="tool" data-purpose="material" data-cost="paid" data-search="schulki schulki klassenraum lernchat dialog rollen">
+            <div class="tool-top"><span class="tool-id">SK</span><span class="badge paid">Historisch: Lizenz</span></div>
             <h3>schulKI</h3><p>KI-Plattform für schulische Lernchats, Assistenten und Aufgaben mit Rückmeldungen.</p>
-            <p class="tool-example"><b>Im Unterricht:</b> Einen Rollen-Dialog zu einer historischen Position anlegen und die Aussagen gemeinsam prüfen.</p>
+            <p class="tool-example"><b>Im Unterricht:</b> Einen vorbereiteten Lerndialog zur Bruchaddition erproben und beobachten, welche Hilfe den nächsten eigenen Denkschritt ermöglicht.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Knüpft die Rückmeldung an die tatsächliche Antwort an, und bleibt danach ein mathematischer Schritt für die lernende Person übrig?</p>
             <div class="tags"><span class="tag">Lernchats</span><span class="tag">Schule</span><span class="tag">Rückmeldung</span></div>
-            <p class="tool-cost">Regulär Tokenpaket oder Abo für Einzelpersonen bzw. Schulen. Probezugänge können verfügbar sein.</p>
-            <p class="tool-source"><a href="https://schulki.de/documentation/abonnements-und-einzelkaufpaket" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Regulär Tokenpaket oder Abo für Einzelpersonen bzw. Schulen. Probezugänge können verfügbar sein.</p>
+            <p class="tool-source"><a href="https://schulki.de/documentation/abonnements-und-einzelkaufpaket" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://schulki.de/" target="_blank" rel="noopener">schulKI öffnen</a>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section" data-section>
+    <section class="section" data-section id="mathematik">
       <div class="wrap">
         <div class="section-head"><h2>Mathematik: Rechnen, Darstellen und Üben</h2><p>Zum Prüfen, Visualisieren und für adaptive Übungsphasen</p></div>
         <div class="tool-grid">
-          <article class="tool" data-cost="freemium" data-search="wolfram alpha mathematik rechnen schrittweise lösungen visualisieren">
-            <div class="tool-top"><span class="tool-id">W</span><span class="badge freemium">teilweise kostenlos</span></div>
-            <h3>Wolfram|Alpha</h3><p>Rechen- und Wissenssystem für überprüfbare Berechnungen und Darstellungen; Schritt-für-Schritt-Lösungen sind Pro-Funktion.</p>
+          <article class="tool" data-purpose="mathematik" data-cost="freemium" data-search="wolfram alpha mathematik rechnen schrittweise lösungen visualisieren">
+            <div class="tool-top"><span class="tool-id">W</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
+            <h3>Wolfram|Alpha</h3><p>Rechen- und Wissenssystem für Berechnungen und Darstellungen. Ergebnisse und Voraussetzungen unabhängig prüfen; verfügbare Lösungsschritte hängen vom Zugang ab.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Habe ich Eingabe, Rechenbereich und Einheiten kontrolliert, und kann ich das Ergebnis durch Überschlag oder Gegenrechnung prüfen?</p>
             <div class="tags"><span class="tag">Berechnen</span><span class="tag">Prüfen</span><span class="tag">Darstellen</span></div>
             <a class="tool-link" href="https://www.wolframalpha.com/" target="_blank" rel="noopener">Wolfram|Alpha öffnen</a>
           </article>
-          <article class="tool" data-cost="free" data-search="geogebra mathematik geometrie algebra grafik visualisieren kostenlos">
-            <div class="tool-top"><span class="tool-id">G</span><span class="badge free">kostenlos</span></div>
+          <article class="tool" data-purpose="mathematik" data-cost="free" data-search="geogebra mathematik geometrie algebra grafik visualisieren kostenlos">
+            <div class="tool-top"><span class="tool-id">G</span><span class="badge free">Historisch: kostenlos</span></div>
             <h3>GeoGebra</h3><p>Dynamische Mathematiksoftware für Geometrie, Algebra, Funktionen, Statistik und interaktive Darstellungen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Bleiben beim Verändern der Darstellung das gemeinsame Ganze und die beabsichtigte mathematische Beziehung erhalten?</p>
             <div class="tags"><span class="tag">Visualisieren</span><span class="tag">Explorieren</span><span class="tag">Mathematik</span></div>
             <a class="tool-link" href="https://www.geogebra.org/" target="_blank" rel="noopener">GeoGebra öffnen</a>
           </article>
-          <article class="tool" data-cost="free" data-search="desmos graphing calculator mathematik funktionen visualisieren aktivität kostenlos">
-            <div class="tool-top"><span class="tool-id">D</span><span class="badge free">kostenlos</span></div>
-            <h3>Desmos</h3><p>Kostenlose Graphik- und Geometriewerkzeuge für Funktionen, Zusammenhänge und explorative Aufgaben.</p>
+          <article class="tool" data-purpose="mathematik" data-cost="free" data-search="desmos graphing calculator mathematik funktionen visualisieren aktivität kostenlos">
+            <div class="tool-top"><span class="tool-id">D</span><span class="badge free">Historisch: kostenlos</span></div>
+            <h3>Desmos</h3><p>Graphik- und Geometriewerkzeuge für Funktionen, Zusammenhänge und explorative Aufgaben.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Sind Achsen, Skalen und Einheiten so gewählt, dass der Graph den Zusammenhang zeigt und keine falsche Größenordnung nahelegt?</p>
             <div class="tags"><span class="tag">Funktionen</span><span class="tag">Graphen</span><span class="tag">Exploration</span></div>
             <a class="tool-link" href="https://www.desmos.com/" target="_blank" rel="noopener">Desmos öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="photomath mathematik kamera rechnen lösungsweg schrittweise">
-            <div class="tool-top"><span class="tool-id">PM</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="mathematik" data-cost="freemium" data-search="photomath mathematik kamera rechnen lösungsweg schrittweise">
+            <div class="tool-top"><span class="tool-id">PM</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Photomath</h3><p>Erfasst Aufgaben per Kamera und zeigt Lösungswege; nützlich als Gegenstand kritischer Lösungsvergleiche.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Hat das Werkzeug die Aufgabe korrekt erfasst, und kann das Kind einen entscheidenden Lösungsschritt anschließend selbst erklären?</p>
             <div class="tags"><span class="tag">Kamera</span><span class="tag">Lösungswege</span><span class="tag">Vergleichen</span></div>
             <a class="tool-link" href="https://photomath.com/" target="_blank" rel="noopener">Photomath öffnen</a>
           </article>
-          <article class="tool" data-cost="paid" data-search="bettermarks adaptiv mathematik üben diagnose schullizenz">
-            <div class="tool-top"><span class="tool-id">B</span><span class="badge paid">Lizenz</span></div>
-            <h3>bettermarks</h3><p>Adaptives Mathematik-Lernsystem für Übungen und Rückmeldungen; Nutzung üblicherweise über Klassen-, Schul- oder Landeslizenz.</p>
+          <article class="tool" data-purpose="mathematik" data-cost="paid" data-search="bettermarks adaptiv mathematik üben diagnose schullizenz">
+            <div class="tool-top"><span class="tool-id">B</span><span class="badge paid">Historisch: Lizenz</span></div>
+            <h3>bettermarks</h3><p>Mathematik-Lernsystem für adaptive Übungen und Rückmeldungen. Den konkreten Zugang und die verfügbare Unterstützung vor dem Unterricht klären.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Welche konkrete Antwort oder Erklärung begründet den nächsten Übungsschritt, und was bleibt hinter einer Ergebnisanzeige noch unklar?</p>
             <div class="tags"><span class="tag">Adaptives Üben</span><span class="tag">Diagnose</span><span class="tag">Schullizenz</span></div>
             <a class="tool-link" href="https://de.bettermarks.com/" target="_blank" rel="noopener">bettermarks öffnen</a>
           </article>
@@ -286,61 +314,66 @@
       </div>
     </section>
 
-    <section class="section" data-section>
+    <section class="section" data-section id="feedback">
       <div class="wrap">
         <div class="section-head"><h2>Schreiben, Feedback und Quiz</h2><p>Texte überarbeiten und den Lernstand sichtbar machen</p></div>
         <div class="tool-grid">
-          <article class="tool" data-cost="freemium" data-search="fellofish fiete fellofish feedback schreiben texte überarbeiten">
-            <div class="tool-top"><span class="tool-id">FF</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="feedback" data-cost="freemium" data-search="fellofish fiete fellofish feedback schreiben texte überarbeiten">
+            <div class="tool-top"><span class="tool-id">FF</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>FelloFish</h3><p>Früher Fiete.ai: Gibt Lernenden Rückmeldungen zu ihren Texten und hilft Lehrkräften, Schreibprozesse zu begleiten.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Eine Argumentation anhand vorgegebener Kriterien überarbeiten lassen und die Änderungen begründen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Bezieht sich das Feedback auf die mathematische Begründung und vereinbarte Kriterien, statt nur sprachliche Glätte zu belohnen?</p>
             <div class="tags"><span class="tag">Schreibfeedback</span><span class="tag">Überarbeiten</span><span class="tag">Kriterien</span></div>
-            <p class="tool-cost">Zum Einstieg 100 kostenlose Feedbacks. Weitere Nutzung über Pro- oder Schullizenz.</p>
-            <p class="tool-source"><a href="https://www.fellofish.com/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Zum Einstieg 100 kostenlose Feedbacks. Weitere Nutzung über Pro- oder Schullizenz.</p>
+            <p class="tool-source"><a href="https://www.fellofish.com/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://www.fellofish.com/" target="_blank" rel="noopener">FelloFish öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="deepl write deepl write sprache text grammatik stil überarbeiten">
-            <div class="tool-top"><span class="tool-id">DW</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="feedback" data-cost="freemium" data-search="deepl write deepl write sprache text grammatik stil überarbeiten">
+            <div class="tool-top"><span class="tool-id">DW</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>DeepL Write</h3><p>Schlägt Verbesserungen für Grammatik, Formulierungen und Stil vor. Der eigene Text bleibt Ausgangspunkt.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Zwei Formulierungsalternativen vergleichen und erklären, welche besser zur Textsorte passt.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Bleiben Fachbegriffe, Quantoren und mathematische Aussagen bei der sprachlichen Überarbeitung inhaltlich unverändert?</p>
             <div class="tags"><span class="tag">Sprache</span><span class="tag">Stil</span><span class="tag">Textvergleich</span></div>
-            <p class="tool-cost">Kostenlose Version mit Zeichenlimit. Write Pro erweitert den Umfang; ein Translator-Abo allein umfasst Write Pro nicht.</p>
-            <p class="tool-source"><a href="https://support.deepl.com/hc/en-us/articles/6318834492700-About-DeepL-Write" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Kostenlose Version mit Zeichenlimit. Write Pro erweitert den Umfang; ein Translator-Abo allein umfasst Write Pro nicht.</p>
+            <p class="tool-source"><a href="https://support.deepl.com/hc/en-us/articles/6318834492700-About-DeepL-Write" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://www.deepl.com/write" target="_blank" rel="noopener">DeepL Write öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="wayground quizizz wayground quiz lernstand fragen assessment">
-            <div class="tool-top"><span class="tool-id">WQ</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="feedback" data-cost="freemium" data-search="wayground quizizz wayground quiz lernstand fragen assessment">
+            <div class="tool-top"><span class="tool-id">WQ</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Wayground</h3><p>Früher Quizizz: Erstellt interaktive Quiz und Lernaktivitäten, auch KI-gestützt aus Materialien. Live oder im eigenen Tempo nutzbar.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Aus einem Unterrichtstext ein kurzes Lernstandsquiz erstellen und Fragen samt Lösungen prüfen.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Prüfen Frage und Antwortoptionen den beabsichtigten Zusammenhang, und ergänzt eine Begründung das bloße richtige Ankreuzen?</p>
             <div class="tags"><span class="tag">Quiz</span><span class="tag">Lernstand</span><span class="tag">Interaktion</span></div>
-            <p class="tool-cost">Kostenloser Starter-Tarif mit Grenzen. KI-Funktionen und Kontingente können je nach Region und Tarif variieren.</p>
-            <p class="tool-source"><a href="https://help.wayground.com/support/solutions/articles/158000404038-wayground-starter-basic-plan" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Kostenloser Starter-Tarif mit Grenzen. KI-Funktionen und Kontingente können je nach Region und Tarif variieren.</p>
+            <p class="tool-source"><a href="https://help.wayground.com/support/solutions/articles/158000404038-wayground-starter-basic-plan" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://wayground.com/" target="_blank" rel="noopener">Wayground öffnen</a>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section" data-section>
+    <section class="section" data-section id="gestaltung">
       <div class="wrap">
         <div class="section-head"><h2>Präsentationen und visuelle Materialien</h2><p>Entwürfe gestalten und fachlich weiterbearbeiten</p></div>
         <div class="tool-grid">
-          <article class="tool" data-cost="free" data-search="canva education canva education präsentation poster visualisieren gestalten">
-            <div class="tool-top"><span class="tool-id">CE</span><span class="badge free">kostenlos</span></div>
+          <article class="tool" data-purpose="gestaltung" data-cost="free" data-search="canva education canva education präsentation poster visualisieren gestalten">
+            <div class="tool-top"><span class="tool-id">CE</span><span class="badge free">Historisch: kostenlos</span></div>
             <h3>Canva Education</h3><p>Gestaltet Präsentationen, Poster und Unterrichtsmaterialien mit Vorlagen und KI-gestützten Funktionen.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Ein Erklärposter zu einem Fachbegriff gestalten und die fachlichen Aussagen kontrollieren.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Stimmen Teilgrößen, Einheiten und Beschriftungen des Erklärposters, und trägt die Darstellung zum Verständnis bei?</p>
             <div class="tags"><span class="tag">Poster</span><span class="tag">Präsentationen</span><span class="tag">Gestaltung</span></div>
-            <p class="tool-cost">Für berechtigte und verifizierte Lehrkräfte der Primar- und Sekundarstufe sowie deren Lernende kostenlos. Berechtigung erforderlich.</p>
-            <p class="tool-source"><a href="https://www.canva.com/education/" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Für berechtigte und verifizierte Lehrkräfte der Primar- und Sekundarstufe sowie deren Lernende kostenlos. Berechtigung erforderlich.</p>
+            <p class="tool-source"><a href="https://www.canva.com/education/" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://www.canva.com/education/" target="_blank" rel="noopener">Canva Education öffnen</a>
           </article>
-          <article class="tool" data-cost="freemium" data-search="gamma gamma präsentation folien dokumente strukturieren">
-            <div class="tool-top"><span class="tool-id">GA</span><span class="badge freemium">teilweise kostenlos</span></div>
+          <article class="tool" data-purpose="gestaltung" data-cost="freemium" data-search="gamma gamma präsentation folien dokumente strukturieren">
+            <div class="tool-top"><span class="tool-id">GA</span><span class="badge freemium">Historisch: teilweise kostenlos</span></div>
             <h3>Gamma</h3><p>Erstellt aus Stichpunkten oder Inhalten Präsentations- und Dokumententwürfe, die anschließend bearbeitet und exportiert werden können.</p>
             <p class="tool-example"><b>Im Unterricht:</b> Eine kurze Einführung aus eigenen Stichpunkten entwerfen und Inhalte sowie Reihenfolge überarbeiten.</p>
+            <p class="tool-check"><b>Lehrkraft prüft:</b> Erhält die vorgeschlagene Reihenfolge alle nötigen mathematischen Begründungsschritte, und kann ich jede Aussage fachlich prüfen?</p>
             <div class="tags"><span class="tag">Folien</span><span class="tag">Strukturieren</span><span class="tag">Entwürfe</span></div>
-            <p class="tool-cost">Kostenloser Einstieg mit begrenzter KI-Nutzung. Bezahlte Tarife erweitern Funktionen und entfernen das Gamma-Branding.</p>
-            <p class="tool-source"><a href="https://gamma.app/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · geprüft am 10.09.2026</p>
+            <p class="tool-cost"><b>Historische Zugangsnotiz, aktuell zu prüfen:</b> Kostenloser Einstieg mit begrenzter KI-Nutzung. Bezahlte Tarife erweitern Funktionen und entfernen das Gamma-Branding.</p>
+            <p class="tool-source"><a href="https://gamma.app/pricing" target="_blank" rel="noopener">Anbieterangaben zum Zugang</a> · früherer Prüfvermerk im Bestand: 10.09.2026. Aktuelle Konditionen erneut prüfen.</p>
             <a class="tool-link" href="https://gamma.app/" target="_blank" rel="noopener">Gamma öffnen</a>
           </article>
         </div>
@@ -362,7 +395,7 @@
 
   <footer>
     <div class="wrap">
-      <span>Bestand: 3. September 2026. Sieben weitere Tools mit Anbieterquellen geprüft und ergänzt am 10. September 2026. Kostenmodelle und regionale Zugänge können sich ändern.</span>
+      <span>Ausgangsbestand: September 2026. Link-Erreichbarkeit geprüft am 4. November 2026. Kostenlabels bleiben ausdrücklich historische Angaben. HTTP-Erreichbarkeit bestätigt weder aktuelle Konditionen noch eine schulische Freigabe.</span>
       <span>Die Auswahl ist eine Orientierung, keine Empfehlung oder Datenschutzfreigabe.</span>
     </div>
   </footer>
@@ -373,15 +406,15 @@
     const tools = [...document.querySelectorAll('.tool')];
     const sections = [...document.querySelectorAll('[data-section]')];
     const resultCount = document.getElementById('resultCount');
-    let cost = 'all';
+    let purpose = 'all';
 
     function applyFilters() {
       const query = search.value.trim().toLocaleLowerCase('de');
       let visible = 0;
       tools.forEach(tool => {
-        const matchesCost = cost === 'all' || tool.dataset.cost === cost;
+        const matchesPurpose = purpose === 'all' || tool.dataset.purpose === purpose;
         const matchesSearch = !query || tool.dataset.search.toLocaleLowerCase('de').includes(query) || tool.textContent.toLocaleLowerCase('de').includes(query);
-        tool.hidden = !(matchesCost && matchesSearch);
+        tool.hidden = !(matchesPurpose && matchesSearch);
         if (!tool.hidden) visible += 1;
       });
       sections.forEach(section => {
@@ -391,8 +424,11 @@
     }
 
     filters.forEach(button => button.addEventListener('click', () => {
-      cost = button.dataset.cost;
-      filters.forEach(item => item.classList.toggle('active', item === button));
+      purpose = button.dataset.purpose;
+      filters.forEach(item => {
+        item.classList.toggle('active', item === button);
+        item.setAttribute('aria-pressed', String(item === button));
+      });
       applyFilters();
     }));
     search.addEventListener('input', applyFilters);

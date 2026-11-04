@@ -1,0 +1,214 @@
+(function () {
+  'use strict';
+  const C=window.HandoutCore, $=id=>document.getElementById(id), all=s=>[...document.querySelectorAll(s)];
+  const formats=window.HANDOUT_FORMATS||[], extras=window.HANDOUT_EXTRAS||[], library=[...formats,...extras];
+  const checks=['Rechenergebnisse und Lösungen unabhängig geprüft.','Darstellungen, Einheiten und das gemeinsame Ganze stimmen.','Genau ein Förderziel ist erkennbar; Aufgaben und Hilfen passen dazu.','Beobachtungen und Arbeitsannahmen bleiben getrennt.','Neue Abschlussaufgabe ist ohne KI lösbar; Beobachtungskriterien sind festgehalten.','Keine identifizierbaren Schülerdaten enthalten.'];
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let state=C.empty(), storageBlocked=false, recoveryRaw='', lastSaved='', toastTimer;
+  const notice=message=>{ $('migrationNotice').hidden=false; $('migrationNotice').textContent=message; };
+  function announce(message) { $('globalStatus').textContent=message; clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('globalStatus').textContent='',6500); }
+  function load() {
+    try {
+      const raw=localStorage.getItem(C.KEY), old=localStorage.getItem(C.LEGACY_KEY);
+      $('recoveryBox').hidden=!old;
+      if(raw) {
+        try { state=C.validate(JSON.parse(raw)); lastSaved=raw; }
+        catch { recoveryRaw=raw; storageBlocked=true; notice('Der bisherige neue Speicherstand ist nicht lesbar. Er bleibt unverändert. Sichern Sie die Arbeitsstände als Datei; darin wird auch der unlesbare Originaltext erhalten. Neue Eingaben sind zunächst nur in dieser Sitzung verfügbar.'); }
+      } else if(old) {
+        try { state=C.migrateLegacy(old); notice('Ihr bisheriger Förderbaustein wurde Handout 2 zugeordnet. Alle alten Felder bleiben zusätzlich im unveränderten Original erhalten. Bitte das Förderziel auf einen Schwerpunkt eingrenzen.'); }
+        catch { recoveryRaw=old; state.recoveredOriginals=[old];notice('Der alte Förderbaustein konnte nicht zugeordnet werden. Der Originalspeicher bleibt unverändert; der Datei-Export erhält zusätzlich seinen Rohtext.'); }
+      }
+    } catch { storageBlocked=true; notice('Der Browser erlaubt keinen Zugriff auf lokale Speicherung. Arbeiten ist möglich; sichern Sie Ihre Ergebnisse vor dem Schließen als Datei.'); }
+    state.diagnostics=state.diagnostics.map(d=>({...C.diagnostic(),...d}));
+    state.builders=state.builders.map(b=>({...C.builder(),...b}));
+    if(!state.diagnostics.length) { const d=C.diagnostic(); state.diagnostics.push(d);state.activeDiagnosticId=d.id; }
+    if(!state.diagnostics.some(x=>x.id===state.activeDiagnosticId))state.activeDiagnosticId=state.diagnostics[0].id;
+    if(!state.builders.some(x=>x.id===state.activeBuilderId))state.activeBuilderId=state.builders[0]?.id||'';
+    state.library={mode:'blank',grade:'',task:'',goal:'',baseline:'',drafts:{},...state.library};
+  }
+  function save(explicit=false) {
+    state.updatedAt=new Date().toISOString();
+    syncPrintPage();
+    if(storageBlocked) { $('storageStatus').textContent='Nicht dauerhaft gespeichert – bitte als Datei sichern.'; if(explicit) announce('Speicherung ist gesperrt oder nicht verfügbar. Bitte die Dateisicherung nutzen; vorhandene Daten werden nicht überschrieben.');return false; }
+    try {
+      const current=localStorage.getItem(C.KEY);
+      if(lastSaved && current!==lastSaved) { storageBlocked=true;notice('Der Speicher wurde in einem anderen Fenster verändert. Zum Schutz beider Stände wurde automatisches Speichern angehalten. Diese Sitzung als Datei sichern und nach Neuladen zusätzlich importieren.');return false; }
+      const raw=JSON.stringify(state); localStorage.setItem(C.KEY,raw); lastSaved=raw;
+      $('storageStatus').textContent='Auf diesem Gerät gespeichert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+      if(explicit)announce('Alle aktuellen Arbeitsstände im Browser gespeichert.'); return true;
+    } catch { storageBlocked=true; $('storageStatus').textContent='Browser-Speicherung fehlgeschlagen – bitte als Datei sichern.';return false; }
+  }
+  const diag=()=>state.diagnostics.find(x=>x.id===state.activeDiagnosticId);
+  const build=()=>state.builders.find(x=>x.id===state.activeBuilderId);
+  const option=(value,label)=>`<option value="${esc(value)}">${esc(label)}</option>`;
+  function selectors() {
+    const options=state.diagnostics.map((d,i)=>option(d.id,`${i+1} · ${d.title || 'Unbenannter Fall'}`)).join('');
+    $('diagnosticSelect').innerHTML=options; $('diagnosticSelect').value=state.activeDiagnosticId;
+    $('transferSelect').innerHTML=options; $('transferSelect').value=state.activeDiagnosticId;
+    $('builderSelect').innerHTML=state.builders.length?state.builders.map((b,i)=>option(b.id,`${i+1} · ${b.title||'Unbenannter Entwurf'}`)).join(''):option('','Noch kein Förderentwurf');
+    $('builderSelect').value=state.activeBuilderId;
+  }
+  function diagSource() { const d=diag();return JSON.stringify([d.grade,d.task,d.solution,d.goal,d.known]); }
+  function buildSource() { const b=build();return b?JSON.stringify([C.contextForBuilder(b),b.focus,b.format]):''; }
+  function promptStatus() {
+    const d=diag(),b=build();
+    $('diagnosisPromptStatus').textContent=!d.prompt?'Noch kein Prompt erzeugt.':d.promptSource!==diagSource()?'Angaben geändert: Der Prompt gehört noch zum früheren Stand. Bitte bewusst neu erzeugen.':'Prompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
+    $('builderPromptStatus').textContent=!b?.prompt?'Noch kein Förderprompt erzeugt.':b.promptSource!==buildSource()?'Angaben oder Format geändert: Der Prompt ist noch nicht aktualisiert. Bitte bewusst neu erzeugen.':'Förderprompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
+  }
+  function renderDiag() { all('[data-diag]').forEach(el=>el.value=diag()[el.dataset.diag]||'');selectors();promptStatus();updateLibraryContext(); }
+  function renderFormat() {
+    const b=build();if(!b)return;
+    const choices=formats.filter(f=>f.category===b.focus);
+    $('build-format').innerHTML=option('','Bitte ein Format wählen')+choices.map(f=>option(f.id,f.title)).join('');
+    $('build-format').value=b.format||'';
+    const f=formats.find(x=>x.id===b.format);
+    $('formatGuidance').textContent=f?`${f.purpose} Prüffrage: ${f.check}`:'Nur die Formate zum gewählten Schwerpunkt werden angeboten. Die vollständige Sammlung steht in Handout 3.';
+  }
+  function evidenceVisibility() { const b=build();if(!b)return;$('evidenceLabel').hidden=b.evidenceStatus!=='observed';$('assumptionLabel').hidden=b.evidenceStatus==='observed'; }
+  function renderBuilder() {
+    const b=build();selectors();$('builderFields').hidden=!b;$('noBuilder').hidden=Boolean(b);
+    if(b) {
+      all('[data-build]').forEach(el=>el.value=b[el.dataset.build]||'');renderFormat();evidenceVisibility();
+      $('builderChecks').innerHTML=checks.map((label,i)=>`<label><input type="checkbox" data-check="${i}" ${b.checks?.includes(String(i))?'checked':''}>${esc(label)}</label>`).join('');
+      $('legacyBuilder').hidden=!b.legacyOriginal;$('legacyBuilderText').textContent=b.legacyOriginal?JSON.stringify(b.legacyOriginal,null,2):'';
+    }
+    promptStatus();updateLibraryContext();
+  }
+  function addBuilder(source) {
+    if(state.builders.length>=500){announce('Grenze von 500 Förderentwürfen erreicht. Bitte vorhandene Entwürfe nutzen und als Datei sichern.');return;}
+    const b=C.builder(source);state.builders.push(b);state.activeBuilderId=b.id;save();renderBuilder();
+    go('foerderbaustein',true); announce('Zusätzlicher Förderentwurf angelegt. Vorhandene Entwürfe bleiben erhalten.');
+  }
+  function ask(message) {
+    return new Promise(resolve=>{
+      const dialog=$('confirmDialog');$('confirmMessage').textContent=message;
+      dialog.returnValue='cancel';
+      dialog.addEventListener('close',()=>resolve(dialog.returnValue==='ok'),{once:true});dialog.showModal();$('confirmCancel').focus();
+    });
+  }
+  async function transfer(id) {
+    const d=state.diagnostics.find(x=>x.id===id);if(!d)return;
+    if(!d.task.trim()||!d.goal.trim()){announce('Bitte zuerst Aufgabe und Aufgabenziel im Fall ergänzen.');return;}
+    if(!await ask('Den Arbeitsstand als zusätzlichen Förderentwurf für Praxisphase 2 bereitstellen? Bestehende Entwürfe bleiben unverändert. Offene Hypothesen werden nicht als bestätigt übernommen.'))return;
+    addBuilder(d);
+  }
+  async function regenerate(kind) {
+    const d=kind==='diagnostic'?diag():build();if(!d)return;
+    if(kind==='diagnostic'&&(!d.task.trim()||!d.solution.trim()||!d.goal.trim())) {announce('Bitte Aufgabe, vorliegende Lösung und Aufgabenziel ergänzen.');return;}
+    if(kind==='builder') {
+      if(!d.task.trim()||!d.goal.trim()||!d.format){announce('Bitte Aufgabe, ein Förderziel und genau ein Format wählen.');return;}
+      if(d.evidenceStatus==='observed'&&!d.evidence.trim()){announce('Bitte die tatsächliche weitere Antwort eintragen oder den Stand auf „noch offen“ setzen.');return;}
+      if(d.evidenceStatus==='assumed'&&!d.assumption.trim()){announce('Bitte die ausdrücklich gewählte Arbeitsannahme eintragen.');return;}
+    }
+    if(d.prompt&&!await ask('Den vorhandenen Prompt durch einen neuen aus den aktuellen Angaben ersetzen? Eigene Bearbeitungen am Prompt werden dabei ersetzt.'))return;
+    d.prompt=kind==='diagnostic'?C.diagnosticPrompt(d):C.builderPrompt(d,formats.find(f=>f.id===d.format));d.promptSource=kind==='diagnostic'?diagSource():buildSource();
+    $(kind==='diagnostic'?'diagnosisPrompt':'builderPrompt').value=d.prompt;save();promptStatus();announce('Prompt mit den aktuellen Angaben erzeugt. Vor dem Kopieren prüfen.');
+  }
+  function libraryContext() {
+    const l=state.library;
+    if(l.mode==='diagnostic'){const d=diag();return {grade:d.grade,task:d.task,goal:d.goal,baseline:`Vorliegende Lösung: ${d.solution}\nWeitere tatsächlich bekannte Informationen: ${d.known||'keine'}\nBeobachtung: ${d.observation}\nOffene Hypothesen: ${[d.hypothesis1,d.hypothesis2].filter(Boolean).join('; ')}\nDie aufgeführten Angaben sind keine automatisch bestätigte Diagnose.`,label:'Handout 1 · '+d.title};}
+    if(l.mode==='builder'){const b=build();return b?{grade:b.grade,task:b.task,goal:b.goal,baseline:C.contextForBuilder(b),label:'Handout 2 · '+b.title}:{grade:'',task:'',goal:'',baseline:'',label:'Kein Förderentwurf vorhanden – Platzhalter ergänzen'};}
+    if(l.mode==='own')return {grade:l.grade,task:l.task,goal:l.goal,baseline:l.baseline,label:'Unabhängiger Bibliotheksfall'};
+    return {grade:'',task:'',goal:'',baseline:'',label:'Neutrale Vorlage mit Platzhaltern'};
+  }
+  function librarySource(){return JSON.stringify(libraryContext());}
+  function updateLibraryContext(){const l=state.library;$('libraryMode').value=l.mode;$('libraryOwn').hidden=l.mode!=='own';$('libraryContext').textContent='Aktueller Kontext: '+libraryContext().label;all('[data-library]').forEach(el=>el.value=l[el.dataset.library]||'');all('.library-warning').forEach(el=>{const draft=l.drafts[el.dataset.format];el.textContent=draft&&draft.source!==librarySource()?'Kontext geändert: Dieser Prompt enthält noch den früheren Fall. Vor dem Kopieren neu befüllen oder bewusst anpassen.':'Fallangaben und alle Platzhalter vor dem Kopieren prüfen.';});}
+  function renderLibrary() {
+    $('promptList').innerHTML=library.map((f,i)=>`<details class="prompt-item" data-format="${esc(f.id)}" data-category="${i<formats.length?f.category:'extra'}"><summary>${String(i+1).padStart(2,'0')} · ${esc(f.title)}</summary><div class="prompt-detail"><dl><dt>Didaktischer Zweck</dt><dd>${esc(f.purpose)}</dd><dt>Geeigneter Einsatz</dt><dd>${esc(f.when)}</dd><dt>Gewünschte Ausgabe</dt><dd>${esc(f.output)}</dd><dt>Fachliche Prüffrage</dt><dd>${esc(f.check)}</dd></dl><label for="library-${esc(f.id)}">Bearbeitbarer Prompt</label><textarea id="library-${esc(f.id)}" data-library-prompt="${esc(f.id)}"></textarea><p class="library-warning context-alert" data-format="${esc(f.id)}"></p><div class="button-row"><button class="button" type="button" data-refill="${esc(f.id)}">Mit aktuellem Kontext neu befüllen</button><button class="button primary" type="button" data-copy="library-${esc(f.id)}">Prompt kopieren</button><button class="button" type="button" data-print-format="${esc(f.id)}">Vorlage drucken</button></div></div></details>`).join('');
+    all('.prompt-item').forEach(item=>item.addEventListener('toggle',()=>{if(item.open)ensureLibrary(item.dataset.format);syncPrintPage();}));
+    all('[data-library-prompt]').forEach(el=>{const d=state.library.drafts[el.dataset.libraryPrompt];if(d)el.value=d.text;});
+    filterLibrary();updateLibraryContext();renderImportedLibraries();
+  }
+  async function ensureLibrary(id,force=false) {
+    const f=library.find(x=>x.id===id);if(!f)return;
+    if(force&&state.library.drafts[id]&&!await ask('Diese bearbeitete Vorlage durch die Vorlage mit dem aktuellen Kontext ersetzen?'))return;
+    if(!state.library.drafts[id]||force){state.library.drafts[id]={text:C.fillTemplate(f.prompt,libraryContext()),source:librarySource()};save();}
+    $('library-'+id).value=state.library.drafts[id].text;updateLibraryContext();
+  }
+  function filterLibrary() {
+    const q=$('promptSearch').value.toLocaleLowerCase('de').trim(),filter=$('libraryFilter').value;let count=0;
+    all('.prompt-item').forEach(item=>{const f=library.find(x=>x.id===item.dataset.format);item.hidden=!(filter==='all'||item.dataset.category===filter)||!Object.values(f).join(' ').toLocaleLowerCase('de').includes(q);if(!item.hidden)count++;});
+    $('libraryCount').textContent=count+' von '+library.length+' Angeboten · 22 Aufgabenformate und 6 Ergänzungen';syncPrintPage();
+  }
+  function renderImportedLibraries(){const saved=state.importedLibraries||[];$('importedLibraries').hidden=!saved.length;$('importedLibraryList').innerHTML=saved.map((l,i)=>`<details><summary>Import ${i+1}</summary>${Object.entries(l.drafts||{}).map(([id,d])=>`<label>${esc(library.find(f=>f.id===id)?.title||id)}<textarea readonly>${esc(d.text)}</textarea></label>`).join('')||'<p>Keine bearbeiteten Vorlagen im Import.</p>'}</details>`).join('');}
+  async function copy(id) {
+    const el=$(id);if(!el?.value.trim()){announce('Bitte zuerst den Prompt erzeugen oder Text eintragen.');return;}
+    let stale=id==='diagnosisPrompt'?diag().promptSource!==diagSource():id==='builderPrompt'?build()?.promptSource!==buildSource():false;
+    if(id.startsWith('library-'))stale=state.library.drafts[id.slice(8)]?.source!==librarySource();
+    if(stale&&!await ask('Dieser Prompt stammt noch aus einem früheren Kontext. Trotzdem genau diesen Text kopieren? Mit Abbrechen können Sie ihn zuerst neu befüllen.'))return;
+    if(/\[[^\]\n]+\]|\{\{[^}]+\}\}/.test(el.value)&&!await ask('Der Prompt enthält noch Platzhalter in Klammern. Trotzdem als Vorlage kopieren? Ersetzen Sie diese vor der Verwendung.'))return;
+    try {if(!navigator.clipboard?.writeText)throw new Error('clipboard');await navigator.clipboard.writeText(el.value);announce('In die Zwischenablage kopiert.');}
+    catch {$('fallbackText').value=el.value;$('copyFallback').showModal();$('fallbackText').focus();$('fallbackText').select();}
+  }
+  function download(filename,text,type='text/plain;charset=utf-8') {const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function exportAll(){save();const output=JSON.parse(JSON.stringify(state));if(recoveryRaw)output.recoveryRaw=recoveryRaw;download('Mathematik-Handouts-Arbeitsstaende.json',JSON.stringify(output,null,2),'application/json');announce('Dateisicherung erstellt. Sie enthält Ihre lokalen Eingaben – nicht öffentlich weitergeben.');}
+  async function importFile(file) {
+    if(!file)return;if(file.size>10000000){announce('Datei ist größer als 10 MB. Import nicht ausgeführt.');return;}
+    try {const data=C.validate(JSON.parse(await file.text()));const merged=C.mergeImport(state,data);if(!await ask(`${data.diagnostics.length} Fälle und ${data.builders.length} Förderentwürfe zusätzlich importieren? Bestehende Arbeitsstände bleiben erhalten.`))return;state=merged;save();renderDiag();renderBuilder();renderLibrary();announce('Arbeitsstände zusätzlich importiert. Bibliotheksbearbeitungen stehen separat unter Handout 3.');}
+    catch(error){announce('Import nicht möglich: '+error.message+' Vorhandene Daten bleiben unverändert.');}
+    finally{$('importFile').value='';}
+  }
+  const entry=(name,value)=>`${name}\n${value||'—'}\n`;
+  function diagText(){const d=diag();return 'HANDOUT 1 – HYPOTHESENBILDUNG · PRAXISPHASE 1\n\n'+[['Fall',d.title],['Klasse / Stufe',d.grade],['Aufgabe',d.task],['Vorliegende Lösung',d.solution],['Weitere bekannte Informationen',d.known],['Aufgabenziel',d.goal],['Beobachtung',d.observation],['Hypothese 1',d.hypothesis1],['Hypothese 2',d.hypothesis2],['Ausgewählte Prüffrage oder Kontrastaufgabe',d.check],['Offene Informationen',d.missing]].map(x=>entry(...x)).join('\n')+'\nOhne weitere tatsächliche Antwort bleibt die Hypothese offen.';}
+  function builderText(){const b=build();if(!b)return '';return 'HANDOUT 2 – FÖRDERBAUSTEIN ENTWICKELN · PRAXISPHASE 2\n\n'+entry('Entwurf',b.title)+'\n'+C.contextForBuilder(b)+'\n\n'+[['Format',formats.find(f=>f.id===b.format)?.title],['KI-Entwurf',b.draft],['Meine Anpassungen',b.adjustments],['Überarbeitete Fassung',b.final],['Fachliche Prüfung',checks.map((v,i)=>(b.checks?.includes(String(i))?'☑ ':'☐ ')+v).join('\n')],['Einsatz',b.use],['Erfolgskontrolle ohne KI',b.success]].map(x=>entry(...x)).join('\n');}
+  function preparePrint(kind,id) {
+    let title='',text='';if(kind==='diagnostic'){title='Handout 1 · Hypothesenbildung';text=diagText();}else if(kind==='builder'){title='Handout 2 · Förderbaustein entwickeln';text=build()?builderText():'Noch kein Förderentwurf angelegt. Bitte einen Fall übernehmen oder einen neuen Entwurf beginnen.';}else {const f=library.find(x=>x.id===id);if(!f)return false;title='Handout 3 · Tool- und Promptbibliothek';text=f.title+'\n\n'+entry('Zweck',f.purpose)+entry('Einsatz',f.when)+entry('Erwartete Ausgabe',f.output)+entry('Prüffrage',f.check)+'\n'+(state.library.drafts[id]?.text??C.fillTemplate(f.prompt,libraryContext()));}
+    $('printSummary').innerHTML=`<h1>${esc(title)}</h1><div class="print-preserve">${esc(text)}</div>`;
+    if(kind==='builder'&&build()){const b=build();$('printSummary').innerHTML+=`<section class="print-material"><h1>Handout 2 · Material zum Weiterarbeiten</h1><h2>KI-Rohentwurf · ungeprüft, sofern nicht dokumentiert</h2><div class="print-preserve">${esc(b.draft||'Kein KI-Rohentwurf eingetragen.')}</div><h2>Überarbeitete Fassung</h2><div class="print-preserve">${esc(b.final||'Noch keine überarbeitete Fassung eingetragen. Der Rohentwurf ist nicht automatisch einsatzbereit.')}</div></section>`;}
+    return true;
+  }
+  async function print(kind,id) {if(await preparePrint(kind,id))window.print();}
+  // Keep print content ready before the print dialog opens (also for WebKit Cmd+P).
+  // Building a large print DOM only in beforeprint can produce incorrect pagination.
+  function syncPrintPage() {
+    const page=C.ALIASES[location.hash.slice(1)]||location.hash.slice(1);
+    if(page==='foerderbaustein')preparePrint('builder');
+    else if(page==='bibliothek') {
+      const open=all('.prompt-item[open]').find(x=>!x.hidden);
+      if(open)preparePrint('library',open.dataset.format);
+      else $('printSummary').innerHTML='<h1>Handout 3 · Tool- und Promptbibliothek</h1><p>Bitte eine Vorlage öffnen und dort „Vorlage drucken“ wählen.</p>';
+    } else if(diag())preparePrint('diagnostic');
+  }
+  function go(hash,focus=false) {let target=C.ALIASES[hash]||hash;if(!['hypothesen','foerderbaustein','bibliothek'].includes(target))target='hypothesen';all('.station-panel').forEach(el=>{el.hidden=el.id!==target;el.classList.toggle('active',el.id===target);});all('[data-nav]').forEach(el=>{el.classList.toggle('active',el.dataset.nav===target);if(el.dataset.nav===target)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});history.replaceState(null,'','#'+target);syncPrintPage();if(focus){$(target+'-title').focus({preventScroll:true});$(target).scrollIntoView({behavior:'smooth'});} }
+  load();
+  $('caseChoice').innerHTML=C.cases.map(c=>option(c.id,`Klasse ${c.grade} · ${c.title}`)).join('');
+  $('builderCaseChoice').insertAdjacentHTML('beforeend',C.cases.map(c=>option(c.id,`Fiktives Beispiel · ${c.title}`)).join(''));
+  all('[data-diag]').forEach(el=>el.addEventListener('input',()=>{diag()[el.dataset.diag]=el.value;save();promptStatus();if(el.dataset.diag==='title')selectors();updateLibraryContext();}));
+  all('[data-build]').forEach(el=>el.addEventListener('input',()=>{const b=build();if(!b)return;b[el.dataset.build]=el.value;if(el.dataset.build==='focus'){b.format='';renderFormat();}if(el.dataset.build==='format')renderFormat();if(el.dataset.build==='evidenceStatus')evidenceVisibility();if(el.dataset.build==='title')selectors();save();promptStatus();updateLibraryContext();}));
+  $('builderChecks').addEventListener('change',()=>{build().checks=all('[data-check]:checked').map(x=>x.dataset.check);save();});
+  $('diagnosticSelect').addEventListener('change',e=>{state.activeDiagnosticId=e.target.value;save();renderDiag();});
+  $('builderSelect').addEventListener('change',e=>{state.activeBuilderId=e.target.value;save();renderBuilder();});
+  function newDiagnostic(item){if(state.diagnostics.length>=500){announce('Grenze von 500 Fällen erreicht. Bitte vorhandene Fälle nutzen und als Datei sichern.');return;}const d=C.diagnostic(item);state.diagnostics.push(d);state.activeDiagnosticId=d.id;save();renderDiag();$('diag-title').focus();announce('Neuer Fall angelegt; bisherige Fälle bleiben erhalten.');}
+  $('addPrepared').addEventListener('click',()=>newDiagnostic(C.cases.find(x=>x.id===$('caseChoice').value)));
+  $('addOwn').addEventListener('click',()=>newDiagnostic());
+  $('transferDiagnostic').addEventListener('click',()=>transfer(state.activeDiagnosticId));
+  $('transferSelected').addEventListener('click',()=>transfer($('transferSelect').value));
+  $('newBuilder').addEventListener('click',()=>{const c=C.cases.find(x=>x.id===$('builderCaseChoice').value);addBuilder(c);});
+  $('generateDiagnosis').addEventListener('click',()=>regenerate('diagnostic'));
+  $('generateBuilder').addEventListener('click',()=>regenerate('builder'));
+  $('saveAll').addEventListener('click',()=>save(true));$('exportAll').addEventListener('click',exportAll);
+  $('importFile').addEventListener('change',e=>importFile(e.target.files[0]));
+  $('downloadBuilder').addEventListener('click',()=>{if(!build())return;download('Handout-2-Foerderbaustein.txt',builderText()+'\n\nMATERIAL ZUM WEITERARBEITEN\n\n'+entry('KI-Rohentwurf',build().draft)+entry('Überarbeitete Fassung',build().final));});
+  $('recoverLegacy').addEventListener('click',async()=>{try {if(state.builders.length>=500){announce('Grenze von 500 Förderentwürfen erreicht.');return;}const old=localStorage.getItem(C.LEGACY_KEY);const migrated=C.migrateLegacy(old);if(!await ask('Alten Förderbaustein zusätzlich übernehmen? Der aktuelle Stand und der Originalspeicher bleiben bestehen.'))return;const b=migrated.builders[0];state.builders.push(b);state.activeBuilderId=b.id;save();renderBuilder();go('foerderbaustein',true);}catch{announce('Alter Stand nicht lesbar. Es wurde nichts überschrieben.');}});
+  $('libraryMode').addEventListener('change',e=>{state.library.mode=e.target.value;save();updateLibraryContext();});
+  all('[data-library]').forEach(el=>el.addEventListener('input',()=>{state.library[el.dataset.library]=el.value;save();updateLibraryContext();}));
+  $('promptList').addEventListener('input',e=>{const id=e.target.dataset.libraryPrompt;if(!id)return;state.library.drafts[id]={text:e.target.value,source:state.library.drafts[id]?.source||librarySource()};save();});
+  $('promptSearch').addEventListener('input',filterLibrary);$('libraryFilter').addEventListener('change',filterLibrary);
+  document.addEventListener('click',e=>{const a=e.target.closest('[data-nav]');if(a){e.preventDefault();go(a.dataset.nav,true);}const c=e.target.closest('[data-copy]');if(c)copy(c.dataset.copy);const r=e.target.closest('[data-refill]');if(r)ensureLibrary(r.dataset.refill,true);const p=e.target.closest('[data-print]');if(p)print(p.dataset.print);const pf=e.target.closest('[data-print-format]');if(pf)print('library',pf.dataset.printFormat);});
+  $('closeFallback').addEventListener('click',()=>$('copyFallback').close());
+  window.addEventListener('hashchange',()=>go(location.hash.slice(1),true));
+  window.addEventListener('storage',e=>{if(e.key===C.KEY&&e.newValue!==lastSaved){storageBlocked=true;notice('Ein anderes Fenster hat die Arbeitsstände geändert. Zum Schutz Ihrer Eingaben bitte diese Sitzung als Datei sichern, neu laden und die Datei zusätzlich importieren.');save();}});
+  window.addEventListener('beforeunload',e=>{if(storageBlocked){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('beforeprint',()=>{if(!$('printSummary').textContent.trim())syncPrintPage();});
+  window.addEventListener('afterprint',syncPrintPage);
+  const discussions=[
+    'Bei 15 − 7 = 12 ist nur die notierte Gleichung sicher sichtbar. Eine mögliche Erklärung wäre, dass 7 − 5 gerechnet und die Zehnerziffer beibehalten wurde. Lassen Sie den Rechenweg beschreiben oder 15 − 7 mit Material zeigen; auch ein Versehen bleibt möglich.',
+    'Bei sechzehn → 61 könnten Zahlwortreihenfolge und Stellenwertzuordnung verwechselt worden sein. Lassen Sie sechzehn mit Zehnern und Einern legen und der Schreibweise zuordnen. Erst dann lässt sich die Vermutung besser beurteilen.',
+    '503 − 78 = 575 passt zur Vermutung, dass stellenweise die kleinere von der größeren Ziffer abgezogen wird. Prüfen Sie das Entbündeln beispielsweise an einer Materialdarstellung und einer passend variierten Aufgabe.',
+    '6 · 7 = 13 passt zur Addition 6 + 7. Ob das Zeichen verwechselt wurde oder die Operationsbedeutung unklar ist, bleibt offen. Lassen Sie sechs Gruppen mit je sieben Elementen darstellen und mit dem Term verbinden.',
+    'Bei 1/2 + 1/3 = 2/5 ist das Ergebnis sichtbar; eine getrennte Addition von Zählern und Nennern ist eine mögliche Deutung. Prüfen Sie gleich große Teile desselben Ganzen, etwa an Bruchstreifen. Fragen Sie auch, ob die Summe kleiner als 1/2 sein kann.',
+    '3,5 + 12 = 4,7 passt zur Vermutung, dass 12 wie 1,2 verarbeitet wurde. Prüfen Sie die Zuordnung von Einern und Zehnteln und lassen Sie eine stellenwertgerechte Darstellung erklären. Der Einzelfehler allein entscheidet nicht zwischen Versehen und Verständnisproblem.'
+  ];
+  $('caseDiscussion').innerHTML=C.cases.map((c,i)=>`<h3>${esc(c.title)}</h3><p>${esc(discussions[i])}</p>`).join('');
+  renderDiag();renderBuilder();renderLibrary();go(location.hash.slice(1));save();
+})();

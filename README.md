@@ -1,27 +1,45 @@
-# Digitale Handouts Mathematik & KI
+# Digitale Handouts Mathematik und KI
 
-Dieses Repository enthält die eigenständige HTML-Fassung der drei digitalen Handouts für die Lehrkräftefortbildung:
+Begleitmaterial für die Praxisphasen einer Lehrkräftefortbildung. Diese Entwicklungsfassung ist noch nicht veröffentlicht.
 
-1. Prompt-Bibliothek Mathematik
-2. Fehleranalyse: Übungsblatt
-3. Förderbaustein-Vorlage
+1. **Handout 1 – Hypothesenbildung · Praxisphase 1:** einen Fall und ein konkretes Aufgabenziel wählen, Beobachtung von Deutung trennen, höchstens zwei vorläufige Hypothesen und einen Prüfschritt sichern. Keine Förderübungen in dieser Phase.
+2. **Handout 2 – Förderbaustein entwickeln · Praxisphase 2:** einen Fall übernehmen oder unabhängig neu beginnen, Ausgangslage beziehungsweise Arbeitsannahme kennzeichnen, ein enges Ziel und ein Format wählen, Material fachlich prüfen.
+3. **Handout 3 – Tool- und Promptbibliothek · offene Vertiefung:** 22 Aufgabenformate und sechs ergänzende Angebote mit vollständigen bearbeitbaren Prompts, Zweck, Einsatz, erwarteter Ausgabe und Prüffrage. Verweise zur Tool-Übersicht und zur erhaltenen Individualisierungs-Vertiefung.
 
-Die zusätzliche Seite **tools.html** bündelt die in der Fortbildung genannten KI- und Mathematik-Tools, kennzeichnet deren Kostenmodell und verlinkt direkt zu den Anbietern.
+## Lokal öffnen
 
-Zusätzlich stehen alle drei Handouts als Word-Dateien zur Verfügung. Die Word-Vorlage zum Förderbaustein kann alternativ zur digitalen Eingabemaske verwendet werden und enthält ausreichend Platz für KI-Entwürfe, fachliche Anpassungen und das einsatzbereite Material.
+`index.html` oder `Digitale Handouts Mathematik.html` im Browser öffnen. Beide Einstiege sind identisch und verwenden dieselben lokalen Dateien: `handouts.css`, `handouts-core.js`, `library-data.js`, `handouts.js`. Deshalb das gesamte Projekt herunterladen, nicht nur eine einzelne HTML-Datei. Kein Framework und keine Installation erforderlich. Für zuverlässige Browser-Speicherung und Zwischenablage ist ein lokaler HTTP-Server empfehlenswert:
 
-## Verwendung
+```sh
+python3 -m http.server 4186 --bind 127.0.0.1
+```
 
-Die Datei **Digitale Handouts Mathematik.html** kann heruntergeladen und anschließend direkt im Browser geöffnet werden. Es ist keine Installation erforderlich.
+Dann `http://127.0.0.1:4186/` öffnen. Die Vorschau ist nur auf diesem Rechner erreichbar. Eine lokale Vorschau und GitHub Pages besitzen getrennte Browser-Speicher.
 
-Auf der Internetseite können die drei analogen Word-Handouts jeweils direkt beim passenden Arbeitsauftrag heruntergeladen werden.
+## Daten und alte Links
 
-Eingaben in der Förderbaustein-Maske werden nur lokal im verwendeten Browser gespeichert. Zusätzlich können der ausgefüllte Förderbaustein und die entwickelten Aufgaben als Datei gespeichert oder ausgedruckt werden.
+- Speicherung erfolgt nur im Browser. Keine automatische Übermittlung an KI-Anbieter, keine Telemetrie, keine Zugangsdaten.
+- „Alle Arbeitsstände als Datei sichern“ exportiert die Fälle, Förderentwürfe, bearbeiteten Bibliotheksvorlagen und erhaltenen Rückfallstände als JSON. Import ergänzt vorhandene Arbeitsstände; er ersetzt sie nicht.
+- Originale des bisherigen Schlüssels `digitale-handouts-foerderbaustein` bleiben unverändert. Die neue Version verwendet `digitale-handouts-v2`. Zuordnung und Grenzen sind in [MIGRATION.md](docs/MIGRATION.md) beschrieben.
+- Bei blockierter Speicherung oder konkurrierenden Änderungen aus einem anderen Tab wird gewarnt. Dann vor dem Schließen exportieren. Browserbereinigung kann lokale Daten entfernen.
+- `#station1` bleibt Bibliothek, `#station2` bleibt Hypothesenbildung/Fehleranalyse und `#station3` bleibt Förderbaustein. Neue Links heißen `#bibliothek`, `#hypothesen`, `#foerderbaustein`.
+- Word-Downloads tragen die neuen Handoutnummern. Die drei alten Dateinamen bleiben zur Kompatibilität erhalten; ihre unveränderten Inhalte zeigen den früheren Stand.
 
-## Versionsverlauf
+## Sicherung und Freigabe
 
-Jede übernommene Änderung wird als eigener Git-Commit dokumentiert. Über den Bereich **Commits** beziehungsweise **History** in GitHub lässt sich nachvollziehen, wann welche Änderung eingearbeitet wurde.
+Vor dem Umbau wurde der veröffentlichte Commit `d25d1e184d6f71e3228391b3fc682dd15fed6c20` auf GitHub unter `backup/vor-handout-umbau-2026-11-04` gesichert und überprüft. Entwicklungsbranch: `codex/handouts-praxisphasen`. GitHub Pages veröffentlicht weiterhin ausschließlich `main` im Repositorywurzelverzeichnis. Keine automatische Veröffentlichung dieser Arbeitskopie.
 
-## Datenschutz
+Nicht ohne ausdrückliche Abnahme nach `main` übernehmen oder veröffentlichen. [Rückkehranleitung](docs/SICHERUNG-UND-RUECKKEHR.md), [Testbericht](docs/TESTBERICHT.md), [notwendige Folienanpassungen](docs/FOLIENANPASSUNGEN.md).
 
-In die Handouts dürfen nur fiktive oder vollständig anonymisierte Schülerlösungen eingetragen werden.
+## Prüfungen und Pflege
+
+```sh
+node --test tests/core.test.cjs
+node --check handouts.js
+node --check handouts-core.js
+node --check library-data.js
+```
+
+Die Tests benötigen nur Node-Bordmittel. Sie ersetzen keine vollständige Browser-, Datenschutz- oder didaktische Validierung. [Tool-Linkcheck](docs/TOOL-LINKCHECK.md) dokumentiert Erreichbarkeit und Prüfgrenzen; historische Kostenangaben sind keine aktuelle Tarif- oder Schulfreigabe.
+
+Nach Änderungen an `index.html` den kompatiblen Dateieinstieg `Digitale Handouts Mathematik.html` identisch halten. Word-Handouts werden mit `scripts/build_word_handouts.py` aus den erhaltenen Originalen und der Bibliothek erzeugt; nach Änderungen erneut rendern und prüfen. QA-Dateien und Teilnehmerdaten gehören nicht ins Repository.

@@ -2,6 +2,21 @@
 *
 !.gitignore
 !README.md
+!index.html
+!individualisierung.html
+!handouts.js
+!handouts-core.js
+!handouts.css
+!library-data.js
+!tests/
+!tests/**
+!scripts/
+!scripts/**
+!docs/
+!docs/**
+!Handout 1 - Hypothesenbildung.docx
+!Handout 2 - Foerderbaustein entwickeln.docx
+!Handout 3 - Tool- und Promptbibliothek.docx
 !Digitale Handouts Mathematik.html
 !tools.html
 !Handout 1 - Prompt-Bibliothek Mathematik.docx
