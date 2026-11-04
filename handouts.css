@@ -176,11 +176,11 @@
     .ai-help { grid-column: 1 / -1; padding: 17px; border-left: 5px solid var(--blue); background: var(--paper-2); }
     .ai-help h4 { margin: 0 0 7px; font-size: 17px; }
     .ai-help p { margin: 0 0 13px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    #goalHelp { margin: 18px 0 24px; }
-    #goalHelp summary { font-size: 17px; }
-    #goalHelp p { font-size: 15px; line-height: 1.55; }
-    #goalHelp[open] summary { margin-bottom: 14px; }
-    #goalHelp>label { margin-top: 22px; }
+    #goalHelp, #hypothesisHelp { margin: 18px 0 24px; }
+    #goalHelp summary, #hypothesisHelp summary { font-size: 17px; }
+    #goalHelp p, #hypothesisHelp p { font-size: 15px; line-height: 1.55; }
+    #goalHelp[open] summary, #hypothesisHelp[open] summary { margin-bottom: 14px; }
+    #goalHelp>label, #hypothesisHelp>label { margin-top: 22px; }
     .field-hint { display: block; margin-top: 7px; color: var(--muted); font-weight: 400; line-height: 1.4; }
     .print-summary { display: none; width: min(900px, calc(100% - 50px)); margin: 0 auto; padding: 48px 0; }
     .print-summary h1 { font-size: 30px; border-bottom: 2px solid var(--blue); padding-bottom: 12px; }
@@ -275,6 +275,14 @@
     .prompt-item summary { padding:20px; font-size:18px; }
     .prompt-detail { display:block; padding:0 22px 22px; }
     .prompt-detail p { line-height:1.55; }
+    .variant-entry { margin-top:30px; padding-top:22px; border-top:1px solid var(--line); }
+    .variant-entry h4 { font-size:20px; margin:0 0 8px; }
+    .format-example { margin:22px 0; padding:18px; background:var(--paper-2); border-left:3px solid var(--blue); }
+    .format-example summary { font-size:17px; padding:4px 0; }
+    .format-example dd { white-space:pre-wrap; }
+    .format-example .example-solution { margin-top:16px; }
+    .library-result { min-height:280px; }
+    .trial-inputs { margin-top:26px; padding-top:20px; border-top:1px solid var(--line); }
     .prompt-detail textarea { min-height:280px; }
     .prompt-detail dt { font-weight:750; margin-top:14px; }.prompt-detail dd { margin:5px 0; line-height:1.55; }
     .context-alert { color:#8a4100; background:#fff5e8; padding:10px; line-height:1.5; }

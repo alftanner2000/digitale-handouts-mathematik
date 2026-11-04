@@ -25,4 +25,4 @@ Auf GitHub die obige Tag-Adresse öffnen. Für eine unabhängige lokale Wiederhe
 git clone --branch backup/vor-handout-umbau-2026-11-04 --single-branch https://github.com/alftanner2000/digitale-handouts-mathematik.git handouts-gesicherter-stand
 ```
 
-Keine bestehenden Dateien überschreiben, keinen Force-Push und kein `reset --hard` verwenden. Die neue Entwicklungsfassung kann parallel erhalten bleiben. Eine Änderung der veröffentlichten Website ist ein eigener Schritt und benötigt ausdrücklich die Abnahme und Freigabe. Bis dahin bleibt die jetzige Produktion bestehen.
+Keine bestehenden Dateien überschreiben, keinen Force-Push und kein `reset --hard` verwenden. Die neue Entwicklungsfassung kann parallel erhalten bleiben. Die Veröffentlichung wurde am 2026-11-04 ausdrücklich freigegeben („Neue Handouts veröffentlichen“). Der Sicherungstag bleibt davon unverändert; den technischen Veröffentlichungsstand dokumentiert der Testbericht.

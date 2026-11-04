@@ -51,11 +51,13 @@
   function diagSource() { const d=diag();return JSON.stringify([d.grade,d.task,d.solution,d.goal,d.known]); }
   function buildSource() { const b=build();return b?JSON.stringify([C.contextForBuilder(b),b.focus,b.format]):''; }
   function goalSource() { const b=build();return b?C.contextForBuilder(b):''; }
+  function hypothesisSource() { const b=build();return b?C.contextForBuilder(b):''; }
   function promptStatus() {
     const d=diag(),b=build();
     $('diagnosisPromptStatus').textContent=!d.prompt?'Noch kein Prompt erzeugt.':d.promptSource!==diagSource()?'Angaben geändert: Der Prompt gehört noch zum früheren Stand. Bitte bewusst neu erzeugen.':'Prompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
     $('builderPromptStatus').textContent=!b?.prompt?'Noch kein Förderprompt erzeugt.':b.promptSource!==buildSource()?'Angaben oder Format geändert: Der Prompt ist noch nicht aktualisiert. Bitte bewusst neu erzeugen.':'Förderprompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
     $('goalPromptStatus').textContent=!b?.goalPrompt?'Noch kein Prompt für Zielvorschläge erzeugt.':b.goalPromptSource!==goalSource()?'Ausgangslage oder bisheriger Zielentwurf geändert: Dieser Prompt gehört noch zum früheren Stand. Bei Bedarf neu erzeugen.':'Prompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
+    $('hypothesisPromptStatus').textContent=!b?.hypothesisPrompt?'Noch kein Diagnoseprompt für diesen Entwurf erzeugt.':b.hypothesisPromptSource!==hypothesisSource()?'Angaben seit der Prompt-Erstellung geändert. Für eine erneute KI-Befragung bei Bedarf bewusst neu erzeugen.':'Diagnoseprompt gehört zu den aktuellen Angaben; eigene Änderungen bleiben erhalten.';
   }
   function renderDiag() { all('[data-diag]').forEach(el=>el.value=diag()[el.dataset.diag]||'');selectors();promptStatus();updateLibraryContext(); }
   function renderFormat() {
@@ -95,13 +97,13 @@
   }
   async function transfer(id) {
     const d=state.diagnostics.find(x=>x.id===id);if(!d)return;
-    if(!d.task.trim()||!d.goal.trim()){announce('Bitte zuerst Aufgabe und Aufgabenziel im Fall ergänzen.');return;}
+    if(!d.task.trim()||!d.solution.trim()){announce('Bitte zuerst Aufgabe und vorliegende oder fiktive Schülerlösung ergänzen. Weitere Felder dürfen noch offenbleiben.');return;}
     if(!await ask('Den Arbeitsstand als zusätzlichen Förderentwurf für Praxisphase 2 bereitstellen? Bestehende Entwürfe bleiben unverändert. Offene Hypothesen werden nicht als bestätigt übernommen.'))return;
     addBuilder(d);
   }
   async function regenerate(kind) {
     const d=kind==='diagnostic'?diag():build();if(!d)return;
-    if(kind==='diagnostic'&&(!d.task.trim()||!d.solution.trim()||!d.goal.trim())) {announce('Bitte Aufgabe, vorliegende Lösung und Aufgabenziel ergänzen.');return;}
+    if(kind==='diagnostic'&&(!d.task.trim()||!d.solution.trim())) {announce('Bitte Aufgabe und vorliegende oder ausdrücklich fiktive Lösung ergänzen. Ein Aufgabenziel kann die KI anschließend vorschlagen.');return;}
     if(kind==='builder') {
       if(!d.task.trim()||!d.goal.trim()||!d.format){announce('Bitte Aufgabe, ein Förderziel und genau ein Format wählen.');return;}
       if(d.evidenceStatus==='observed'&&!d.evidence.trim()){announce('Bitte die tatsächliche weitere Antwort eintragen oder den Stand auf „noch offen“ setzen.');return;}
@@ -119,6 +121,12 @@
     if(b.goalPrompt&&!await ask('Den bearbeiteten Ziel-Prompt durch einen neuen aus den aktuellen Angaben ersetzen? Das gewählte Förderziel bleibt erhalten.'))return;
     b.goalPrompt=C.goalPrompt(b);b.goalPromptSource=goalSource();$('goalPrompt').value=b.goalPrompt;save();promptStatus();announce('Prompt für Zielvorschläge erzeugt. In einer freigegebenen KI verwenden und genau ein passendes Ziel auswählen.');
   }
+  async function regenerateHypotheses() {
+    const b=build();if(!b)return;
+    if(!b.task.trim()||!b.observation.trim()){announce('Bitte zunächst Aufgabe und vorliegende oder ausdrücklich fiktive Schülerlösung eintragen. Hypothesen und Aufgabenziel dürfen leer bleiben.');(!b.task.trim()?$('build-task'):$('build-observation')).focus();return;}
+    if(b.hypothesisPrompt&&!await ask('Den bisherigen Diagnoseprompt durch einen neuen aus den aktuellen Fallangaben ersetzen? Ihre Ergebnisfelder bleiben unverändert.'))return;
+    b.hypothesisPrompt=C.builderHypothesisPrompt(b);b.hypothesisPromptSource=hypothesisSource();$('hypothesisPrompt').value=b.hypothesisPrompt;save();promptStatus();announce('Diagnoseprompt erzeugt. Nach der KI-Arbeit die Antwort prüfen und erst dann die passenden Ergebnisfelder ergänzen.');
+  }
   async function applyGoal() {
     const b=build();if(!b)return;const candidate=(b.goalCandidate||'').trim();
     if(!candidate){announce('Bitte zuerst genau einen ausgewählten Zielvorschlag einfügen und fachlich prüfen.');$('build-goalCandidate').focus();return;}
@@ -129,32 +137,53 @@
     const l=state.library;
     if(l.mode==='diagnostic'){const d=diag();return {grade:d.grade,task:d.task,goal:d.goal,baseline:`Vorliegende Lösung: ${d.solution}\nWeitere tatsächlich bekannte Informationen: ${d.known||'keine'}\nBeobachtung: ${d.observation}\nOffene Hypothesen: ${[d.hypothesis1,d.hypothesis2].filter(Boolean).join('; ')}\nDie aufgeführten Angaben sind keine automatisch bestätigte Diagnose.`,label:'Handout 1 · '+d.title};}
     if(l.mode==='builder'){const b=build();return b?{grade:b.grade,task:b.task,goal:b.goal,baseline:C.contextForBuilder(b),label:'Handout 2 · '+b.title}:{grade:'',task:'',goal:'',baseline:'',label:'Kein Förderentwurf vorhanden – Platzhalter ergänzen'};}
+    if(l.mode==='sample')return {...window.HANDOUT_TRIAL_EXAMPLE,label:'Fiktive Bruchauswertung · gemeinsame Erprobung'};
     if(l.mode==='own')return {grade:l.grade,task:l.task,goal:l.goal,baseline:l.baseline,label:'Unabhängiger Bibliotheksfall'};
     return {grade:'',task:'',goal:'',baseline:'',label:'Neutrale Vorlage mit Platzhaltern'};
   }
   function librarySource(){return JSON.stringify(libraryContext());}
-  function updateLibraryContext(){const l=state.library;$('libraryMode').value=l.mode;$('libraryOwn').hidden=l.mode!=='own';$('libraryContext').textContent='Aktueller Kontext: '+libraryContext().label;all('[data-library]').forEach(el=>el.value=l[el.dataset.library]||'');all('.library-warning').forEach(el=>{const draft=l.drafts[el.dataset.format];el.textContent=draft&&draft.source!==librarySource()?'Kontext geändert: Dieser Prompt enthält noch den früheren Fall. Vor dem Kopieren neu befüllen oder bewusst anpassen.':'Fallangaben und alle Platzhalter vor dem Kopieren prüfen.';});}
+  function updateLibraryContext(){const l=state.library;$('libraryMode').value=l.mode;$('libraryOwn').hidden=l.mode!=='own';$('libraryContext').textContent='Aktueller Kontext: '+libraryContext().label;$('trialContextSummary').textContent='Aktueller Kontext für die Erprobung: '+libraryContext().label;all('[data-library]').forEach(el=>el.value=l[el.dataset.library]||'');all('.library-warning').forEach(el=>{const draft=l.drafts[el.dataset.format];el.textContent=draft&&draft.source!==librarySource()?'Kontext geändert: Dieser Prompt und seine Erprobung gehören noch zum früheren Fall. Zum Wechsel bewusst neu befüllen; vorhandene Ergebnisse werden dabei getrennt archiviert.':'Fallangaben und alle Platzhalter vor dem Kopieren prüfen. Ein KI-Ergebnis bleibt bis zu Ihrer Prüfung ein Entwurf.';});}
+  async function trialContext(kind) {
+    if(kind==='builder') {
+      if(!build()){announce('Bitte zuerst in Handout 2 einen Förderentwurf anlegen oder die fiktive Beispielauswertung wählen.');return;}
+      state.library.mode='builder';
+    } else {
+      const sample=window.HANDOUT_TRIAL_EXAMPLE;
+      if(!sample){announce('Die Beispielauswertung ist nicht verfügbar. Bitte die Seite vollständig neu laden.');return;}
+      if(!await ask('Die fiktive Bruchauswertung als Bibliothekskontext verwenden? Eigene Kontextfelder bleiben gespeichert. Bereits bearbeitete Prompts und Ergebnisse werden nicht überschrieben.'))return;
+      state.library.mode='sample';
+    }
+    $('libraryFilter').value='examples';$('promptSearch').value='';updateLibraryContext();filterLibrary();save();go('bibliothek',true);
+    announce('Ausgangslage für die Erprobung gewählt. Öffnen Sie ein Format. Bereits bearbeitete Prompts bei Bedarf bewusst neu befüllen.');
+  }
+  function exampleMarkup(f) {
+    if(!f.example)return '';
+    const e=f.example;
+    return `<details class="format-example"><summary>Konkretes Beispiel zur Bruchaddition</summary><dl><dt>Ausgangslage und Zweck</dt><dd>${esc(e.context)}</dd><dt>Aufgabe beziehungsweise Impuls</dt><dd>${esc(e.task)}</dd></dl><details class="example-solution"><summary>Lösung und didaktische Prüfung</summary><dl><dt>Lösung beziehungsweise erwartbare Antwort</dt><dd>${esc(e.solution)}</dd><dt>Beobachtungskriterium</dt><dd>${esc(e.criterion)}</dd><dt>Was daraus noch nicht folgt</dt><dd>${esc(e.limit)}</dd></dl></details><p class="field-hint">Dieses feste Beispiel dient der Orientierung. Der folgende Prompt verwendet den oben gewählten Kontext, nicht automatisch den Beispielfall.</p></details>`;
+  }
   function renderLibrary() {
-    $('promptList').innerHTML=library.map((f,i)=>`<details class="prompt-item" data-format="${esc(f.id)}" data-category="${i<formats.length?f.category:'extra'}"><summary>${String(i+1).padStart(2,'0')} · ${esc(f.title)}</summary><div class="prompt-detail"><dl><dt>Didaktischer Zweck</dt><dd>${esc(f.purpose)}</dd><dt>Geeigneter Einsatz</dt><dd>${esc(f.when)}</dd><dt>Gewünschte Ausgabe</dt><dd>${esc(f.output)}</dd><dt>Fachliche Prüffrage</dt><dd>${esc(f.check)}</dd></dl><label for="library-${esc(f.id)}">Bearbeitbarer Prompt</label><textarea id="library-${esc(f.id)}" data-library-prompt="${esc(f.id)}"></textarea><p class="library-warning context-alert" data-format="${esc(f.id)}"></p><div class="button-row"><button class="button" type="button" data-refill="${esc(f.id)}">Mit aktuellem Kontext neu befüllen</button><button class="button primary" type="button" data-copy="library-${esc(f.id)}">Prompt kopieren</button><button class="button" type="button" data-print-format="${esc(f.id)}">Vorlage drucken</button></div></div></details>`).join('');
+    $('promptList').innerHTML=library.map((f,i)=>`<details class="prompt-item" data-format="${esc(f.id)}" data-category="${i<formats.length?f.category:'extra'}"><summary>${String(i+1).padStart(2,'0')} · ${esc(f.title)}${f.example?' · mit Aufgabenbeispiel':''}</summary><div class="prompt-detail"><dl><dt>Didaktischer Zweck</dt><dd>${esc(f.purpose)}</dd><dt>Geeigneter Einsatz</dt><dd>${esc(f.when)}</dd><dt>Gewünschte Ausgabe</dt><dd>${esc(f.output)}</dd><dt>Fachliche Prüffrage</dt><dd>${esc(f.check)}</dd></dl>${exampleMarkup(f)}<label for="library-${esc(f.id)}">Bearbeitbarer Prompt</label><textarea id="library-${esc(f.id)}" data-library-prompt="${esc(f.id)}"></textarea><p class="library-warning context-alert" data-format="${esc(f.id)}"></p><div class="button-row"><button class="button" type="button" data-refill="${esc(f.id)}">Mit aktuellem Kontext neu befüllen</button><button class="button primary" type="button" data-copy="library-${esc(f.id)}">Prompt kopieren</button></div><div class="trial-inputs"><label for="trial-result-${esc(f.id)}">KI-Ergebnis oder eigene Ausarbeitung · ${esc(f.title)}</label><textarea id="trial-result-${esc(f.id)}" data-library-result="${esc(f.id)}" class="library-result" placeholder="Aufgaben, Darstellungen oder Hinweise einfügen. Noch ungeprüfte Aussagen als Entwurf behandeln."></textarea><label for="trial-notes-${esc(f.id)}">Meine fachliche Prüfung und Anpassungen · ${esc(f.title)}</label><textarea id="trial-notes-${esc(f.id)}" data-library-notes="${esc(f.id)}" placeholder="Was passt zum Ziel? Welche Rechnung, Darstellung oder Hilfe muss geändert werden?"></textarea></div><div class="button-row"><button class="button" type="button" data-print-format="${esc(f.id)}">Prompt und Erprobung drucken</button></div></div></details>`).join('');
     all('.prompt-item').forEach(item=>item.addEventListener('toggle',()=>{if(item.open)ensureLibrary(item.dataset.format);syncPrintPage();}));
     all('[data-library-prompt]').forEach(el=>{const d=state.library.drafts[el.dataset.libraryPrompt];if(d)el.value=d.text;});
+    all('[data-library-result]').forEach(el=>el.value=state.library.drafts[el.dataset.libraryResult]?.result||'');
+    all('[data-library-notes]').forEach(el=>el.value=state.library.drafts[el.dataset.libraryNotes]?.notes||'');
     filterLibrary();updateLibraryContext();renderImportedLibraries();
   }
   async function ensureLibrary(id,force=false) {
     const f=library.find(x=>x.id===id);if(!f)return;
-    if(force&&state.library.drafts[id]&&!await ask('Diese bearbeitete Vorlage durch die Vorlage mit dem aktuellen Kontext ersetzen?'))return;
-    if(!state.library.drafts[id]||force){state.library.drafts[id]={text:C.fillTemplate(f.prompt,libraryContext()),source:librarySource()};save();}
-    $('library-'+id).value=state.library.drafts[id].text;updateLibraryContext();
+    if(force&&state.library.drafts[id]&&!await ask('Diesen Prompt aus dem aktuellen Kontext neu erzeugen? Eigene Promptänderungen werden ersetzt. Ergebnisse und Anmerkungen bleiben bei gleichem Kontext erhalten; bei einem neuen Kontext werden sie vorher getrennt archiviert.'))return;
+    if(!state.library.drafts[id]||force){try{state=C.refillLibraryDraft(state,id,C.fillTemplate(f.prompt,libraryContext()),librarySource());save();}catch(error){announce('Neu befüllen nicht möglich: '+error.message);return;}}
+    $('library-'+id).value=state.library.drafts[id].text;$('trial-result-'+id).value=state.library.drafts[id].result||'';$('trial-notes-'+id).value=state.library.drafts[id].notes||'';updateLibraryContext();renderImportedLibraries();
   }
   function filterLibrary() {
     const q=$('promptSearch').value.toLocaleLowerCase('de').trim(),filter=$('libraryFilter').value;let count=0;
-    all('.prompt-item').forEach(item=>{const f=library.find(x=>x.id===item.dataset.format);item.hidden=!(filter==='all'||item.dataset.category===filter)||!Object.values(f).join(' ').toLocaleLowerCase('de').includes(q);if(!item.hidden)count++;});
+    all('.prompt-item').forEach(item=>{const f=library.find(x=>x.id===item.dataset.format);item.hidden=!(filter==='all'||item.dataset.category===filter||(filter==='examples'&&f.example))||!JSON.stringify(f).toLocaleLowerCase('de').includes(q);if(!item.hidden)count++;});
     $('libraryCount').textContent=count+' von '+library.length+' Angeboten · 22 Aufgabenformate und 6 Ergänzungen';syncPrintPage();
   }
-  function renderImportedLibraries(){const saved=state.importedLibraries||[];$('importedLibraries').hidden=!saved.length;$('importedLibraryList').innerHTML=saved.map((l,i)=>`<details><summary>Import ${i+1}</summary>${Object.entries(l.drafts||{}).map(([id,d])=>`<label>${esc(library.find(f=>f.id===id)?.title||id)}<textarea readonly>${esc(d.text)}</textarea></label>`).join('')||'<p>Keine bearbeiteten Vorlagen im Import.</p>'}</details>`).join('');}
+  function renderImportedLibraries(){const saved=state.importedLibraries||[];$('importedLibraries').hidden=!saved.length;$('importedLibraryList').innerHTML=saved.map((l,i)=>`<details><summary>Gesicherter Bibliotheksstand ${i+1}</summary>${Object.entries(l.drafts||{}).map(([id,d])=>`<label>${esc(library.find(f=>f.id===id)?.title||id)} · gespeicherter Prompt<textarea readonly>${esc(d.text)}</textarea></label>${d.result?`<label>Gespeichertes Ergebnis<textarea readonly>${esc(d.result)}</textarea></label>`:''}${d.notes?`<label>Gespeicherte Prüfung und Anmerkungen<textarea readonly>${esc(d.notes)}</textarea></label>`:''}`).join('')||'<p>Keine bearbeiteten Vorlagen in dieser Sicherung.</p>'}</details>`).join('');}
   async function copy(id) {
     const el=$(id);if(!el?.value.trim()){announce('Bitte zuerst den Prompt erzeugen oder Text eintragen.');return;}
-    let stale=id==='diagnosisPrompt'?diag().promptSource!==diagSource():id==='builderPrompt'?build()?.promptSource!==buildSource():id==='goalPrompt'?build()?.goalPromptSource!==goalSource():false;
+    let stale=id==='diagnosisPrompt'?diag().promptSource!==diagSource():id==='builderPrompt'?build()?.promptSource!==buildSource():id==='goalPrompt'?build()?.goalPromptSource!==goalSource():id==='hypothesisPrompt'?build()?.hypothesisPromptSource!==hypothesisSource():false;
     if(id.startsWith('library-'))stale=state.library.drafts[id.slice(8)]?.source!==librarySource();
     if(stale&&!await ask('Dieser Prompt stammt noch aus einem früheren Kontext. Trotzdem genau diesen Text kopieren? Mit Abbrechen können Sie ihn zuerst neu befüllen.'))return;
     if(/\[[^\]\n]+\]|\{\{[^}]+\}\}/.test(el.value)&&!await ask('Der Prompt enthält noch Platzhalter in Klammern. Trotzdem als Vorlage kopieren? Ersetzen Sie diese vor der Verwendung.'))return;
@@ -165,7 +194,7 @@
   function exportAll(){save();const output=JSON.parse(JSON.stringify(state));if(recoveryRaw)output.recoveryRaw=recoveryRaw;download('Mathematik-Handouts-Arbeitsstaende.json',JSON.stringify(output,null,2),'application/json');announce('Dateisicherung erstellt. Sie enthält Ihre lokalen Eingaben – nicht öffentlich weitergeben.');}
   async function importFile(file) {
     if(!file)return;if(file.size>10000000){announce('Datei ist größer als 10 MB. Import nicht ausgeführt.');return;}
-    try {const data=C.validate(JSON.parse(await file.text()));const merged=C.mergeImport(state,data);if(!await ask(`${data.diagnostics.length} Fälle und ${data.builders.length} Förderentwürfe zusätzlich importieren? Bestehende Arbeitsstände bleiben erhalten.`))return;state=merged;save();renderDiag();renderBuilder();renderLibrary();announce('Arbeitsstände zusätzlich importiert. Bibliotheksbearbeitungen stehen separat unter Handout 3.');}
+    try {const data=C.validate(JSON.parse(await file.text()));const merged=C.mergeImport(state,data);if(!await ask(`${data.diagnostics.length} Fälle und ${data.builders.length} Förderentwürfe zusätzlich importieren? Bestehende Arbeitsstände bleiben erhalten.`))return;state=merged;save();renderDiag();renderBuilder();renderLibrary();announce('Arbeitsstände übernommen. Vorhandene Bearbeitungen bleiben erhalten. Bibliotheksstände finden Sie in Handout 3.');}
     catch(error){announce('Import nicht möglich: '+error.message+' Vorhandene Daten bleiben unverändert.');}
     finally{$('importFile').value='';}
   }
@@ -173,7 +202,7 @@
   function diagText(){const d=diag();return 'HANDOUT 1 – HYPOTHESENBILDUNG · PRAXISPHASE 1\n\n'+[['Fall',d.title],['Klasse / Stufe',d.grade],['Aufgabe',d.task],['Vorliegende Lösung',d.solution],['Weitere bekannte Informationen',d.known],['Aufgabenziel',d.goal],['Beobachtung',d.observation],['Hypothese 1',d.hypothesis1],['Hypothese 2',d.hypothesis2],['Ausgewählte Prüffrage oder Kontrastaufgabe',d.check],['Offene Informationen',d.missing]].map(x=>entry(...x)).join('\n')+'\nOhne weitere tatsächliche Antwort bleibt die Hypothese offen.';}
   function builderText(){const b=build();if(!b)return '';return 'HANDOUT 2 – FÖRDERBAUSTEIN ENTWICKELN · PRAXISPHASE 2\n\n'+entry('Entwurf',b.title)+'\n'+C.contextForBuilder(b)+'\n\n'+[['Format',formats.find(f=>f.id===b.format)?.title],['KI-Entwurf',b.draft],['Meine Anpassungen',b.adjustments],['Überarbeitete Fassung',b.final],['Fachliche Prüfung',checks.map((v,i)=>(b.checks?.includes(String(i))?'☑ ':'☐ ')+v).join('\n')],['Einsatz',b.use],['Erfolgskontrolle ohne KI',b.success]].map(x=>entry(...x)).join('\n');}
   function preparePrint(kind,id) {
-    let title='',text='';if(kind==='diagnostic'){title='Handout 1 · Hypothesenbildung';text=diagText();}else if(kind==='builder'){title='Handout 2 · Förderbaustein entwickeln';text=build()?builderText():'Noch kein Förderentwurf angelegt. Bitte einen Fall übernehmen oder einen neuen Entwurf beginnen.';}else {const f=library.find(x=>x.id===id);if(!f)return false;title='Handout 3 · Tool- und Promptbibliothek';text=f.title+'\n\n'+entry('Zweck',f.purpose)+entry('Einsatz',f.when)+entry('Erwartete Ausgabe',f.output)+entry('Prüffrage',f.check)+'\n'+(state.library.drafts[id]?.text??C.fillTemplate(f.prompt,libraryContext()));}
+    let title='',text='';if(kind==='diagnostic'){title='Handout 1 · Hypothesenbildung';text=diagText();}else if(kind==='builder'){title='Handout 2 · Förderbaustein entwickeln';text=build()?builderText():'Noch kein Förderentwurf angelegt. Bitte einen Fall übernehmen oder einen neuen Entwurf beginnen.';}else {const f=library.find(x=>x.id===id);if(!f)return false;const d=state.library.drafts[id];title='Handout 3 · Tool- und Promptbibliothek';text=f.title+'\n\n'+entry('Zweck',f.purpose)+entry('Einsatz',f.when)+entry('Erwartete Ausgabe',f.output)+entry('Prüffrage',f.check)+'\n'+(d?.text??C.fillTemplate(f.prompt,libraryContext()))+'\n\n'+entry('KI-Ergebnis oder eigene Ausarbeitung – Prüfung unten dokumentieren',d?.result)+entry('Meine fachliche Prüfung und Anpassungen',d?.notes);}
     $('printSummary').innerHTML=`<h1>${esc(title)}</h1><div class="print-preserve">${esc(text)}</div>`;
     if(kind==='builder'&&build()){const b=build();$('printSummary').innerHTML+=`<section class="print-material"><h1>Handout 2 · Material zum Weiterarbeiten</h1><h2>KI-Rohentwurf · ungeprüft, sofern nicht dokumentiert</h2><div class="print-preserve">${esc(b.draft||'Kein KI-Rohentwurf eingetragen.')}</div><h2>Überarbeitete Fassung</h2><div class="print-preserve">${esc(b.final||'Noch keine überarbeitete Fassung eingetragen. Der Rohentwurf ist nicht automatisch einsatzbereit.')}</div></section>`;}
     return true;
@@ -207,7 +236,11 @@
   $('newBuilder').addEventListener('click',()=>{const c=C.cases.find(x=>x.id===$('builderCaseChoice').value);addBuilder(c);});
   $('builderCaseChoice').addEventListener('change',updateBuilderEntry);
   $('generateGoal').addEventListener('click',regenerateGoal);
+  $('generateHypotheses').addEventListener('click',regenerateHypotheses);
   $('applyGoal').addEventListener('click',applyGoal);
+  $('exploreVariants').addEventListener('click',()=>trialContext('builder'));
+  $('trialFromBuilder').addEventListener('click',()=>trialContext('builder'));
+  $('trialFromExample').addEventListener('click',()=>trialContext('sample'));
   $('generateDiagnosis').addEventListener('click',()=>regenerate('diagnostic'));
   $('generateBuilder').addEventListener('click',()=>regenerate('builder'));
   $('saveAll').addEventListener('click',()=>save(true));$('exportAll').addEventListener('click',exportAll);
@@ -216,7 +249,7 @@
   $('recoverLegacy').addEventListener('click',async()=>{try {if(state.builders.length>=500){announce('Grenze von 500 Förderentwürfen erreicht.');return;}const old=localStorage.getItem(C.LEGACY_KEY);const migrated=C.migrateLegacy(old);if(!await ask('Alten Förderbaustein zusätzlich übernehmen? Der aktuelle Stand und der Originalspeicher bleiben bestehen.'))return;const b=migrated.builders[0];state.builders.push(b);state.activeBuilderId=b.id;save();renderBuilder();go('foerderbaustein',true);}catch{announce('Alter Stand nicht lesbar. Es wurde nichts überschrieben.');}});
   $('libraryMode').addEventListener('change',e=>{state.library.mode=e.target.value;save();updateLibraryContext();});
   all('[data-library]').forEach(el=>el.addEventListener('input',()=>{state.library[el.dataset.library]=el.value;save();updateLibraryContext();}));
-  $('promptList').addEventListener('input',e=>{const id=e.target.dataset.libraryPrompt;if(!id)return;state.library.drafts[id]={text:e.target.value,source:state.library.drafts[id]?.source||librarySource()};save();});
+  $('promptList').addEventListener('input',e=>{const el=e.target,id=el.dataset.libraryPrompt||el.dataset.libraryResult||el.dataset.libraryNotes;if(!id)return;const key=el.dataset.libraryPrompt?'text':el.dataset.libraryResult?'result':'notes';const d=state.library.drafts[id]||{text:$('library-'+id).value,source:librarySource()};d[key]=el.value;state.library.drafts[id]=d;save();});
   $('promptSearch').addEventListener('input',filterLibrary);$('libraryFilter').addEventListener('change',filterLibrary);
   document.addEventListener('click',e=>{const a=e.target.closest('[data-nav]');if(a){e.preventDefault();go(a.dataset.nav,true);}const c=e.target.closest('[data-copy]');if(c)copy(c.dataset.copy);const r=e.target.closest('[data-refill]');if(r)ensureLibrary(r.dataset.refill,true);const p=e.target.closest('[data-print]');if(p)print(p.dataset.print);const pf=e.target.closest('[data-print-format]');if(pf)print('library',pf.dataset.printFormat);});
   $('closeFallback').addEventListener('click',()=>$('copyFallback').close());

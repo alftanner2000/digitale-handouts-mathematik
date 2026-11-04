@@ -191,12 +191,18 @@ test('import normalizes minimal valid entries before any UI trim calls', () => {
   const incoming = C.empty();
   incoming.diagnostics = [{id: 'minimum-diagnostic', title: 'Minimaler Fall'}];
   incoming.builders = [{id: 'minimum-builder', title: 'Minimaler Entwurf'}];
+  incoming.library = {mode: 'sample'};
+  const before = clone(incoming);
   const merged = C.mergeImport(C.empty(), incoming);
   for (const [actual, defaults] of [[merged.diagnostics.at(-1), C.diagnostic()], [merged.builders.at(-1), C.builder()]]) {
     for (const [key, value] of Object.entries(defaults)) assert.equal(typeof actual[key], typeof value, key);
     assert.doesNotThrow(() => actual.task.trim());
     assert.doesNotThrow(() => actual.goal.trim());
   }
+  assert.equal(merged.library.mode, 'sample');
+  assert.deepEqual(merged.library.drafts, {});
+  for (const key of ['grade','task','goal','baseline']) assert.equal(merged.library[key], '');
+  assert.deepEqual(incoming, before);
   assert.doesNotThrow(() => C.validate(clone(merged)));
 });
 
@@ -236,6 +242,7 @@ test('500 cases are valid; merging past the limit fails without changing the cur
 
 test('library archive limit is checked before adding another imported archive', () => {
   const current = C.empty();
+  current.library.goal = 'Vorhandener Kontext bleibt erhalten';
   current.importedLibraries = Array.from({length: 500}, () => ({mode: 'blank', drafts: {}}));
   const before = JSON.stringify(current);
   C.validate(current);
@@ -262,6 +269,293 @@ test('export/import roundtrip retains current and prior libraries, legacy origin
   for (const marker of ['CURRENT LIBRARY', 'INCOMING LIBRARY', 'EARLIER LIBRARY', 'LEGACY ORIGINAL', 'EARLIER LEGACY', 'RAW RECOVERY', 'EARLIER RECOVERY', 'Bearbeiteter Diagnoseprompt', 'Geprüfte Fassung', 'originalCheckbox']) assert.ok(serialized.includes(marker), marker);
   assert.ok(third.builders.some(b => b.draft === unicode));
   assert.doesNotThrow(() => C.validate(clone(third)));
+});
+
+test('library results and teacher notes are optional text fields within storage version 2', () => {
+  const state = C.empty();
+  state.library.drafts = {
+    old: {text: 'Bisher bearbeiteter Prompt', source: 'Alter Kontext'},
+    resultOnly: {text: 'Prompt A', source: 'Kontext A', result: 'KI-Ergebnis\n' + unicode},
+    notesOnly: {text: 'Prompt B', source: 'Kontext B', notes: 'Eigene fachliche Anmerkung\n' + unicode},
+    empty: {text: 'Prompt C', source: 'Kontext C', result: '', notes: ''}
+  };
+  const before = clone(state);
+  assert.equal(C.validate(state), state);
+  assert.equal(state.version, 2);
+  assert.deepEqual(state, before);
+  const restored = C.validate(clone(state));
+  assert.deepEqual(restored.library.drafts, before.library.drafts);
+  assert.ok(!Object.hasOwn(restored.library.drafts.old, 'result'));
+  assert.ok(!Object.hasOwn(restored.library.drafts.old, 'notes'));
+  assert.ok(!Object.hasOwn(restored.library.drafts.resultOnly, 'notes'));
+  assert.ok(!Object.hasOwn(restored.library.drafts.notesOnly, 'result'));
+});
+
+test('invalid library result or notes are rejected in current and imported libraries without mutation', () => {
+  for (const archived of [false, true]) for (const field of ['result', 'notes']) for (const invalid of [null, 42, true, [], {}, ['text']]) {
+    const incoming = C.empty();
+    const lib = {mode: 'blank', drafts: {example: {text: 'Prompt', source: 'Kontext', [field]: invalid}}};
+    if (archived) incoming.importedLibraries = [lib]; else incoming.library = lib;
+    const current = C.empty(), beforeCurrent = clone(current), beforeIncoming = clone(incoming);
+    assert.throws(() => C.validate(incoming), /Ungültiges Textfeld im Bibliothekseintrag/, field);
+    assert.throws(() => C.mergeImport(current, incoming), field);
+    assert.deepEqual(current, beforeCurrent);
+    assert.deepEqual(incoming, beforeIncoming);
+  }
+  const arrayDraft = [];
+  Object.assign(arrayDraft, {text: 'Prompt', source: 'Kontext', result: 'Ergebnis', notes: 'Anmerkung'});
+  const state = C.empty();
+  state.library.drafts.example = arrayDraft;
+  assert.throws(() => C.validate(state), /Ungültiger Bibliothekseintrag/);
+});
+
+test('per-format results and notes survive repeated imports without overwriting current or archived work', () => {
+  const current = C.empty(), incoming = C.empty();
+  const id = 'handlung-bild-symbol';
+  current.library.drafts[id] = {text: 'CURRENT PROMPT', source: 'current context', result: 'CURRENT RESULT\n' + unicode, notes: 'CURRENT NOTES\n' + unicode};
+  current.library.drafts.fehlerdetektiv = {text: 'OTHER PROMPT', source: 'other context', result: 'OTHER RESULT', notes: 'OTHER NOTES'};
+  incoming.library.drafts[id] = {text: 'INCOMING PROMPT', source: 'incoming context', result: 'INCOMING RESULT\n' + unicode, notes: 'INCOMING NOTES\n' + unicode};
+  incoming.importedLibraries = [{mode: 'own', drafts: {[id]: {text: 'ARCHIVED PROMPT', source: 'archived context', result: 'ARCHIVED RESULT\n' + unicode, notes: 'ARCHIVED NOTES\n' + unicode}}}];
+  const beforeCurrent = clone(current), beforeIncoming = clone(incoming);
+  const first = C.mergeImport(current, incoming);
+  assert.deepEqual(first.library, current.library);
+  assert.deepEqual(first.importedLibraries[0], incoming.library);
+  assert.deepEqual(first.importedLibraries[1], incoming.importedLibraries[0]);
+  assert.deepEqual(current, beforeCurrent);
+  assert.deepEqual(incoming, beforeIncoming);
+  const second = C.mergeImport(C.empty(), clone(first));
+  const third = C.mergeImport(C.empty(), clone(second));
+  assert.equal(third.version, 2);
+  const libraries = [third.library, ...third.importedLibraries];
+  for (const expected of [current.library, incoming.library, incoming.importedLibraries[0]]) {
+    assert.ok(libraries.some(actual => JSON.stringify(actual) === JSON.stringify(expected)));
+  }
+  assert.doesNotThrow(() => C.validate(clone(third)));
+});
+
+test('importing older v2 library drafts preserves their prompts and existing new result fields separately', () => {
+  const current = C.empty(), old = C.empty();
+  current.library.drafts.fehlerdetektiv = {text: 'Heutiger Prompt', source: 'heutiger Kontext', result: 'Eigenes KI-Ergebnis', notes: 'Meine fachliche Prüfung'};
+  old.library.drafts.fehlerdetektiv = {text: 'Alter bearbeiteter Prompt\n' + unicode, source: 'alter Kontext'};
+  old.importedLibraries = [{drafts: {partnerdialog: {text: 'Früherer Archivprompt', source: 'früherer Kontext'}}}];
+  const beforeCurrent = clone(current), beforeOld = clone(old);
+  const merged = C.mergeImport(current, old);
+  assert.equal(merged.version, 2);
+  assert.deepEqual(merged.library, beforeCurrent.library);
+  assert.deepEqual(merged.importedLibraries[0], beforeOld.library);
+  assert.deepEqual(merged.importedLibraries[1], beforeOld.importedLibraries[0]);
+  assert.deepEqual(current, beforeCurrent);
+  assert.deepEqual(old, beforeOld);
+  assert.deepEqual(C.validate(clone(merged)).importedLibraries, merged.importedLibraries);
+});
+
+test('refilling a new library format creates an independent v2 state with empty result and notes', () => {
+  for (const library of [C.empty().library, {mode: 'blank'}]) {
+    const current = C.empty();
+    current.library = library;
+    const before = clone(current);
+    const next = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Neuer Prompt\n' + unicode, 'Neuer Kontext');
+    assert.equal(next.version, 2);
+    assert.deepEqual(next.library.drafts.fehlerdetektiv, {text: 'Neuer Prompt\n' + unicode, source: 'Neuer Kontext', result: '', notes: ''});
+    assert.deepEqual(current, before);
+    assert.notEqual(next, current);
+    assert.notEqual(next.library, current.library);
+    assert.ok(!next.importedLibraries);
+  }
+});
+
+test('refilling the same source updates the prompt but retains result and notes without an archive', () => {
+  const current = C.empty();
+  current.library.drafts.fehlerdetektiv = {text: 'Bisheriger Prompt', source: 'Gleicher Kontext', result: 'Ergebnis\n' + unicode, notes: 'Anmerkung\n' + unicode};
+  current.importedLibraries = Array.from({length: 500}, () => ({drafts: {}}));
+  const before = clone(current);
+  const next = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Bewusst neuer Prompt', 'Gleicher Kontext');
+  assert.deepEqual(next.library.drafts.fehlerdetektiv, {...before.library.drafts.fehlerdetektiv, text: 'Bewusst neuer Prompt'});
+  assert.equal(next.importedLibraries.length, 500);
+  assert.deepEqual(current, before);
+  assert.notEqual(next.library.drafts.fehlerdetektiv, current.library.drafts.fehlerdetektiv);
+});
+
+test('a changed source archives only the affected completed draft before clearing its active result and notes', () => {
+  const current = C.empty();
+  Object.assign(current.library, {mode: 'own', task: 'Bereits geänderter globaler Kontext'});
+  const oldSource = JSON.stringify({task: 'Frühere Aufgabe', baseline: 'Frühere Ausgangslage'});
+  current.library.drafts.fehlerdetektiv = {text: 'Früherer Prompt\n' + unicode, source: oldSource, result: 'Eigenes Ergebnis\n' + unicode, notes: 'Eigene Prüfung\n' + unicode};
+  current.library.drafts.partnerdialog = {text: 'Anderer Prompt', source: 'anderer Kontext', result: 'Anderes Ergebnis', notes: 'Andere Prüfung'};
+  current.importedLibraries = [{drafts: {existing: {text: 'Älteres Archiv', source: 'Archivkontext'}}}];
+  const before = clone(current);
+  const next = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Neuer Prompt', 'Neuer Kontext');
+  assert.deepEqual(next.library.drafts.fehlerdetektiv, {text: 'Neuer Prompt', source: 'Neuer Kontext', result: '', notes: ''});
+  assert.deepEqual(next.library.drafts.partnerdialog, before.library.drafts.partnerdialog);
+  assert.deepEqual(next.importedLibraries[0], before.importedLibraries[0]);
+  assert.deepEqual(next.importedLibraries[1], {drafts: {fehlerdetektiv: before.library.drafts.fehlerdetektiv}});
+  assert.deepEqual(current, before);
+  const twice = C.mergeImport(C.empty(), clone(C.mergeImport(C.empty(), clone(next))));
+  assert.ok(twice.importedLibraries.some(lib => JSON.stringify(lib) === JSON.stringify(next.importedLibraries[1])));
+  assert.deepEqual(twice.library, next.library);
+});
+
+test('older drafts or whitespace-only results retain replacement behavior without creating archives', () => {
+  for (const extra of [{}, {result: '', notes: ''}, {result: ' \n\t', notes: '  '}]) {
+    const current = C.empty();
+    current.library.drafts.fehlerdetektiv = {text: 'Alte Vorlage', source: 'Alter Kontext', ...extra};
+    current.importedLibraries = Array.from({length: 500}, () => ({drafts: {}}));
+    const before = clone(current);
+    const next = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Neue Vorlage', 'Neuer Kontext');
+    assert.equal(next.importedLibraries.length, 500);
+    assert.deepEqual(next.library.drafts.fehlerdetektiv, {text: 'Neue Vorlage', source: 'Neuer Kontext', result: '', notes: ''});
+    assert.deepEqual(current, before);
+  }
+});
+
+test('either a result or notes trigger archiving and the 500-archive limit is checked before any change', () => {
+  for (const field of ['result', 'notes']) {
+    const current = C.empty();
+    current.library.drafts.fehlerdetektiv = {text: 'Prompt', source: 'Alter Kontext', [field]: 'Erhaltenswerter Text'};
+    current.importedLibraries = Array.from({length: 499}, () => ({drafts: {}}));
+    const atLimit = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Neuer Prompt', 'Neuer Kontext');
+    assert.equal(atLimit.importedLibraries.length, 500);
+    assert.equal(atLimit.importedLibraries.at(-1).drafts.fehlerdetektiv[field], 'Erhaltenswerter Text');
+    atLimit.library.drafts.fehlerdetektiv[field] = 'Weitere Bearbeitung';
+    const before = clone(atLimit);
+    assert.throws(() => C.refillLibraryDraft(atLimit, 'fehlerdetektiv', 'Noch neuerer Prompt', 'Noch neuerer Kontext'), /500/);
+    assert.deepEqual(atLimit, before);
+  }
+});
+
+test('refilling rejects invalid input without mutating or polluting existing state', () => {
+  const current = C.empty();
+  current.library.drafts.fehlerdetektiv = {text: 'Prompt', source: 'Kontext', result: 'Ergebnis', notes: 'Anmerkung'};
+  const before = clone(current);
+  for (const id of [null, 42, '', '  ', '__proto__', 'constructor', 'prototype']) assert.throws(() => C.refillLibraryDraft(current, id, 'Neuer Prompt', 'Neuer Kontext'));
+  for (const invalid of [null, 42, true, [], {}]) {
+    assert.throws(() => C.refillLibraryDraft(current, 'fehlerdetektiv', invalid, 'Neuer Kontext'));
+    assert.throws(() => C.refillLibraryDraft(current, 'fehlerdetektiv', 'Neuer Prompt', invalid));
+  }
+  assert.deepEqual(current, before);
+  const damaged = clone(current);
+  damaged.library.drafts.fehlerdetektiv.notes = 42;
+  const beforeDamaged = clone(damaged);
+  assert.throws(() => C.refillLibraryDraft(damaged, 'fehlerdetektiv', 'Neuer Prompt', 'Neuer Kontext'));
+  assert.deepEqual(damaged, beforeDamaged);
+  assert.equal(Object.prototype.result, undefined);
+  assert.equal(Object.prototype.notes, undefined);
+});
+
+test('an export with 500 saved library archives can be restored into an untouched target', () => {
+  const current = C.empty();
+  current.library.drafts.fehlerdetektiv = {text: 'Alter Prompt', source: 'Alter Kontext', result: 'Ergebnis\n' + unicode, notes: 'Fachliche Prüfung'};
+  current.importedLibraries = Array.from({length: 499}, (_, i) => ({drafts: {example: {text: 'Archiv ' + i, source: 'Kontext ' + i}}}));
+  const full = C.refillLibraryDraft(current, 'fehlerdetektiv', 'Aktueller Prompt', 'Neuer Kontext');
+  const exported = clone(full), before = clone(exported);
+  const restored = C.mergeImport(C.empty(), exported);
+  assert.equal(restored.importedLibraries.length, 500);
+  assert.deepEqual(restored.library, full.library);
+  assert.deepEqual(restored.importedLibraries, full.importedLibraries);
+  assert.deepEqual(exported, before);
+  const restoredAgain = C.mergeImport(C.empty(), clone(restored));
+  assert.deepEqual(restoredAgain.library, full.library);
+  assert.deepEqual(restoredAgain.importedLibraries, full.importedLibraries);
+});
+
+test('adopting an incoming active library retains target archives and checks actual archive growth', () => {
+  const current = C.empty(), incoming = C.empty();
+  current.importedLibraries = [{drafts: {example: {text: 'Vorhandenes Archiv', source: 'Alter Kontext'}}}];
+  incoming.library.drafts.fehlerdetektiv = {text: 'Importierter Prompt', source: 'Kontext', result: 'Ergebnis', notes: 'Anmerkung'};
+  incoming.importedLibraries = Array.from({length: 499}, () => ({drafts: {}}));
+  const before = clone(current);
+  const merged = C.mergeImport(current, incoming);
+  assert.equal(merged.importedLibraries.length, 500);
+  assert.deepEqual(merged.importedLibraries[0], current.importedLibraries[0]);
+  assert.deepEqual(merged.library, incoming.library);
+  assert.deepEqual(current, before);
+  incoming.importedLibraries.push({drafts: {}});
+  assert.throws(() => C.mergeImport(current, incoming), /Bibliotheksarchive/);
+  assert.deepEqual(current, before);
+});
+
+test('any existing library context, draft, nonblank mode or unknown field prevents replacement', () => {
+  const mutations = [
+    ...['grade','task','goal','baseline'].map(key => lib => {lib[key] = ' ';}),
+    lib => {lib.mode = 'own';},
+    lib => {lib.mode = 'sample';},
+    lib => {delete lib.mode;},
+    lib => {lib.drafts.example = {text: '', source: ''};},
+    lib => {lib.futureMaterial = '';},
+    lib => {lib.futureMaterial = {result: 'Unbekanntes Material erhalten'};}
+  ];
+  for (const mutate of mutations) {
+    const current = C.empty(), incoming = C.empty();
+    mutate(current.library);
+    incoming.library.drafts.fehlerdetektiv = {text: 'Importiert', source: 'Importkontext'};
+    const before = clone(current);
+    const merged = C.mergeImport(current, incoming);
+    assert.deepEqual(merged.library, before.library);
+    assert.deepEqual(merged.importedLibraries[0], incoming.library);
+    assert.deepEqual(current, before);
+  }
+});
+
+test('a minimal explicitly blank library is untouched but a nonblank destination still respects the archive limit', () => {
+  const current = C.empty(), incoming = C.empty();
+  current.library = {mode: 'blank'};
+  incoming.library.drafts.fehlerdetektiv = {text: 'Importiert', source: 'Importkontext', result: 'Ergebnis'};
+  incoming.importedLibraries = Array.from({length: 500}, () => ({drafts: {}}));
+  assert.deepEqual(C.mergeImport(current, incoming).library, incoming.library);
+  current.library.futureMaterial = 'Nicht überschreiben';
+  const before = clone(current);
+  assert.throws(() => C.mergeImport(current, incoming), /Bibliotheksarchive/);
+  assert.deepEqual(current, before);
+});
+
+test('exactly eight library formats provide complete concrete examples with separate solutions and limits', () => {
+  const examples = [...formats, ...extras].filter(f => f.example);
+  assert.deepEqual(examples.map(f => f.id), ['handlung-bild-symbol','darstellungen-zuordnen','gestufte-hilfekarten','differenzierung-gemeinsames-lernziel','strukturierte-rechenpaeckchen','fehlerdetektiv','exit-ticket-ohne-ki','hypothesenbildung']);
+  for (const f of examples) {
+    assert.deepEqual(Object.keys(f.example).sort(), ['context','task','solution','criterion','limit'].sort(), f.id);
+    for (const value of Object.values(f.example)) assert.ok(typeof value === 'string' && value.trim(), f.id);
+    assert.match(f.example.context, /Fiktiver Ausgangsfall/);
+    assert.match(f.example.context, /Denkweg ist unbekannt/);
+  }
+});
+
+test('the common trial context is explicitly fictitious and fills each example prompt without inventing evidence', () => {
+  const trial = clone(sandbox.window.HANDOUT_TRIAL_EXAMPLE);
+  assert.deepEqual(Object.keys(trial).sort(), ['grade','task','goal','baseline'].sort());
+  for (const value of Object.values(trial)) assert.ok(typeof value === 'string' && value.trim());
+  assert.equal(trial.task, '1/2 + 1/3 = ?');
+  assert.match(trial.baseline, /Fiktive notierte Lösung/);
+  assert.match(trial.baseline, /Offene Vermutung/);
+  assert.match(trial.baseline, /Ausdrücklich gewählte Arbeitsannahme/);
+  assert.match(trial.baseline, /Keine weitere Kinderantwort bekannt/);
+  for (const f of [...formats, ...extras].filter(f => f.example)) {
+    const filled = C.fillTemplate(f.prompt, trial);
+    assert.ok(filled.includes(trial.task), f.id);
+    assert.ok(filled.includes(trial.goal), f.id);
+    assert.ok(filled.includes(trial.baseline), f.id);
+    assert.doesNotMatch(filled, /\{\{[^}]+\}\}/, f.id);
+  }
+});
+
+test('sample mode remains v2-compatible in active and archived libraries across imports', () => {
+  const incoming = C.empty();
+  incoming.library.mode = 'sample';
+  incoming.library.drafts.fehlerdetektiv = {text: 'Beispielprompt', source: JSON.stringify(sandbox.window.HANDOUT_TRIAL_EXAMPLE), result: 'Erprobung', notes: 'Prüfung'};
+  incoming.importedLibraries = [{mode: 'sample', drafts: {}}];
+  assert.equal(C.validate(incoming).version, 2);
+  const merged = C.mergeImport(C.empty(), clone(incoming));
+  assert.deepEqual(merged.library, incoming.library);
+  assert.equal(merged.importedLibraries[0].mode, 'sample');
+  assert.doesNotThrow(() => C.validate(clone(merged)));
+});
+
+test('HTML exposes the sample context and eight-example filter without changing the neutral default', () => {
+  const mode = html.match(/<select\b[^>]*id="libraryMode"[^>]*>([\s\S]*?)<\/select>/)[1];
+  assert.match(mode, /^<option value="blank">/);
+  assert.match(mode, /<option value="sample">Fiktive Bruchauswertung/);
+  assert.match(html, /<option value="examples">Acht konkrete Erprobungsbeispiele<\/option>/);
+  assert.match(html, /id="trialFromExample"/);
+  assert.match(html, /id="trialFromBuilder"/);
 });
 
 test('exactly 22 requested formats in the required order and categories', () => {
@@ -456,4 +750,168 @@ test('new goal-help fields survive repeated JSON/import roundtrips and reject no
     invalid.builders[0][key] = {not: 'text'};
     assert.throws(() => C.validate(invalid), key);
   }
+});
+
+test('H1 permits a missing task goal and requests a proposed requirement, not an invented learning state', () => {
+  const d = C.diagnostic(C.cases[4]);
+  d.goal = '';
+  const before = clone(d);
+  const p = C.diagnosticPrompt(d);
+  assert.ok(p.includes(d.task));
+  assert.ok(p.includes(d.solution));
+  assert.match(p, /Ein Aufgabenziel ist keine Voraussetzung/);
+  assert.match(p, /aufgabenbezogenes Ziel ausdrücklich als Vorschlag/);
+  assert.match(p, /keinen beobachteten Lernstand und keine Annahme über das Kind/);
+  assert.match(p, /Erfinde weder eine Schülerlösung noch eine fallbezogene Hypothese/);
+  assert.deepEqual(d, before);
+});
+
+test('H1 keeps an existing goal available for optional refinement without mutating it', () => {
+  const d = populatedDiagnostic();
+  d.goal = 'Eigenes Aufgabenziel\n' + unicode;
+  const before = clone(d);
+  Object.freeze(d);
+  const p = C.diagnosticPrompt(d);
+  assert.ok(p.includes(d.goal));
+  assert.match(p, /Behalte ein passendes vorhandenes Aufgabenziel bei oder präzisiere es bei Bedarf/);
+  assert.deepEqual(d, before);
+});
+
+test('H2 hypothesis help adds two empty v2 fields and requires no prior hypotheses, goal or format', () => {
+  const b = C.builder(C.cases[4]);
+  b.taskGoal = '';
+  for (const key of ['hypothesisPrompt', 'hypothesisPromptSource', 'hypotheses', 'goal', 'format']) assert.equal(b[key], '');
+  assert.equal(C.empty().version, 2);
+  assert.equal(typeof C.builderHypothesisPrompt, 'function');
+  const p = C.builderHypothesisPrompt(b);
+  assert.ok(p.includes(b.task));
+  assert.ok(p.includes(b.observation));
+  assert.match(p, /Eigene Hypothesen, Fachbegriffe, ein Aufgabenziel oder ein Förderziel sind keine Voraussetzung/);
+  assert.match(p, /Fehlt das konkrete Aufgabenziel/);
+  assert.match(p, /kennzeichne es als Vorschlag/);
+  assert.doesNotMatch(p, /Genau ein Format auswählen|Formatspezifischer Auftrag/);
+  assert.doesNotThrow(() => C.builderHypothesisPrompt(C.builder()));
+});
+
+test('H2 hypothesis prompt carries all known inputs and keeps evidence, assumptions and uncertainty distinct', () => {
+  const b = C.builder(populatedDiagnostic());
+  b.topic = 'Bruchverständnis';
+  b.conception = 'Nur vorläufiger Bezug zur gemeinsamen Einheit';
+  b.assumption = 'FIKTIVE ARBEITSANNAHME: Teilgrößen bleiben unbeachtet.';
+  b.evidence = 'WEITERE TATSÄCHLICHE ANTWORT: Ein Viertel wird richtig gezeigt.';
+  for (const status of ['open', 'assumed', 'observed']) {
+    b.evidenceStatus = status;
+    const p = C.builderHypothesisPrompt(b);
+    assert.ok(p.includes(C.contextForBuilder(b)), status);
+    for (const value of [b.grade, b.task, b.observation, b.known, b.taskGoal, b.hypotheses, b.plannedCheck, b.missing, b.conception]) assert.ok(p.includes(value), status + ': ' + value);
+    if (status === 'observed') {
+      assert.ok(p.includes(b.evidence));
+      assert.ok(!p.includes(b.assumption));
+    } else {
+      assert.ok(p.includes(b.assumption));
+      assert.ok(!p.includes(b.evidence));
+    }
+    assert.match(p, /Eine Arbeitsannahme ist keine tatsächlich beobachtete Antwort/);
+  }
+});
+
+test('H2 hypothesis help uses exactly five output headings and no promotion products', () => {
+  const p = C.builderHypothesisPrompt(C.builder());
+  assert.deepEqual(p.split('\n').filter(line => /^[A-ZÄÖÜß ]+$/.test(line)), ['KONKRETES AUFGABENZIEL', 'BEOBACHTUNG', 'OFFENE HYPOTHESEN', 'GEPLANTER PRÜFSCHRITT', 'NOCH FEHLENDE INFORMATIONEN']);
+  for (const phrase of ['insgesamt höchstens zwei', 'aus vorhandenen Hinweisen', 'Erfinde keinen Denkweg und keine Kinderäußerung', 'gezielte offene Rückfrage oder kurze Kontrastaufgabe', 'stützende und widersprechende Antworten, ausdrücklich als hypothetisch', 'keine gesicherte Diagnose', 'keine Förderübungen, keinen Förderplan und keinen vollständigen Förderbaustein', 'Ohne tatsächliche weitere Antworten bleiben die Hypothesen offen', 'Kein Vorschlag wird automatisch bestätigt']) assert.ok(p.includes(phrase), phrase);
+  assert.match(p, /Fehlt die Aufgabe oder eine vorliegende beziehungsweise vorgegebene fiktive Lösung oder Äußerung, frage gezielt danach/);
+  assert.match(p, /Erfinde in diesem Fall keine fallbezogene Hypothese und keine Schülerlösung/);
+  assert.match(p, /vorgegebene fiktive Lösung ist als fiktiv zu kennzeichnen/);
+});
+
+test('generating H2 hypothesis help cannot change current observations, hypotheses, checks, goals or prompts', () => {
+  const b = Object.assign(C.builder(populatedDiagnostic()), {
+    goal: 'Mein bisheriges Förderziel',
+    hypothesisPrompt: 'Bereits bearbeiteter Hilfeprompt\n' + unicode,
+    hypothesisPromptSource: 'Vorheriger Kontext',
+    goalPrompt: 'Zielhilfe unverändert',
+    goalCandidate: 'Noch nicht übernommener Zielvorschlag',
+    draft: 'Bestehendes Material',
+    checks: ['0', '2']
+  });
+  const before = clone(b);
+  Object.freeze(b.checks);
+  Object.freeze(b);
+  C.builderHypothesisPrompt(b);
+  assert.deepEqual(b, before);
+});
+
+test('new hypothesis fields preserve old-v2 and legacy compatibility and survive repeated imports', () => {
+  const old = C.empty();
+  const oldBuilder = Object.assign(C.builder(), {hypotheses: 'Vorläufige Vermutung', goal: 'Vorhandenes Förderziel'});
+  delete oldBuilder.hypothesisPrompt;
+  delete oldBuilder.hypothesisPromptSource;
+  old.builders.push(oldBuilder);
+  C.validate(old);
+  const upgraded = C.mergeImport(C.empty(), old).builders.at(-1);
+  for (const key of ['hypothesisPrompt', 'hypothesisPromptSource']) assert.equal(upgraded[key], '');
+  assert.equal(upgraded.hypotheses, oldBuilder.hypotheses);
+  assert.equal(upgraded.goal, oldBuilder.goal);
+  const legacy = C.migrateLegacy(JSON.stringify({buildError: 'Alte offene Deutung', buildDraft: unicode})).builders[0];
+  for (const key of ['hypothesisPrompt', 'hypothesisPromptSource']) assert.equal(legacy[key], '');
+  const incoming = C.empty();
+  const b = Object.assign(C.builder(), {hypothesisPrompt: 'Bearbeitet\n' + unicode, hypothesisPromptSource: 'Kontext\n' + unicode, hypotheses: 'Unbestätigte Hypothese', goal: 'Separates Förderziel'});
+  incoming.builders.push(b);
+  const once = C.mergeImport(C.empty(), clone(incoming));
+  const twice = C.mergeImport(C.empty(), clone(once));
+  const result = twice.builders.at(-1);
+  for (const key of ['hypothesisPrompt', 'hypothesisPromptSource', 'hypotheses', 'goal']) assert.equal(result[key], b[key]);
+  for (const key of ['hypothesisPrompt', 'hypothesisPromptSource']) {
+    const invalid = clone(incoming);
+    invalid.builders[0][key] = {not: 'text'};
+    assert.throws(() => C.validate(invalid), key);
+  }
+});
+
+test('H1 transfer keeps the raw solution separate from the recorded observation', () => {
+  const d = populatedDiagnostic();
+  d.solution = 'Fiktive Schülerlösung\n½ + ⅓ = ⅖';
+  d.observation = 'Festgehalten ist eine falsche Gleichung.\nDer Denkweg ist noch unbekannt.';
+  const before = clone(d);
+  const b = C.builder(d);
+  assert.equal(b.observation, d.solution);
+  assert.equal(b.noticed, d.observation);
+  assert.equal(C.builder().noticed, '');
+  assert.deepEqual(d, before);
+  const context = C.contextForBuilder(b);
+  assert.ok(context.includes(b.observation));
+  assert.ok(context.includes(b.noticed));
+  assert.match(context, /Festgehaltene Beobachtung an der Lösung/);
+  assert.ok(C.builderHypothesisPrompt(b).includes(context));
+  assert.ok(C.goalPrompt(b).includes(context));
+  assert.ok(C.builderPrompt(b, formats[0]).includes(context));
+});
+
+test('older combined observation fields stay byte-for-byte unchanged on v2 import and legacy migration', () => {
+  const combined = 'Ursprüngliche Lösung: ½ + ⅓ = ⅖\nFrühere ergänzte Beobachtung\n' + unicode;
+  const old = C.empty();
+  const b = Object.assign(C.builder(), {observation: combined});
+  delete b.noticed;
+  old.builders.push(b);
+  C.validate(old);
+  const imported = C.mergeImport(C.empty(), old).builders.at(-1);
+  assert.equal(imported.observation, combined);
+  assert.equal(imported.noticed, '');
+  const migrated = C.migrateLegacy(JSON.stringify({buildObservation: combined})).builders[0];
+  assert.equal(migrated.observation, combined);
+  assert.equal(migrated.noticed, '');
+  assert.equal(migrated.legacyOriginal.buildObservation, combined);
+});
+
+test('new separate observation survives roundtrips without replacing the raw solution', () => {
+  const incoming = C.empty();
+  const b = Object.assign(C.builder(), {observation: 'Unveränderte Roh-Lösung\n' + unicode, noticed: 'Nach Prüfung festgehaltene Beobachtung\n' + unicode});
+  incoming.builders.push(b);
+  const once = C.mergeImport(C.empty(), clone(incoming));
+  const twice = C.mergeImport(C.empty(), clone(once));
+  assert.equal(twice.builders.at(-1).observation, b.observation);
+  assert.equal(twice.builders.at(-1).noticed, b.noticed);
+  const invalid = clone(incoming);
+  invalid.builders[0].noticed = {not: 'text'};
+  assert.throws(() => C.validate(invalid));
 });

@@ -10,10 +10,24 @@ Ausgangslage (beobachtete Lösung oder Äußerung, offene Vermutungen und ausdr�
   const safeguards = `Arbeite nur am ausgewählten Format und am genannten Lernziel. Verwende ausschließlich fiktive oder vollständig anonymisierte Angaben. Trenne tatsächliche Beobachtungen, vorläufige Deutungen und Arbeitsannahmen. Erfinde keine Äußerungen oder Bearbeitungen des Kindes. Benenne fehlende Angaben. Wenn du eine ungesicherte Ausgangslage für die Materialplanung annimmst, schreibe ausdrücklich: „Unter der Annahme, dass …“. Eine einzelne Lösung belegt weder eine gesicherte Diagnose noch eine dauerhafte Eigenschaft des Kindes. Ein Materialentwurf belegt keine Lernwirkung. Prüfe Rechnungen, Einheiten, Darstellungen und Lösungen auf Konsistenz. Kennzeichne, was die Lehrkraft vor dem Einsatz noch fachlich oder hinsichtlich der Passung prüfen muss.`;
 
   const prompt = (instruction) => `${context}\n\n${instruction}\n\n${safeguards}`;
+  const fractionCase = "Fiktiver Ausgangsfall, Klasse 6: Zu ½ + ⅓ wurde ⅖ notiert. Der Denkweg ist unbekannt.";
+  window.HANDOUT_TRIAL_EXAMPLE = {
+    grade: "6",
+    task: "1/2 + 1/3 = ?",
+    goal: "Das Kind stellt zwei ungleichnamige Brüche am selben Bezugs-Ganzen als gleich große Teile dar, berechnet ihre Summe und erklärt an einer eigenen Skizze oder in Worten, warum das Erweitern die Anteile nicht verändert.",
+    baseline: "Fiktive notierte Lösung: 1/2 + 1/3 = 2/5. Offene Vermutung: Möglicherweise werden Zähler und Nenner getrennt addiert; der Denkweg ist unbekannt. Ausdrücklich gewählte Arbeitsannahme für Förderbeispiele: Die gemeinsame Teilgröße soll geklärt werden. Keine weitere Kinderantwort bekannt."
+  };
 
   window.HANDOUT_FORMATS = [
     {
       id: "handlung-bild-symbol",
+      example: {
+        context: `${fractionCase} Förderbeispiel unter der Arbeitsannahme, dass die gemeinsame Teilgröße noch geklärt werden muss.`,
+        task: "Nimm drei gleich lange Papierstreifen; jeder steht für dasselbe Ganze. Markiere auf dem ersten ½, auf dem zweiten ⅓. Unterteile beide in je sechs gleich große Teile. Übertrage die markierten Längen hintereinander auf den dritten Streifen. Beschrifte deine Darstellung und erkläre: Was verändert sich beim Unterteilen, was bleibt gleich?",
+        solution: "Die Hälfte umfasst 3 von 6 Teilen, das Drittel 2 von 6. Zusammen sind 5 von 6 gleich großen Teilen markiert: ½ + ⅓ = 3/6 + 2/6 = 5/6. Die Unterteilung verändert weder die markierte Länge noch das Bezugs-Ganze.",
+        criterion: "Das Kind verbindet 3/6 und 2/6 mit den markierten Längen, erklärt die gleiche Teilgröße und begründet, warum der Anteil beim Unterteilen gleich bleibt.",
+        limit: "Die Darstellung ist eine Erklärhilfe nach einem eigenen Versuch, kein unbeeinflusster Diagnosenachweis. Die Arbeitsannahme bleibt zu prüfen."
+      },
       category: "A",
       title: "Handlung – Bild – Symbol",
       purpose: "Eine mathematische Beziehung in unterschiedlichen Darstellungen erkennen und die Verbindungen erklären.",
@@ -26,6 +40,13 @@ Gib eine kleine neue Aufgabe zum selbstständigen Übertragen und eine gestufte 
     },
     {
       id: "darstellungen-zuordnen",
+      example: {
+        context: `${fractionCase} Förderbeispiel unter der Arbeitsannahme, dass Term und Bruchdarstellung verbunden werden sollen.`,
+        task: "Erstelle fünf Karten: A ½ + ⅓; B 3/6 + 2/6; C ein Streifen mit sechs gleich großen Feldern, davon fünf markiert; D 5/6; E ein gleich langer Streifen mit fünf gleich großen Feldern, davon zwei markiert. Auftrag: Welche Karten zeigen denselben Wert? Begründe an den Teilgrößen, warum eine Karte nicht passt. Alle Streifen stehen für dasselbe Ganze.",
+        solution: "A, B, C und D zeigen 5/6. Karte E zeigt 2/5 und gehört nicht dazu. Bei B und C werden Sechstel gezählt; das markierte Stück auf E besteht aus zwei Fünfteln. 2/5 ist kleiner als ½ und kann daher nicht die Summe ½ + ⅓ sein.",
+        criterion: "Das Kind begründet mindestens eine Zuordnung zwischen Term und Streifen und die Ablehnung von E über Teilgröße und Anteil, nicht nur über ähnliche Ziffern.",
+        limit: "Die Karten liefern bereits mögliche Ergebnisse. Richtiges Zuordnen allein belegt weder selbstständiges Addieren noch eine gesicherte Diagnose."
+      },
       category: "A",
       title: "Darstellungen zuordnen",
       purpose: "Gleichwertige Darstellungen unterscheiden und Zuordnungen mathematisch begründen.",
@@ -74,6 +95,13 @@ Gib für jede Aufgabe einen optionalen Hinweis, ohne die Lücke sofort zu fülle
     },
     {
       id: "gestufte-hilfekarten",
+      example: {
+        context: `${fractionCase} Unter der Arbeitsannahme eines Klärungsbedarfs zur gemeinsamen Einheit werden Hilfen erst nach dem eigenen Versuch angeboten.`,
+        task: "Aufgabe: Berechne ½ + ⅓ und erkläre deine Rechnung. Hilfe 1: Was bedeuten die beiden Brüche, wenn sie sich auf dasselbe Ganze beziehen? Hilfe 2: Zeichne zwei gleich lange Streifen mit je sechs gleich großen Teilen. Markiere jeweils den geforderten Anteil. Hilfe 3: ½ = 3/6. Wie viele Sechstel sind ⅓? Wie viele Sechstel sind es zusammen? Nur die nächste benötigte Hilfe aufdecken.",
+        solution: "⅓ = 2/6; daher ½ + ⅓ = 3/6 + 2/6 = 5/6. Der Nenner 6 benennt die gemeinsame Teilgröße, die Zähler zählen diese Teile.",
+        criterion: "Festhalten, welche Hilfe verwendet wurde und welchen Schritt das Kind anschließend selbst erklärt. Das Kind muss Anteil, gemeinsame Einheit und Summe verbinden.",
+        limit: "Eine Lösung nach Hilfe 3 ist keine selbstständige Ausgangsleistung. Danach eine neue Aufgabe ohne dieselbe Hilfe prüfen; nicht aus dem Hilfebedarf etikettieren."
+      },
       category: "B",
       title: "Gestufte Hilfekarten",
       purpose: "Hilfe dosieren, damit der nächste Denkschritt möglichst selbstständig bleibt.",
@@ -86,6 +114,13 @@ Ergänze getrennt die vollständige Lösung und Hinweise: Woran könnte die Lehr
     },
     {
       id: "differenzierung-gemeinsames-lernziel",
+      example: {
+        context: `${fractionCase} Gemeinsames Förderziel unter einer Arbeitsannahme: die Summe mithilfe gleich großer Teile darstellen und begründen.`,
+        task: "Alle bearbeiten ½ + ⅓ und erklären, warum eine gemeinsame Teilgröße benötigt wird. Variante A: drei gleich lange, bereits in Sechstel geteilte Streifen; Anteile markieren und zusammenführen. Variante B: drei gleich lange leere Streifen; eine passende gemeinsame Unterteilung selbst einzeichnen. Variante C: ohne vorgegebene Streifen eine eigene Darstellung entwickeln und mit der Rechnung verbinden. Unterstützung nach tatsächlichem Bedarf wählen.",
+        solution: "In allen Varianten gilt ½ + ⅓ = 3/6 + 2/6 = 5/6. Entscheidend ist dieselbe Erklärung: Die Anteile beziehen sich auf dasselbe Ganze; erst gleich große Teilstücke werden zusammengezählt. Die Unterstützung ändert sich, nicht das Ziel.",
+        criterion: "Für alle Varianten dieselben Kriterien: gleiche Bezugsgröße, gleich große Teile, richtige Summe und passende Begründung. Verwendete Hilfe getrennt dokumentieren.",
+        limit: "A, B und C sind Unterstützungsangebote, keine festen Leistungsgruppen. Erfolg mit vorgegebener Unterteilung zeigt noch nicht, dass das Kind sie selbst wählen kann."
+      },
       category: "B",
       title: "Differenzierung am gemeinsamen Lernziel",
       purpose: "Dasselbe mathematische Ziel über unterschiedliche Hilfen und Darstellungen zugänglich machen.",
@@ -98,6 +133,13 @@ Gib eine kurze gemeinsame Kontrollaufgabe ohne KI, getrennte Lösungen und Beoba
     },
     {
       id: "strukturierte-rechenpaeckchen",
+      example: {
+        context: `${fractionCase} Nach der Klärung wird unter der Arbeitsannahme weitergeübt, dass Aufgabenbeziehungen das Verständnis gleicher Teile festigen können.`,
+        task: "Bearbeite ½ + 1/6, ½ + 2/6, ½ + 3/6 und ½ + 4/6. Nutze bei Bedarf gleich lange, in Sechstel unterteilte Streifen. Erkläre, was von Zeile zu Zeile gleich bleibt und warum die Summe jeweils um 1/6 wächst. Ergänze eine weitere Aufgabe nach dieser ausdrücklich vereinbarten Veränderung. Welche Zeile entspricht ½ + ⅓?",
+        solution: "Die Summen sind 4/6 = 2/3, 5/6, 6/6 = 1 und 7/6 = 1⅙. Die Fortsetzung lautet ½ + 5/6 = 8/6 = 4/3. Der erste Summand bleibt 3/6, der zweite wächst um 1/6. Die zweite Zeile entspricht der Ausgangsaufgabe, weil ⅓ = 2/6.",
+        criterion: "Das Kind erklärt die Ergebnisänderung über den unveränderten ersten Summanden und den Zuwachs eines Sechstels; es verbindet die zweite Zeile mit der Ausgangsaufgabe.",
+        limit: "Bloßes Fortsetzen oder Ablesen genügt nicht als Verständnisbeleg. Bei Ergebnissen über 1 braucht die Darstellung ein zweites gleich großes Bezugs-Ganzes."
+      },
       category: "B",
       title: "Strukturierte Rechenpäckchen",
       purpose: "Aufgabenbeziehungen entdecken und zum Rechnen oder Begründen nutzen.",
@@ -158,6 +200,13 @@ Schlage vor, wie die Lehrkraft nach tatsächlich beobachteten Schwierigkeiten Un
     },
     {
       id: "fehlerdetektiv",
+      example: {
+        context: `${fractionCase} Die notierte Fehlantwort wird als ausdrücklich fiktiver Lösungsweg untersucht, nicht als festgestellter Denkweg eines Kindes.`,
+        task: "Prüfe diesen fiktiven Weg: ½ + ⅓ = (1 + 1)/(2 + 3) = 2/5. Markiere das erste unzulässige Gleichheitszeichen. Erkläre den Fehler mit gleich großen Teilen, korrigiere den Weg und prüfe zusätzlich: Kann die Summe kleiner als ½ sein, wenn ⅓ hinzugefügt wird?",
+        solution: "Bereits die erste Gleichsetzung ist unzulässig. Hälften und Drittel sind verschieden große Teile; durch Addieren der Nenner entstehen keine passenden Fünftel. Richtig: ½ + ⅓ = 3/6 + 2/6 = 5/6. Zudem ist 2/5 kleiner als ½, während die gesuchte Summe größer sein muss.",
+        criterion: "Das Kind lokalisiert den ersten Fehler, begründet ihn über Teilgrößen und nutzt die Größenkontrolle zusätzlich zur korrekten Rechnung.",
+        limit: "Das Aufdecken dieses vorgegebenen Fehlers beweist nicht, dass derselbe Fehler selbstständig vermieden wird. Keine Ursache einem realen Kind zuschreiben."
+      },
       category: "C",
       title: "Fehlerdetektiv",
       purpose: "Einen fiktiven Lösungsweg prüfen, eine fehlerhafte Stelle lokalisieren und die Korrektur begründen.",
@@ -242,6 +291,13 @@ Falls keine Bearbeitung vorliegt, kennzeichne die Rückmeldung als Beispiel und 
     },
     {
       id: "exit-ticket-ohne-ki",
+      example: {
+        context: `${fractionCase} Nach einer Förderung zur gemeinsamen Einheit folgt eine neue selbstständige Prüfung; daraus wird keine Lernwirkungsgarantie abgeleitet.`,
+        task: "Ohne KI und ohne die zuvor genutzte Hilfe: Berechne 2/3 + 1/4. Erkläre mit einer eigenen Skizze oder in Worten, warum deine Teile zusammengezählt werden dürfen. Nenne außerdem eine einfache Größenkontrolle. Die Lösung erst nach dem eigenen Versuch ansehen.",
+        solution: "2/3 + 1/4 = 8/12 + 3/12 = 11/12. Beide Anteile beziehen sich auf dasselbe Ganze; Zwölftel sind gleich große Teile. Die Summe ist größer als 2/3 und kleiner als 1, denn 1/4 ist kleiner als das zu 1 fehlende Drittel.",
+        criterion: "Beobachten: wertgleiches Umformen, gemeinsame Einheit, richtige Summe und dazu passende Erklärung oder Skizze. Ein richtiges Ergebnis ohne Begründung lässt das Verständnis noch offen.",
+        limit: "Eine einzelne neue Aufgabe liefert einen Hinweis auf selbstständige Anwendung, keinen Beleg dauerhafter Kompetenz. Bei Unklarheit später mit einer weiteren Variation nachfragen."
+      },
       category: "D",
       title: "Exit-Ticket ohne KI",
       purpose: "Am Ende einer Lernphase eine neue eigenständige Bearbeitung zum konkreten Ziel erhalten.",
@@ -341,13 +397,20 @@ Prüfe zusätzlich Einheit, Definitionsbedingungen und Sachkontext. Ein rechneri
     },
     {
       id: "hypothesenbildung",
+      example: {
+        context: `${fractionCase} Diagnose vor Förderung: mögliche Deutungen und eine offene Kontrastaufgabe, noch keine Erklärhilfe.`,
+        task: "Lege zwei gleich lange, ungeteilte Papierstreifen vor. Frage: Zeige ½ + ½ und ½ + ⅓ an den Streifen und erkläre deinen Weg. Was ist an beiden Aufgaben gleich, was ist verschieden? Erst den eigenen Versuch abwarten; nicht vorher Sechstel oder das Ergebnis nennen. Die Lehrkraft dokumentiert die tatsächlichen Aussagen.",
+        solution: "Fachlich: ½ + ½ = 1; ½ + ⅓ = 5/6. Hypothese 1: Verschieden große Teile werden ohne gemeinsame Einheit gezählt. Eine hypothetische Aussage wie „zwei Stücke, also 2/5“ könnte dies stützen. Hypothese 2: Die Bedeutung ist verfügbar, die symbolische Regel wurde verwechselt. Eine selbstständig passende Darstellung samt begründeter Korrektur könnte eher dazu passen. Keine dieser Antworten liegt im Ausgangsfall bereits vor.",
+        criterion: "Beobachten, wie das Kind Bezugs-Ganzes, Teilgröße und Zählen verbindet. Passende selbstständige Darstellung und Erklärung würden Hypothese 1 schwächen; anhaltend unpassende Zuordnungen würden Hypothese 2 infrage stellen. Unklare Aussagen offen nachfragen.",
+        limit: "Beide Hypothesen bleiben vorläufig. Der Kontrast beweist keine Ursache; auch Sprache oder ungewohntes Material können die Antwort beeinflussen. Erklärhilfen erst danach gezielt einsetzen."
+      },
       category: "D",
       title: "Beobachtung und vorläufige Hypothesen",
       purpose: "Eine vorliegende Lösung vorsichtig deuten und einen nächsten Prüfschritt vorbereiten.",
       when: "Für Praxisphase 1 oder eine eigenständige erste Fehleranalyse ohne anschließende Übungsproduktion.",
       output: "Aufgabenziel, Beobachtung, höchstens zwei Hypothesen, passende Prüffragen und offene Informationen.",
       check: "Sind beobachtbare Angaben und Deutungen getrennt und alle erwarteten Kinderantworten ausdrücklich hypothetisch?",
-      prompt: prompt(`Unterstütze mich bei der Vorbereitung einer förderorientierten mathematischen Diagnose. Entnimm Aufgabe, Aufgabenziel, vorliegende Lösung oder Äußerung und tatsächlich bekannte Zusatzinformationen ausschließlich den Angaben oben. Wenn die beobachtete Lösung fehlt, frage danach, statt sie zu erfinden.
+      prompt: prompt(`Unterstütze mich bei der Vorbereitung einer förderorientierten mathematischen Diagnose. Entnimm Aufgabe, vorliegende Lösung oder Äußerung und tatsächlich bekannte Zusatzinformationen ausschließlich den Angaben oben. Wenn die Aufgabe oder die beobachtete Lösung fehlt, frage danach, statt sie zu erfinden. Ein Aufgabenziel ist keine Voraussetzung: Fehlt es, schlage ein enges aufgabenbezogenes Ziel vor, ohne damit einen Lernstand des Kindes zu behaupten. Behalte ein passendes vorhandenes Ziel bei oder präzisiere es.
 Beschreibe zunächst ausschließlich, was beobachtbar ist. Formuliere danach höchstens zwei unterschiedliche, vorsichtige Diagnosehypothesen. Begründe ihre Plausibilität anhand vorhandener Hinweise, ohne einen Denkweg oder eine Kinderäußerung als Tatsache zu ergänzen. Alltagssprachliche Vermutungen sind zulässig. Eine wissenschaftliche Kompetenzzuordnung ist keine Voraussetzung.
 Nenne zu jeder Hypothese eine offene Rückfrage oder kurze Kontrastaufgabe. Beschreibe knapp, welche mögliche Antwort die Vermutung stützen beziehungsweise infrage stellen würde, und kennzeichne diese Antworten ausdrücklich als hypothetisch. Benenne offene Informationen. Stelle keine gesicherte Diagnose. Erstelle jetzt keine Förderübungen, keinen Förderplan und keine Unterrichtsreihe. Ohne tatsächliche weitere Kinderantwort bleibt die Hypothese offen.`)
     }
