@@ -4,11 +4,11 @@ Datum: 2026-11-04. Branch: `codex/handouts-praxisphasen`. Ausschließlich fiktiv
 
 ## Ergebnis
 
-Die drei Praxisphasen, die 22 Aufgabenformate, sechs zusätzliche Bibliotheksangebote, die Datenübernahme und die drei neuen Word-Handouts sind umgesetzt. 25 automatisierte Tests bestehen. Die folgenden Browserprüfungen wurden zusätzlich tatsächlich durchgeführt; sie sind keine Behauptung einer vollständigen Geräte- oder Unterrichtsvalidierung.
+Die drei Praxisphasen, die 22 Aufgabenformate, sechs zusätzliche Bibliotheksangebote, die Datenübernahme und die drei neuen Word-Handouts sind umgesetzt. Einschließlich der nachträglichen Zielhilfe bestehen 32 automatisierte Tests. Die folgenden Browserprüfungen wurden zusätzlich tatsächlich durchgeführt; sie sind keine Behauptung einer vollständigen Geräte- oder Unterrichtsvalidierung.
 
 ## Automatisierte Prüfungen
 
-`node --test tests/core.test.cjs`: **25 bestanden, 0 fehlgeschlagen**.
+`node --test tests/core.test.cjs`: **32 bestanden, 0 fehlgeschlagen**.
 
 - Sechs unterschiedliche Beispielaufgaben und unabhängige neue Fälle mit eigenen Kennungen.
 - Umlaute, Brüche, Anführungszeichen und mehrzeilige Texte in Speicherung und Prompts.
@@ -28,6 +28,19 @@ Zusätzlich: JavaScript-Syntaxprüfung, `git diff --check`, Prüfung der neuen W
 ## Tatsächlich geprüfte Browserabläufe
 
 Lokale HTTP-Vorschau auf `127.0.0.1:4186`, hauptsächlich in DuckDuckGo auf macOS; ergänzende Layout- und DOM-Prüfung im integrierten Chromium-Browser.
+
+### Ergänzung: Einstieg und KI-Zielhilfe
+
+Am selben Tag nach dem ersten Entwicklungscommit ergänzt und in DuckDuckGo geprüft:
+
+- Auswahl „Eigenes neues Beispiel · mit leeren Feldern beginnen“ lässt den aktuellen Entwurf unverändert. Erst „Leeren Förderentwurf anlegen“ erzeugt einen weiteren leeren Entwurf; vorherige bleiben auswählbar.
+- Ein eigener fiktiver Bruchfall wurde eingegeben. Der Zielprompt ließ sich ohne vorhandenes Förderziel und ohne ausgewähltes Format erzeugen.
+- Ein fiktiver Zielvorschlag wurde bewusst ins Hauptzielfeld übernommen. Bei einem zweiten Vorschlag erschien eine Ersetzen-Bestätigung; Abbrechen erhielt das erste Ziel.
+- Nach Neuladen waren der Fall und das gewählte Ziel weiterhin vorhanden. Ein Förderprompt ließ sich danach mit einem ausgewählten Format erzeugen.
+- Die optionalen Felder `goalPrompt`, `goalPromptSource` und `goalCandidate` werden mit dem jeweiligen Förderentwurf gespeichert und exportiert. Die Speicherversion bleibt 2; fehlende Felder älterer Stände werden mit leeren Werten ergänzt.
+- Sieben zusätzliche Kernlogiktests prüfen die neue Zielhilfe, alle drei Ausgangslagen, die fehlende Ziel-/Formatvoraussetzung, das unveränderte ursprüngliche Ziel und die Kompatibilität mit älteren Importen.
+
+Die KI-Hilfe erzeugt lediglich einen Prompt. Es wurde kein externer KI-Dienst aufgerufen und keine reale KI-Antwort auf ihre Qualität geprüft. Die manuelle Übernahme wurde mit ausdrücklich fiktivem Text getestet. Die vorhandene Kopierfunktion wird wiederverwendet; in diesem Ergänzungstest wurde sie nicht separat erneut getestet. Word-Handouts wurden bei dieser rein digitalen Bedienhilfe nicht geändert.
 
 | Ablauf | Beobachtetes Ergebnis |
 | --- | --- |

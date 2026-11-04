@@ -6,6 +6,8 @@ Begleitmaterial für die Praxisphasen einer Lehrkräftefortbildung. Diese Entwic
 2. **Handout 2 – Förderbaustein entwickeln · Praxisphase 2:** einen Fall übernehmen oder unabhängig neu beginnen, Ausgangslage beziehungsweise Arbeitsannahme kennzeichnen, ein enges Ziel und ein Format wählen, Material fachlich prüfen.
 3. **Handout 3 – Tool- und Promptbibliothek · offene Vertiefung:** 22 Aufgabenformate und sechs ergänzende Angebote mit vollständigen bearbeitbaren Prompts, Zweck, Einsatz, erwarteter Ausgabe und Prüffrage. Verweise zur Tool-Übersicht und zur erhaltenen Individualisierungs-Vertiefung.
 
+In Handout 2 benennt der Einstieg ausdrücklich, ob ein leerer eigener Fall angelegt oder ein vorbereitetes Beispiel übernommen wird. Die Auswahl allein verändert den bestehenden Entwurf nicht. Unter „2 · Ein enges Ziel“ kann die optionale Hilfe **Förderziel mit KI formulieren** einen kopierbaren Prompt aus der Ausgangslage erzeugen – auch ohne vorhandenes Förderziel. Die Lehrkraft prüft die Zielvorschläge und übernimmt genau einen bewusst in das Zielfeld. Ein bereits vorhandenes Ziel wird nur nach Bestätigung ersetzt. Das gewählte Ziel fließt anschließend in den Förderprompt ein; bestehende Prompts werden nicht stillschweigend überschrieben.
+
 ## Lokal öffnen
 
 `index.html` oder `Digitale Handouts Mathematik.html` im Browser öffnen. Beide Einstiege sind identisch und verwenden dieselben lokalen Dateien: `handouts.css`, `handouts-core.js`, `library-data.js`, `handouts.js`. Deshalb das gesamte Projekt herunterladen, nicht nur eine einzelne HTML-Datei. Kein Framework und keine Installation erforderlich. Für zuverlässige Browser-Speicherung und Zwischenablage ist ein lokaler HTTP-Server empfehlenswert:

@@ -351,3 +351,109 @@ test('HTML provides local storage/export/import explanations and manual clipboar
   assert.deepEqual(scripts, ['handouts-core.js','library-data.js','handouts.js']);
   assert.ok(scripts.every(src => !/^https?:/i.test(src)));
 });
+
+test('optional goal help adds empty fields without changing storage version or chosen goal', () => {
+  const b = C.builder();
+  for (const key of ['goalPrompt', 'goalPromptSource', 'goalCandidate']) assert.equal(b[key], '');
+  assert.equal(b.goal, '');
+  assert.equal(C.empty().version, 2);
+  assert.equal(C.KEY, 'digitale-handouts-v2');
+  assert.equal(typeof C.goalPrompt, 'function');
+});
+
+test('goal prompt needs neither an existing goal nor a selected format', () => {
+  const b = C.builder(C.cases[4]);
+  assert.equal(b.goal, '');
+  assert.equal(b.format, '');
+  const p = C.goalPrompt(b);
+  assert.ok(p.includes(b.task));
+  assert.ok(p.includes(b.taskGoal));
+  assert.ok(p.includes(C.contextForBuilder(b)));
+  assert.match(p, /vorhandenes Förderziel oder gewähltes Aufgabenformat ist dafür nicht erforderlich/);
+  assert.doesNotMatch(p, /Genau ein Format auswählen|Formatspezifischer Auftrag/);
+  assert.doesNotThrow(() => C.goalPrompt(C.builder()));
+});
+
+test('goal prompt carries the complete context and distinguishes all three evidence states', () => {
+  const b = C.builder(populatedDiagnostic());
+  b.topic = 'Bruchverständnis';
+  b.conception = 'Vorläufiger Bezug zu gleich großen Teilen';
+  b.assumption = 'ANNAHME: Die Teilgröße bleibt beim Addieren unbeachtet.';
+  b.evidence = 'TATSÄCHLICH: Das Kind zeigt gleich große Hälften am Streifen.';
+  for (const status of ['open', 'assumed', 'observed']) {
+    b.evidenceStatus = status;
+    const p = C.goalPrompt(b);
+    assert.ok(p.includes(C.contextForBuilder(b)), status);
+    for (const value of [b.task, b.taskGoal, b.known, b.observation, b.hypotheses, b.plannedCheck, b.missing, b.conception]) assert.ok(p.includes(value), status + ': ' + value);
+    if (status === 'observed') {
+      assert.ok(p.includes(b.evidence));
+      assert.ok(!p.includes(b.assumption));
+      assert.match(p, /Tatsächlich beobachtete weitere Antwort/);
+    } else {
+      assert.ok(p.includes(b.assumption));
+      assert.ok(!p.includes(b.evidence));
+      assert.match(p, /Unter der Annahme, dass/);
+    }
+  }
+});
+
+test('goal help limits alternatives and requires an observable, conditional, teacher-selected goal', () => {
+  const p = C.goalPrompt(C.builder());
+  for (const text of ['höchstens zwei alternative Förderziele', 'beobachtbaren mathematischen Handlung, Darstellung oder Erklärung', 'Hilfsmittel oder Unterstützung', 'Prüfaufgabe ohne KI', 'konkretes fachliches Prüfkriterium', 'Keine willkürlichen Prozentwerte oder Erfolgsquoten', 'gezielte Rückfrage', 'Keine gesicherte Diagnose', 'keine Förderübungen und keinen vollständigen Förderbaustein', 'wählt genau ein Ziel aus', 'übernimmt es bewusst', 'Kein Vorschlag gilt automatisch als bestätigt oder übernommen']) assert.ok(p.includes(text), text);
+  assert.match(p, /Unter der Annahme, dass/);
+  assert.match(p, /kein Versprechen einer Lernwirkung/);
+});
+
+test('generating goal help does not mutate an existing goal, candidate or other builder fields', () => {
+  const b = Object.assign(C.builder(populatedDiagnostic()), {
+    goal: 'Mein vorhandenes Ziel\n' + unicode,
+    goalPrompt: 'Mein zuvor bearbeiteter Zielprompt',
+    goalPromptSource: 'Mein voriger Kontext',
+    goalCandidate: 'Mein noch nicht übernommener Kandidat',
+    draft: 'Vorhandenes Material',
+    checks: ['1']
+  });
+  const before = clone(b);
+  Object.freeze(b.checks);
+  Object.freeze(b);
+  const p = C.goalPrompt(b);
+  assert.ok(p.includes(b.goal));
+  assert.match(p, /vorhandenes Ziel darfst du bei Bedarf präzisieren/);
+  assert.deepEqual(b, before);
+});
+
+test('older v2 imports and legacy migration safely initialize the new optional goal-help fields', () => {
+  const incoming = C.empty();
+  const oldBuilder = Object.assign(C.builder(), {goal: 'Vorhandenes Ziel bleibt', draft: unicode});
+  for (const key of ['goalPrompt', 'goalPromptSource', 'goalCandidate']) delete oldBuilder[key];
+  incoming.builders.push(oldBuilder);
+  C.validate(incoming);
+  const imported = C.mergeImport(C.empty(), incoming).builders.at(-1);
+  assert.equal(imported.goal, oldBuilder.goal);
+  assert.equal(imported.draft, unicode);
+  for (const key of ['goalPrompt', 'goalPromptSource', 'goalCandidate']) assert.equal(imported[key], '');
+  const legacy = C.migrateLegacy(JSON.stringify({buildGoal1: 'Altes Ziel', buildDraft: unicode})).builders[0];
+  assert.equal(legacy.goal, 'Altes Ziel');
+  for (const key of ['goalPrompt', 'goalPromptSource', 'goalCandidate']) assert.equal(legacy[key], '');
+});
+
+test('new goal-help fields survive repeated JSON/import roundtrips and reject non-text input', () => {
+  const incoming = C.empty();
+  const b = Object.assign(C.builder(), {
+    goal: 'Ausgewähltes Ziel unverändert',
+    goalPrompt: 'Bearbeiteter Zielprompt\n' + unicode,
+    goalPromptSource: 'Kontext\n' + unicode,
+    goalCandidate: 'Noch zu prüfender Kandidat\n' + unicode
+  });
+  incoming.builders.push(b);
+  const once = C.mergeImport(C.empty(), clone(incoming));
+  const twice = C.mergeImport(C.empty(), clone(once));
+  const result = twice.builders.at(-1);
+  for (const key of ['goal', 'goalPrompt', 'goalPromptSource', 'goalCandidate']) assert.equal(result[key], b[key]);
+  C.validate(twice);
+  for (const key of ['goalPrompt', 'goalPromptSource', 'goalCandidate']) {
+    const invalid = clone(incoming);
+    invalid.builders[0][key] = {not: 'text'};
+    assert.throws(() => C.validate(invalid), key);
+  }
+});

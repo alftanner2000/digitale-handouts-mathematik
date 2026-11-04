@@ -21,7 +21,7 @@
     return {id:uid(),title:item?.title || 'Eigener Fall',grade:item?.grade || '',task:item?.task || '',solution:item?.solution || '',goal:item?.goal || '',known:'',observation:'',hypothesis1:'',hypothesis2:'',check:'',missing:'',prompt:'',promptSource:''};
   }
   function builder(source) {
-    return {id:uid(),title:source?.title || 'Neuer Förderentwurf',grade:source?.grade || '',topic:'',task:source?.task || '',observation:source ? [source.solution, source.observation].filter(Boolean).join('\n') : '',known:source?.known || '',taskGoal:source?.goal || '',hypotheses:source ? [source.hypothesis1,source.hypothesis2].filter(Boolean).join('\n') : '',plannedCheck:source?.check || '',missing:source?.missing || '',evidenceStatus:'open',evidence:'',assumption:'',conception:'',goal:'',focus:'A',format:'',draft:'',adjustments:'',final:'',use:'',success:'',checks:[],prompt:'',promptSource:''};
+    return {id:uid(),title:source?.title || 'Neuer Förderentwurf',grade:source?.grade || '',topic:'',task:source?.task || '',observation:source ? [source.solution, source.observation].filter(Boolean).join('\n') : '',known:source?.known || '',taskGoal:source?.goal || '',hypotheses:source ? [source.hypothesis1,source.hypothesis2].filter(Boolean).join('\n') : '',plannedCheck:source?.check || '',missing:source?.missing || '',evidenceStatus:'open',evidence:'',assumption:'',conception:'',goal:'',goalPrompt:'',goalPromptSource:'',goalCandidate:'',focus:'A',format:'',draft:'',adjustments:'',final:'',use:'',success:'',checks:[],prompt:'',promptSource:''};
   }
   function empty() { const d=diagnostic(cases[0]); return {version:2,diagnostics:[d],builders:[],activeDiagnosticId:d.id,activeBuilderId:'',library:{mode:'blank',grade:'',task:'',goal:'',baseline:'',drafts:{}},legacy:{},updatedAt:''}; }
   function migrateLegacy(raw) {
@@ -122,6 +122,19 @@ Stand der Ausgangslage: ${status}
 Möglicher fachlicher Bezug (optional, vorläufig): ${val(b.conception,'offen')}
 Ein enges, beobachtbares Förderziel: ${val(b.goal)}`;
   }
+  function goalPrompt(b) {
+    return `Hilf mir, ein enges, beobachtbares mathematisches Förderziel zu formulieren. Ein vorhandenes Förderziel oder gewähltes Aufgabenformat ist dafür nicht erforderlich.
+${contextForBuilder(b)}
+
+Schlage höchstens zwei alternative Förderziele vor. Ein vorhandenes Ziel darfst du bei Bedarf präzisieren, aber nicht als bereits fachlich bestätigt behandeln. Jeder Vorschlag betrifft genau eine überschaubare mathematische Beziehung oder Fähigkeit, passend zur Aufgabe und zur angegebenen Ausgangslage.
+Gib je Vorschlag knapp an:
+• Zielsatz: „Das Kind …“ mit einer beobachtbaren mathematischen Handlung, Darstellung oder Erklärung.
+• Bedingung: Welche Hilfsmittel oder Unterstützung sind erlaubt, was soll selbstständig gelingen?
+• Prüfung: Eine neue kurze Prüfaufgabe ohne KI und ein konkretes fachliches Prüfkriterium. Benenne, was die Lehrkraft daran sehen oder hören müsste. Keine willkürlichen Prozentwerte oder Erfolgsquoten.
+Trenne Beobachtungen, offene Vermutungen und Annahmen. Bei Unsicherheit formuliere den Vorschlag ausdrücklich bedingt: „Unter der Annahme, dass …“. Fehlen entscheidende Informationen, stelle eine gezielte Rückfrage, statt einen Lernstand oder eine Kinderantwort zu erfinden. Keine gesicherte Diagnose und kein Versprechen einer Lernwirkung.
+Erstelle jetzt keine Förderübungen und keinen vollständigen Förderbaustein. Die einzelne Prüfaufgabe dient nur dazu, das Ziel überprüfbar zu beschreiben.
+Die Lehrkraft prüft die Vorschläge fachlich, wählt genau ein Ziel aus und übernimmt es bewusst. Kein Vorschlag gilt automatisch als bestätigt oder übernommen.`;
+  }
   function fillTemplate(text, context) {
     const map={klasse:context.grade||'[Klasse / Stufe ergänzen]',aufgabe:context.task||'[Aufgabe ergänzen]',ziel:context.goal||'[konkretes Ziel ergänzen]',ausgangslage:context.baseline||'[Ausgangslage / Arbeitsannahme ergänzen]'};
     return text.replace(/\{\{(klasse|aufgabe|ziel|ausgangslage)\}\}/g,(_,key)=>map[key]);
@@ -146,5 +159,5 @@ Halte genau ein Förderziel ein. Der gemeinsame Ergebnisrahmen hat Vorrang vor e
 7. Separat: Lösungen mit nachvollziehbarer Prüfung sowie kurze beobachtbare Kriterien für die Lehrkraft.
 Ein guter Materialentwurf belegt weder die Diagnose noch eine Lernwirkung. Behaupte keine Prüfung durch die Lehrkraft. Kennzeichne nötige fachliche Kontrollen.`;
   }
-  return {KEY,LEGACY_KEY,ALIASES,cases,uid,diagnostic,builder,empty,migrateLegacy,validate,mergeImport,diagnosticPrompt,contextForBuilder,fillTemplate,builderPrompt};
+  return {KEY,LEGACY_KEY,ALIASES,cases,uid,diagnostic,builder,empty,migrateLegacy,validate,mergeImport,diagnosticPrompt,contextForBuilder,goalPrompt,fillTemplate,builderPrompt};
 });

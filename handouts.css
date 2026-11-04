@@ -176,6 +176,11 @@
     .ai-help { grid-column: 1 / -1; padding: 17px; border-left: 5px solid var(--blue); background: var(--paper-2); }
     .ai-help h4 { margin: 0 0 7px; font-size: 17px; }
     .ai-help p { margin: 0 0 13px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    #goalHelp { margin: 18px 0 24px; }
+    #goalHelp summary { font-size: 17px; }
+    #goalHelp p { font-size: 15px; line-height: 1.55; }
+    #goalHelp[open] summary { margin-bottom: 14px; }
+    #goalHelp>label { margin-top: 22px; }
     .field-hint { display: block; margin-top: 7px; color: var(--muted); font-weight: 400; line-height: 1.4; }
     .print-summary { display: none; width: min(900px, calc(100% - 50px)); margin: 0 auto; padding: 48px 0; }
     .print-summary h1 { font-size: 30px; border-bottom: 2px solid var(--blue); padding-bottom: 12px; }
