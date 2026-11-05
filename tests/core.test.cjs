@@ -17,8 +17,45 @@ const formats = clone(sandbox.window.HANDOUT_FORMATS);
 const extras = clone(sandbox.window.HANDOUT_EXTRAS);
 const variantRoutes = clone(sandbox.window.HANDOUT_VARIANT_ROUTES);
 const variantSources = clone(sandbox.window.HANDOUT_VARIANT_SOURCES);
+const moreExamples = clone(sandbox.window.HANDOUT_MORE_EXAMPLES);
+const freeIdeas = clone(sandbox.window.HANDOUT_FREE_IDEAS);
 const html = read('index.html');
+const app = read('handouts.js');
 const unicode = 'Äußere Größe: ½ + ⅓ = ⅚\n„Zähler“, € 3,50, <Bild> & Erklärung\nZweite Zeile – ohne Namen.';
+const lookupFormat = id => [...formats, ...extras, freeIdeas].find(item => item.id === id);
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+// Execute the actual application functions with isolated, in-memory DOM/storage doubles.
+// This checks handler behavior, not browser rendering or external clipboard access.
+function appFunction(name) {
+  const start = app.indexOf('function ' + name + '(');
+  assert.ok(start >= 0, name + ' exists');
+  const lineStart = app.lastIndexOf('\n', start) + 1;
+  const lineEnd = app.indexOf('\n', start);
+  const firstLine = app.slice(lineStart, lineEnd);
+  if (firstLine.trimEnd().endsWith('}')) return firstLine;
+  const end = app.indexOf('\n  }', start);
+  assert.ok(end >= 0, name + ' ends');
+  return app.slice(lineStart, end + 4);
+}
+
+function runApp(names, context, expression) {
+  return vm.runInNewContext('"use strict";\n' + names.map(appFunction).join('\n') + '\n' + expression, context);
+}
+
+const ideaFields = ['customFormat','formatIdeasPrompt','formatIdeasPromptSource','formatIdeasResult'];
+function ownIdeaBuilder() {
+  return Object.assign(C.builder(C.cases[4]), {
+    format: 'custom', goal: 'Gleich große Bruchteile erklären.', customFormat: 'Eigene Aufgaben erfinden\n' + unicode,
+    formatIdeasPrompt: 'Bearbeiteter Ideenprompt', formatIdeasPromptSource: 'Voriger Stand', formatIdeasResult: 'Noch nicht ausgewählter Vorschlag',
+    draft: 'Vorhandenes Rohmaterial', final: 'Geprüftes Material', adjustments: 'Eigene Korrektur'
+  });
+}
+
+function fakeNodes() {
+  const nodes = {};
+  return {nodes, $: id => nodes[id] ||= {value: '', innerHTML: '', textContent: '', hidden: false, open: false, focus() {}, select() {}, showModal() {this.open = true;}}};
+}
 
 function populatedDiagnostic() {
   const d = C.diagnostic(C.cases[4]);
@@ -608,9 +645,9 @@ test('exactly eight library formats provide complete concrete examples with sepa
   }
 });
 
-test('six distinct variant routes link only existing formats and leave the 22 plus 6 offers intact', () => {
-  assert.deepEqual(variantRoutes.map(route => route.id), ['denkweg','bedeutung','beziehungen','hilfen','fehler','uebertragen']);
-  assert.equal(new Set(variantRoutes.map(route => route.id)).size, 6);
+test('example routes have unique IDs and valid links without limiting the available formats', () => {
+  assert.ok(variantRoutes.length >= 6);
+  assert.equal(new Set(variantRoutes.map(route => route.id)).size, variantRoutes.length);
   assert.equal(formats.length, 22);
   assert.equal(extras.length, 6);
   const ids = new Set([...formats, ...extras].map(format => format.id));
@@ -639,18 +676,19 @@ test('every variant example has a task, separate solution, criterion and limit',
   assert.match(variantRoutes.find(route => route.id === 'uebertragen').examples[0].limit, /keine dauerhafte Beherrschung/);
 });
 
-test('all variant source indexes resolve to titled HTTPS primary-source links', () => {
-  assert.ok(variantSources.length);
-  const urls = new Set();
+test('all example source indexes resolve to titled HTTPS primary-source links', () => {
+  assert.equal(variantSources.length, 10);
+  const titles = new Set();
   for (const source of variantSources) {
     assert.ok(typeof source.title === 'string' && source.title.trim());
     const url = new URL(source.url);
     assert.equal(url.protocol, 'https:');
     assert.ok(url.hostname === 'dzlm.de' || url.hostname.endsWith('.dzlm.de'), url.hostname);
-    assert.ok(!urls.has(source.url), source.url);
-    urls.add(source.url);
+    // A material overview may support different topics, so repeated URLs are valid.
+    assert.ok(!titles.has(source.title), source.title);
+    titles.add(source.title);
   }
-  for (const route of variantRoutes) {
+  for (const route of [...variantRoutes, ...moreExamples]) {
     assert.ok(Array.isArray(route.sources) && route.sources.length, route.id);
     assert.equal(new Set(route.sources).size, route.sources.length, route.id);
     for (const index of route.sources) assert.ok(Number.isInteger(index) && index >= 0 && index < variantSources.length, route.id + ': ' + index);
@@ -660,19 +698,21 @@ test('all variant source indexes resolve to titled HTTPS primary-source links', 
 test('variant rendering separates fixed examples from selected-context prompts', () => {
   const source = read('handouts.js');
   const render = source.slice(source.indexOf('  function renderVariantRoutes()'), source.indexOf('  function openFormat('));
-  const nodes = {variantRoutes: {innerHTML: ''}, variantSources: {innerHTML: ''}};
+  const nodes = {variantRoutes: {innerHTML: ''}, variantSources: {innerHTML: ''}, moreExamples: {innerHTML: ''}};
   const state = C.empty(), before = clone(state);
   const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   vm.runInNewContext('"use strict";\n' + render + '\nrenderVariantRoutes();', {
-    window: {HANDOUT_VARIANT_ROUTES: variantRoutes, HANDOUT_VARIANT_SOURCES: variantSources},
-    library: [...formats, ...extras], state, $: id => nodes[id], esc
+    window: {HANDOUT_VARIANT_ROUTES: variantRoutes, HANDOUT_VARIANT_SOURCES: variantSources, HANDOUT_MORE_EXAMPLES: moreExamples},
+    library: [...formats, ...extras], lookupFormat, state, $: id => nodes[id], esc
   });
-  assert.equal((nodes.variantRoutes.innerHTML.match(/class="variant-route"/g) || []).length, 6);
+  assert.equal((nodes.variantRoutes.innerHTML.match(/class="variant-route"/g) || []).length, variantRoutes.length);
   assert.equal((nodes.variantRoutes.innerHTML.match(/class="route-example"/g) || []).length, variantRoutes.reduce((sum, route) => sum + route.examples.length, 0));
   assert.equal((nodes.variantRoutes.innerHTML.match(/data-open-format=/g) || []).length, variantRoutes.reduce((sum, route) => sum + route.formats.length, 0));
   for (const route of variantRoutes) for (const id of route.formats) assert.ok(nodes.variantRoutes.innerHTML.includes('data-open-format="' + id + '"'));
   assert.match(nodes.variantRoutes.innerHTML, /das Beispiel oben wird nicht übernommen/);
   for (const item of variantSources) assert.ok(nodes.variantSources.innerHTML.includes(esc(item.url)));
+  assert.equal((nodes.moreExamples.innerHTML.match(/class="route-example"/g) || []).length, moreExamples.length);
+  for (const example of moreExamples) for (const id of example.formats) assert.ok(nodes.moreExamples.innerHTML.includes('data-open-format="' + id + '"'));
   assert.deepEqual(state, before);
 });
 
@@ -693,8 +733,8 @@ test('opening a route format preserves selected context and an existing prompt, 
     const item = {dataset: {format: id}, open: false, querySelector: () => ({focus: () => focusCount++}), scrollIntoView: () => scrollCount++};
     const fail = () => {throw new Error('Opening must not regenerate or replace an existing draft');};
     vm.runInNewContext('"use strict";\n' + open + ensure + '\nopenFormat(' + JSON.stringify(id) + ');', {
-      state, library: [...formats, ...extras], all: () => [item], $: key => nodes[key],
-      filterLibrary: () => filterCount++, announce: () => {}, updateLibraryContext: () => {}, renderImportedLibraries: () => {},
+      state, library: [...formats, ...extras], lookupFormat, all: () => [item], $: key => nodes[key],
+      filterLibrary: () => filterCount++, announce: () => {}, updateLibraryContext: () => {}, renderImportedLibraries: () => {}, resizeOpenPrompts: () => {},
       C: {refillLibraryDraft: fail, fillTemplate: fail}, save: fail, ask: fail, libraryContext: fail, librarySource: fail
     });
     assert.deepEqual(state, before, mode);
@@ -1120,4 +1160,358 @@ test('new separate observation survives roundtrips without replacing the raw sol
   const invalid = clone(incoming);
   invalid.builders[0].noticed = {not: 'text'};
   assert.throws(() => C.validate(invalid));
+});
+
+test('four further examples are complete, distinct and link to available formats', () => {
+  assert.equal(moreExamples.length, 4);
+  assert.equal(new Set(moreExamples.map(example => example.id)).size, moreExamples.length);
+  const allIds = new Set([...formats, ...extras].map(item => item.id));
+  for (const example of moreExamples) {
+    for (const key of ['id','title','condition','task','solution','criterion','limit']) assert.ok(typeof example[key] === 'string' && example[key].trim(), example.id + ': ' + key);
+    assert.match(example.condition, /Anderer Beispielfall.*Arbeitsannahme/);
+    assert.ok(example.formats.length);
+    for (const id of example.formats) assert.ok(allIds.has(id), id);
+  }
+});
+
+test('free ideas are an additional open helper, not a restriction or replacement for the 28 templates', () => {
+  for (const key of ['id','title','purpose','when','output','check','prompt']) assert.ok(typeof freeIdeas[key] === 'string' && freeIdeas[key].trim(), key);
+  assert.ok(![...formats, ...extras].some(item => item.id === freeIdeas.id));
+  const p = C.fillTemplate(freeIdeas.prompt, {grade:'6',task:'2/3 + 1/4',goal:'Gemeinsame Teilgröße erklären',baseline:unicode});
+  for (const phrase of ['nicht als Begrenzung','weitere Alternativen','Beschränke dich nicht','begründete Kombinationen','keine verpflichtende Reihenfolge','erst nach meiner fachlichen Prüfung','Ein vorgegebenes Format ist nicht erforderlich']) assert.ok(p.includes(phrase), phrase);
+  assert.match(p, /Fehlen Ziel oder entscheidende Angaben/);
+  assert.match(p, /Keine Diagnose aus einer einzelnen Fehllösung/);
+  assert.doesNotMatch(p, /Arbeite nur am ausgewählten Format/);
+  assert.ok(p.includes(unicode));
+  assert.doesNotMatch(p, /\{\{(?:klasse|aufgabe|ziel|ausgangslage)\}\}/);
+});
+
+test('custom builder prompts use the chosen own idea rather than an unrelated template or unselected proposals', () => {
+  const b = ownIdeaBuilder(), before = clone(b);
+  const p = C.builderPrompt(b, formats[0]);
+  assert.ok(p.includes(b.customFormat));
+  assert.ok(p.includes(b.goal));
+  assert.ok(p.includes(C.contextForBuilder(b)));
+  assert.match(p, /begründete Kombination/);
+  assert.match(p, /nicht auf einen vorgegebenen Formatkatalog/);
+  assert.ok(!p.includes(formats[0].prompt.split('\n\n')[1]));
+  assert.ok(!p.includes(b.formatIdeasResult));
+  for (const phrase of ['genau ein Förderziel','Erfolgskontrolle ohne KI','keine Kinderantwort erfinden','belegt weder die Diagnose noch eine Lernwirkung']) assert.ok(p.includes(phrase), phrase);
+  assert.deepEqual(b, before);
+});
+
+test('new optional idea fields retain version 2 and initialize in old imports and legacy migration', () => {
+  for (const key of ideaFields) assert.equal(C.builder()[key], '');
+  const old = C.empty(), b = C.builder(C.cases[4]);
+  for (const key of ideaFields) delete b[key];
+  b.format = formats[0].id; b.prompt = unicode; old.builders.push(b);
+  assert.doesNotThrow(() => C.validate(old));
+  const imported = C.mergeImport(C.empty(), old).builders.at(-1);
+  assert.equal(imported.format, b.format); assert.equal(imported.prompt, unicode);
+  for (const key of ideaFields) assert.equal(imported[key], '');
+  const migrated = C.migrateLegacy(JSON.stringify({buildDraft:unicode, 'module-text-plan':'Alter Plan'}));
+  for (const key of ideaFields) assert.equal(migrated.builders[0][key], '');
+  assert.equal(migrated.builders[0].legacyOriginal['module-text-plan'], 'Alter Plan');
+  assert.equal(migrated.version, 2); assert.equal(C.KEY, 'digitale-handouts-v2');
+});
+
+test('all new builder idea fields reject non-text values without changing the state', () => {
+  for (const key of ideaFields) for (const value of [null, 0, false, [], {}]) {
+    const state = C.empty(); state.builders.push(ownIdeaBuilder()); state.builders[0][key] = value;
+    const before = clone(state);
+    assert.throws(() => C.validate(state), /Ungültiges Textfeld/);
+    assert.deepEqual(state, before);
+  }
+});
+
+test('own ideas, proposed alternatives and free-helper drafts survive repeated export/import roundtrips', () => {
+  const state = C.empty(); state.builders.push(ownIdeaBuilder());
+  for (const key of ideaFields) state.builders[0][key] += '\n' + unicode;
+  const draft = {text:'Freier Prompt\n' + unicode, source:'Kontext A', result:'Eigene Idee ohne KI', notes:unicode};
+  state.library.drafts[freeIdeas.id] = draft;
+  state.importedLibraries = [{mode:'own', drafts:{[freeIdeas.id]:{...draft, source:'Archivkontext'}}}];
+  const once = C.mergeImport(C.empty(), JSON.parse(C.serializeBackup(state)));
+  const twice = C.mergeImport(C.empty(), JSON.parse(C.serializeBackup(once)));
+  for (const key of ['format', ...ideaFields, 'draft','final','adjustments']) assert.equal(twice.builders.at(-1)[key], state.builders[0][key]);
+  assert.deepEqual(twice.library.drafts[freeIdeas.id], draft);
+  assert.equal(twice.importedLibraries[0].drafts[freeIdeas.id].source, 'Archivkontext');
+  assert.equal(twice.version, 2);
+});
+
+test('actual load and save retain free ideas and normalize old v2 builders in local storage', () => {
+  const stored = C.empty(); stored.builders.push(ownIdeaBuilder(), C.builder());
+  for (const key of ideaFields) delete stored.builders[1][key];
+  stored.library.drafts[freeIdeas.id] = {text:'',source:'Eigener Fall',result:unicode,notes:'Eigene Prüfung'};
+  const data = new Map([[C.KEY, JSON.stringify(stored)]]), dom = fakeNodes();
+  const context = {C, state:C.empty(), lastSaved:'', recoveryRaw:'', storageBlocked:false,
+    localStorage:{getItem:key => data.get(key) ?? null,setItem:(key,value) => data.set(key,value)},
+    $:dom.$, notice:() => {}, syncPrintPage:() => {}, announce:() => {}};
+  runApp(['load','save'], context, 'load(); save();');
+  const saved = JSON.parse(data.get(C.KEY));
+  for (const key of ideaFields) {assert.equal(saved.builders[0][key], stored.builders[0][key]);assert.equal(saved.builders[1][key], '');}
+  assert.deepEqual(saved.library.drafts[freeIdeas.id], stored.library.drafts[freeIdeas.id]);
+  assert.equal(context.storageBlocked, false);
+});
+
+test('source fingerprints preserve old-template compatibility and flag changed selected own ideas', () => {
+  const b = ownIdeaBuilder(), context = {C, build:() => b};
+  const first = runApp(['buildSource','formatIdeasSource'], context, '[buildSource(),formatIdeasSource()]');
+  b.customFormat += '\nGeänderte Vorgehensweise';
+  const changed = runApp(['buildSource','formatIdeasSource'], context, '[buildSource(),formatIdeasSource()]');
+  assert.notEqual(changed[0], first[0]); assert.notEqual(changed[1], first[1]);
+  b.format = formats[0].id;
+  assert.equal(runApp(['buildSource'], context, 'buildSource()'), JSON.stringify([C.contextForBuilder(b),b.focus,b.format]));
+  const templateSource = runApp(['buildSource'], context, 'buildSource()');
+  b.customFormat += '\nNoch nicht ausgewählter Wunsch';
+  assert.equal(runApp(['buildSource'], context, 'buildSource()'), templateSource);
+  const before = clone(b); b.formatIdeasResult += '\nWeitere Antwort';
+  assert.equal(runApp(['formatIdeasSource'], context, 'formatIdeasSource()'), runApp(['formatIdeasSource'], {C,build:() => before}, 'formatIdeasSource()'));
+});
+
+test('open idea generation needs no existing goal or format and never auto-selects a proposal', async () => {
+  const b = ownIdeaBuilder(); b.goal = ''; b.format = ''; b.formatIdeasPrompt = '';
+  const before = clone(b), dom = fakeNodes();
+  await runApp(['formatIdeasSource','regenerateFormatIdeas'], {C, freeIdeas, build:() => b, $:dom.$, save:() => {}, promptStatus:() => {}, announce:() => {}, ask:async() => true}, 'regenerateFormatIdeas()');
+  assert.ok(b.formatIdeasPrompt.includes(b.task)); assert.ok(b.formatIdeasPrompt.includes(b.customFormat));
+  assert.match(b.formatIdeasPrompt, /Fehlen Ziel oder entscheidende Angaben/);
+  assert.equal(dom.$('formatIdeasPrompt').value, b.formatIdeasPrompt);
+  assert.ok(b.formatIdeasPromptSource);
+  for (const key of Object.keys(before).filter(key => !['formatIdeasPrompt','formatIdeasPromptSource'].includes(key))) assert.deepEqual(b[key], before[key], key);
+});
+
+test('cancelled idea regeneration and incomplete evidence cannot overwrite saved work', async () => {
+  for (const change of [b => {}, b => {b.task = '';}, b => {b.evidenceStatus = 'observed';b.evidence = '';}, b => {b.evidenceStatus = 'assumed';b.assumption = '';}]) {
+    const b = ownIdeaBuilder(); change(b); const before = clone(b), dom = fakeNodes();
+    await runApp(['formatIdeasSource','regenerateFormatIdeas'], {C, freeIdeas, build:() => b, $:dom.$, save:() => assert.fail('must not save'), promptStatus:() => {}, announce:() => {}, ask:async() => false}, 'regenerateFormatIdeas()');
+    assert.deepEqual(b, before);
+  }
+});
+
+test('choosing a custom idea is explicit, cancelable and preserves existing prompts and materials', async () => {
+  const b = ownIdeaBuilder(); b.format = formats[0].id; const before = clone(b), dom = fakeNodes();
+  const context = {build:() => b, $:dom.$, ask:async() => false, save:() => {}, renderFormat:() => {}, promptStatus:() => {}, announce:() => {}};
+  await runApp(['chooseCustomFormat'], context, 'chooseCustomFormat()'); assert.deepEqual(b, before);
+  context.ask = async() => true;
+  await runApp(['chooseCustomFormat'], context, 'chooseCustomFormat()');
+  assert.deepEqual(b, {...before,format:'custom'});
+  b.customFormat = '   '; b.format = formats[0].id; const emptyBefore = clone(b);
+  await runApp(['chooseCustomFormat'], context, 'chooseCustomFormat()'); assert.deepEqual(b, emptyBefore);
+});
+
+test('H2 format selection offers every template in all mode and always permits a custom idea', () => {
+  const b = ownIdeaBuilder(), dom = fakeNodes();
+  const context = {build:() => b,formats,$:dom.$,option:(value,label) => '<option value="' + value + '">' + label + '</option>'};
+  for (const focus of ['all','A','B','C','D']) {
+    b.focus = focus; const before = clone(b); runApp(['renderFormat'], context, 'renderFormat()');
+    const markup = dom.$('build-format').innerHTML;
+    assert.ok(markup.includes('value="custom"'));
+    const expected = formats.filter(format => focus === 'all' || format.category === focus);
+    for (const format of expected) assert.ok(markup.includes('value="' + format.id + '"'));
+    assert.equal((markup.match(/<option /g) || []).length, expected.length + 2);
+    assert.deepEqual(b, before);
+  }
+});
+
+test('changing the H2 category never erases a custom choice or its saved ideas and material', () => {
+  const binding = app.split('\n').find(line => line.trim().startsWith("all('[data-build]').forEach") && line.includes('addEventListener'));
+  assert.ok(binding);
+  const b = ownIdeaBuilder(), before = clone(b);
+  let handler;
+  const el = {dataset:{build:'focus'},value:'D',addEventListener:(name,callback) => {handler = callback;}};
+  vm.runInNewContext(binding, {all:() => [el],build:() => b,formats,renderFormat:() => {},evidenceVisibility:() => {},selectors:() => {},save:() => {},promptStatus:() => {},updateLibraryContext:() => {}});
+  handler(); assert.deepEqual(b, {...before,focus:'D'});
+});
+
+test('generating a custom material prompt requires an explicit idea and retains proposal results', async () => {
+  const b = ownIdeaBuilder(); b.prompt = ''; b.customFormat = ''; const before = clone(b), dom = fakeNodes();
+  const context = {C, formats,build:() => b,$:dom.$,save:() => {},promptStatus:() => {},announce:() => {},ask:async() => true};
+  await runApp(['buildSource','regenerate'], context, 'regenerate("builder")'); assert.deepEqual(b, before);
+  b.customFormat = 'Ein Spiel mit selbst erfundenen Aufgaben';
+  await runApp(['buildSource','regenerate'], context, 'regenerate("builder")');
+  assert.ok(b.prompt.includes(b.customFormat)); assert.equal(b.formatIdeasResult, before.formatIdeasResult);
+  assert.equal(b.draft, before.draft); assert.equal(b.final, before.final);
+});
+
+test('H3 free-helper inputs save without AI and retain the original source after a context change', () => {
+  const state = C.empty(), dom = fakeNodes(); let source = 'Kontext A', saves = 0;
+  const context = {state,$:dom.$,librarySource:() => source,save:() => saves++,updateLibraryContext:() => {}};
+  context.event = {target:{dataset:{libraryResult:freeIdeas.id},value:'Eigene Idee ohne KI\n' + unicode}};
+  runApp(['saveLibraryInput'], context, 'saveLibraryInput(event)');
+  source = 'Kontext B'; context.event = {target:{dataset:{libraryNotes:freeIdeas.id},value:'Eigene Prüfung'}};
+  runApp(['saveLibraryInput'], context, 'saveLibraryInput(event)');
+  assert.deepEqual(clone(state.library.drafts[freeIdeas.id]), {text:'',source:'Kontext A',result:'Eigene Idee ohne KI\n' + unicode,notes:'Eigene Prüfung'});
+  assert.equal(saves, 2);
+});
+
+test('free-helper regeneration is cancelable and archives a changed-context result before replacement', async () => {
+  const state = C.empty(), dom = fakeNodes();
+  state.library.drafts[freeIdeas.id] = {text:'Eigener Prompt',source:'Alter Kontext',result:unicode,notes:'Prüfung'};
+  const before = clone(state), context = {C,state,lookupFormat,$:dom.$,ask:async() => false,libraryContext:() => ({grade:'6',task:'2/3 + 1/4',goal:'Neues Ziel',baseline:'Neue Annahme'}),librarySource:() => 'Neuer Kontext',save:() => {},announce:() => {},updateLibraryContext:() => {},renderImportedLibraries:() => {},resizeOpenPrompts:() => {}};
+  await runApp(['ensureLibrary'], context, 'ensureLibrary(' + JSON.stringify(freeIdeas.id) + ',true)');
+  assert.deepEqual(context.state, before);
+  context.ask = async() => true;
+  await runApp(['ensureLibrary'], context, 'ensureLibrary(' + JSON.stringify(freeIdeas.id) + ',true)');
+  assert.deepEqual(context.state.importedLibraries[0].drafts[freeIdeas.id], before.library.drafts[freeIdeas.id]);
+  const active = context.state.library.drafts[freeIdeas.id];
+  assert.equal(active.source, 'Neuer Kontext'); assert.equal(active.result, ''); assert.equal(active.notes, '');
+  assert.ok(active.text.includes('2/3 + 1/4')); assert.equal(dom.$('library-' + freeIdeas.id).value, active.text);
+  context.state.library.drafts[freeIdeas.id].result = 'Neuer eigener Entwurf';
+  await runApp(['ensureLibrary'], context, 'ensureLibrary(' + JSON.stringify(freeIdeas.id) + ',true)');
+  assert.equal(context.state.library.drafts[freeIdeas.id].result, 'Neuer eigener Entwurf');
+  assert.equal(context.state.importedLibraries.length, 1);
+});
+
+test('archived free ideas render under their human-readable title with safely escaped notes and results', () => {
+  const state = C.empty(), dom = fakeNodes();
+  state.importedLibraries = [{drafts:{[freeIdeas.id]:{text:'Prompt <x>',source:'Kontext',result:unicode,notes:'</textarea><script>bad</script>'}}}];
+  runApp(['renderImportedLibraries'], {state,lookupFormat,$:dom.$,esc:escapeHtml}, 'renderImportedLibraries()');
+  const output = dom.$('importedLibraryList').innerHTML;
+  assert.ok(output.includes(freeIdeas.title)); assert.ok(output.includes(escapeHtml(unicode)));
+  assert.ok(output.includes('&lt;/textarea&gt;&lt;script&gt;'));
+  assert.ok(!output.includes('<script>')); assert.equal(dom.$('importedLibraries').hidden, false);
+});
+
+test('copying stale H2 or H3 free-idea prompts requires confirmation and copies the exact edited text', async () => {
+  for (const id of ['formatIdeasPrompt','library-' + freeIdeas.id]) {
+    const b = ownIdeaBuilder(), state = C.empty(), dom = fakeNodes(), written = [], asked = [];
+    state.library.drafts[freeIdeas.id] = {text:unicode,source:'Früherer Kontext'}; dom.$(id).value = unicode;
+    const context = {state,build:() => b,$:dom.$,formatIdeasSource:() => 'Aktueller Kontext',librarySource:() => 'Aktueller Kontext',ask:async message => {asked.push(message);return false;},navigator:{clipboard:{writeText:async text => written.push(text)}},announce:() => {}};
+    await runApp(['copy'], context, 'copy(' + JSON.stringify(id) + ')');
+    assert.equal(written.length, 0); assert.match(asked[0], /früheren Kontext/);
+    context.ask = async message => {asked.push(message);return true;};
+    await runApp(['copy'], context, 'copy(' + JSON.stringify(id) + ')');
+    assert.deepEqual(written, [unicode]);
+  }
+});
+
+test('free-idea copy keeps placeholder confirmation and manual clipboard fallback', async () => {
+  const state = C.empty(), dom = fakeNodes(), id = 'library-' + freeIdeas.id;
+  state.library.drafts[freeIdeas.id] = {text:'Wunsch: [selbst ergänzen]',source:'A'}; dom.$(id).value = state.library.drafts[freeIdeas.id].text;
+  const prompts = [], context = {state,$:dom.$,librarySource:() => 'A',navigator:{},announce:() => {},ask:async message => {prompts.push(message);return false;}};
+  await runApp(['copy'], context, 'copy(' + JSON.stringify(id) + ')'); assert.equal(dom.$('copyFallback').open, false);
+  context.ask = async message => {prompts.push(message);return true;};
+  await runApp(['copy'], context, 'copy(' + JSON.stringify(id) + ')');
+  assert.ok(prompts.every(message => message.includes('Platzhalter')));
+  assert.equal(dom.$('copyFallback').open, true); assert.equal(dom.$('fallbackText').value, dom.$(id).value);
+});
+
+test('H2 text and print distinguish chosen custom ideas from unselected wishes and retain proposals', () => {
+  const b = ownIdeaBuilder(), dom = fakeNodes(), context = {C,build:() => b,formats,checks:[],entry:(label,value) => label + '\n' + (value || '—') + '\n',$:dom.$,esc:escapeHtml};
+  const text = runApp(['builderText'], context, 'builderText()');
+  for (const value of [b.customFormat,b.formatIdeasPrompt,b.formatIdeasResult,b.draft,b.final]) assert.ok(text.includes(value), value);
+  assert.ok(text.includes('Gewählte Vorgehensweise\n' + b.customFormat));
+  b.format = formats[0].id;
+  const other = runApp(['builderText'], context, 'builderText()');
+  assert.ok(other.includes('Gewählte Vorgehensweise\n' + formats[0].title));
+  assert.ok(other.includes('nicht automatisch ausgewählt\n' + b.customFormat));
+  runApp(['builderText','preparePrint'], context, 'preparePrint("builder")');
+  for (const value of [b.customFormat,b.formatIdeasPrompt,b.formatIdeasResult,b.draft,b.final]) assert.ok(dom.$('printSummary').innerHTML.includes(escapeHtml(value)));
+});
+
+test('explicit free-helper print preserves own non-AI results and notes without silently generating a prompt', async () => {
+  const state = C.empty(), dom = fakeNodes();
+  state.library.drafts[freeIdeas.id] = {text:'',source:'Kontext',result:unicode,notes:'Eigene Prüfung <wichtig>'};
+  const before = clone(state); let printed = 0;
+  const context = {state,lookupFormat,C,$:dom.$,esc:escapeHtml,entry:(label,value) => label + '\n' + (value || '—') + '\n',window:{print:() => printed++},libraryContext:() => {throw new Error('Existing empty prompt must stay empty');}};
+  await runApp(['preparePrint','print'], context, 'print("library",' + JSON.stringify(freeIdeas.id) + ')');
+  const output = dom.$('printSummary').innerHTML;
+  assert.ok(output.includes(freeIdeas.title)); assert.ok(output.includes(escapeHtml(unicode))); assert.ok(output.includes('Eigene Prüfung &lt;wichtig&gt;'));
+  assert.ok(!output.includes('Entwickle zunächst drei')); assert.equal(printed, 1); assert.deepEqual(state, before);
+});
+
+test('keyboard print preparation targets the open free-idea panel while explicit buttons retain their own target', () => {
+  const dom = fakeNodes(), calls = []; dom.$('freeIdeasPanel').open = true;
+  const context = {C,freeIdeas,$:dom.$,location:{hash:'#bibliothek'},all:() => [{dataset:{format:formats[0].id},hidden:false}],preparePrint:(...args) => calls.push(args)};
+  runApp(['syncPrintPage'], context, 'syncPrintPage()'); assert.deepEqual(calls, [['library',freeIdeas.id]]);
+  dom.$('freeIdeasPanel').open = false; calls.length = 0;
+  runApp(['syncPrintPage'], context, 'syncPrintPage()'); assert.deepEqual(calls, [['library',formats[0].id]]);
+  assert.match(app, /print\('library',pf\.dataset\.printFormat\)/);
+});
+
+test('HTML exposes independent own-idea inputs, explicit generation/copy/print and a nonexclusive guide', () => {
+  for (const id of ['build-customFormat','generateFormatIdeas','formatIdeasPrompt','build-formatIdeasResult','chooseCustomFormat','freeIdeasPanel','generateFreeIdeas','library-' + freeIdeas.id,'trial-result-' + freeIdeas.id,'trial-notes-' + freeIdeas.id,'moreExamples']) assert.ok(html.includes('id="' + id + '"'), id);
+  for (const key of ['customFormat','formatIdeasPrompt','formatIdeasResult']) assert.ok(html.includes('data-build="' + key + '"'));
+  assert.match(html, /keine vollständige Liste, keine Pflichtauswahl/);
+  assert.match(html, /ohne KI ausfüllbar/);
+  assert.ok(html.includes('data-print-format="' + freeIdeas.id + '"'));
+  assert.ok(app.includes("$('freeIdeasPanel').addEventListener('input',saveLibraryInput)"));
+  assert.ok(app.includes("$('generateFreeIdeas').addEventListener('click',()=>ensureLibrary(freeIdeas.id,true))"));
+  assert.ok(app.includes("$('moreExamples').addEventListener('click'"));
+});
+
+test('every generated prompt and the independent guide receive full-text and text-download controls', () => {
+  const selector = app.match(/const promptSelector='([^']+)'/)[1];
+  for (const id of ['diagnosisPrompt','hypothesisPrompt','goalPrompt','formatIdeasPrompt','builderPrompt','independentPrompt']) {
+    assert.ok(selector.includes('#' + id), id);
+    assert.ok(html.includes('id="' + id + '"'), id);
+  }
+  assert.ok(selector.includes('[data-library-prompt]'));
+  assert.match(html, /Die Seite erstellt nur den Prompttext/);
+  assert.match(html, /ruft keine KI auf und füllt Ergebnisfelder nicht automatisch/);
+  assert.match(html, /Kopiert wird genau der angezeigte Text/);
+  const independent = html.match(/<textarea id="independentPrompt" readonly>([\s\S]*?)<\/textarea>/)[1];
+  for (const phrase of ['Tatsächlich vorliegende Lösung','Vermutungen','Ziel','Gewünschte Ausgabe','Erfinde keine Kinderantworten','Behaupte keine gesicherte Diagnose oder Lernwirkung']) assert.ok(independent.includes(phrase), phrase);
+  assert.ok(html.includes('data-copy="independentPrompt"'));
+});
+
+test('prompt tools install once per textarea and never alter the full prompt value', () => {
+  const rows = [], elements = ['formatIdeasPrompt','library-' + freeIdeas.id,'independentPrompt'].map(id => ({id,dataset:{},value:unicode,after:row => rows.push(row)}));
+  const context = {promptSelector:'test-selector',all:() => elements,esc:escapeHtml,document:{createElement:() => ({})}};
+  runApp(['installPromptTools'], context, 'installPromptTools(); installPromptTools();');
+  assert.equal(rows.length, elements.length);
+  elements.forEach((el,i) => {
+    assert.equal(el.value, unicode); assert.equal(el.dataset.toolsReady, 'true');
+    assert.ok(rows[i].innerHTML.includes('data-expand-prompt="' + el.id + '"'));
+    assert.ok(rows[i].innerHTML.includes('data-save-prompt="' + el.id + '"'));
+    assert.ok(rows[i].innerHTML.includes('aria-controls="' + el.id + '"'));
+  });
+});
+
+test('expanded prompts resize to their whole text only when visible without changing content', () => {
+  const elements = [
+    {dataset:{expanded:'true'},getClientRects:() => [{}],scrollHeight:1900,style:{height:'200px'},value:unicode},
+    {dataset:{expanded:'true'},getClientRects:() => [],scrollHeight:2200,style:{height:'300px'},value:unicode},
+    {dataset:{expanded:'false'},getClientRects:() => [{}],scrollHeight:2400,style:{height:'400px'},value:unicode}
+  ];
+  runApp(['resizeOpenPrompts'], {promptSelector:'test-selector',all:() => elements}, 'resizeOpenPrompts()');
+  assert.deepEqual(elements.map(el => el.style.height), ['1904px','300px','400px']);
+  assert.ok(elements.every(el => el.value === unicode));
+});
+
+test('full-prompt toggle and TXT export use the displayed text without generating or selecting anything', () => {
+  const binding = app.split('\n').find(line => line.includes("document.addEventListener('click'") && line.includes('[data-expand-prompt]'));
+  assert.ok(binding); const dom = fakeNodes(), downloads = []; let handler, resized = 0;
+  const el = dom.$('formatIdeasPrompt'); el.dataset = {}; el.style = {height:''}; el.value = unicode;
+  const context = {$:dom.$,document:{addEventListener:(type,callback) => {handler = callback;}},resizeOpenPrompts:() => resized++,download:(...args) => downloads.push(args),announce:() => {}};
+  vm.runInNewContext(binding, context);
+  const button = {dataset:{expandPrompt:el.id = 'formatIdeasPrompt'},setAttribute(name,value) {this[name] = value;}};
+  const toggleEvent = {target:{closest:selector => selector === '[data-expand-prompt]' ? button : null}};
+  handler(toggleEvent); assert.equal(el.dataset.expanded, 'true'); assert.equal(button['aria-expanded'], 'true'); assert.equal(resized, 1);
+  handler(toggleEvent); assert.equal(el.dataset.expanded, 'false'); assert.equal(button['aria-expanded'], 'false'); assert.equal(el.style.height, '');
+  const downloadEvent = {target:{closest:selector => selector === '[data-save-prompt]' ? {dataset:{savePrompt:'formatIdeasPrompt'}} : null}};
+  handler(downloadEvent); assert.deepEqual(downloads, [['Mathematik-formatIdeasPrompt-Prompt.txt',unicode]]);
+  el.value = '   '; handler(downloadEvent); assert.equal(downloads.length, 1);
+});
+
+test('the independent prompt guide copies exactly its visible template after placeholder confirmation', async () => {
+  const text = html.match(/<textarea id="independentPrompt" readonly>([\s\S]*?)<\/textarea>/)[1];
+  const dom = fakeNodes(), copied = [], questions = []; dom.$('independentPrompt').value = text;
+  await runApp(['copy'], {$:dom.$,ask:async question => {questions.push(question);return true;},navigator:{clipboard:{writeText:async value => copied.push(value)}},announce:() => {}}, 'copy("independentPrompt")');
+  assert.deepEqual(copied, [text]); assert.equal(questions.length, 1); assert.match(questions[0], /Platzhalter/);
+});
+
+test('library rendering restores the free helper beside all 28 templates without truncating stored text', () => {
+  const state = C.empty(), dom = fakeNodes(), long = unicode.repeat(100), ids = [freeIdeas.id,formats[0].id];
+  for (const id of ids) state.library.drafts[id] = {text:long,source:'Alt',result:'Eigene Idee ' + id,notes:'Notiz ' + id};
+  const elements = key => ids.map(id => {const el = dom.$(key + id);el.dataset = {[key === 'library-' ? 'libraryPrompt' : key === 'trial-result-' ? 'libraryResult' : 'libraryNotes']:id};return el;});
+  const bySelector = {'[data-library-prompt]':elements('library-'),'[data-library-result]':elements('trial-result-'),'[data-library-notes]':elements('trial-notes-'),'.prompt-item':[]};
+  let toolInstalls = 0;
+  runApp(['renderLibrary'], {state,library:[...formats,...extras],formats,$:dom.$,all:selector => bySelector[selector] || [],esc:escapeHtml,exampleMarkup:() => '',filterLibrary:() => {},updateLibraryContext:() => {},renderImportedLibraries:() => {},installPromptTools:() => toolInstalls++}, 'renderLibrary()');
+  assert.equal((dom.$('promptList').innerHTML.match(/class="prompt-item"/g) || []).length, 28);
+  assert.equal(toolInstalls, 1);
+  for (const id of ids) {
+    assert.equal(dom.$('library-' + id).value, long);
+    assert.equal(dom.$('trial-result-' + id).value, state.library.drafts[id].result);
+    assert.equal(dom.$('trial-notes-' + id).value, state.library.drafts[id].notes);
+  }
 });

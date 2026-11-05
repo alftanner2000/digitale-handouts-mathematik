@@ -9,7 +9,19 @@ Ausgangslage (beobachtete Lösung oder Äußerung, offene Vermutungen und ausdr�
 
   const safeguards = `Arbeite nur am ausgewählten Format und am genannten Lernziel. Verwende ausschließlich fiktive oder vollständig anonymisierte Angaben. Trenne tatsächliche Beobachtungen, vorläufige Deutungen und Arbeitsannahmen. Erfinde keine Äußerungen oder Bearbeitungen des Kindes. Benenne fehlende Angaben. Wenn du eine ungesicherte Ausgangslage für die Materialplanung annimmst, schreibe ausdrücklich: „Unter der Annahme, dass …“. Eine einzelne Lösung belegt weder eine gesicherte Diagnose noch eine dauerhafte Eigenschaft des Kindes. Ein Materialentwurf belegt keine Lernwirkung. Prüfe Rechnungen, Einheiten, Darstellungen und Lösungen auf Konsistenz. Kennzeichne, was die Lehrkraft vor dem Einsatz noch fachlich oder hinsichtlich der Passung prüfen muss.`;
 
-  const prompt = (instruction) => `${context}\n\n${instruction}\n\n${safeguards}`;
+  const prompt = (instruction, guard=safeguards) => `${context}\n\n${instruction}\n\n${guard}`;
+  window.HANDOUT_FREE_IDEAS = {
+    id:"freie-foerderideen", title:"Eigene Förderideen und weitere KI-Vorschläge",
+    purpose:"Aus der geklärten Ausgangslage passende nächste Schritte entwickeln, auch außerhalb der Beispielsammlung.",
+    when:"Wenn Sie eine eigene Idee prüfen oder weitere Möglichkeiten vergleichen möchten.",
+    output:"Drei begründete Alternativen mit einem kleinen Beispiel, Lösungen, Prüfkriterium und Einsatzgrenze; die Lehrkraft wählt selbst.",
+    check:"Passt die Idee zum gewählten Ziel und zum tatsächlichen Kenntnisstand, oder wäre zunächst eine Rückfrage nötig?",
+    prompt:prompt(`Entwickle zunächst drei unterschiedliche mögliche nächste Schritte für diesen Fall. Die Zahl drei dient nur der Übersicht dieser Antwort, nicht als Begrenzung der Möglichkeiten. Auf Nachfrage kannst du weitere Alternativen entwickeln. Beschränke dich nicht auf die sechs Beispielzugänge oder die 28 Vorlagen einer Bibliothek. Eigene, offene, spielerische, handelnde, sprachliche oder digitale Aufgabenideen sowie begründete Kombinationen sind möglich, sofern sie dem mathematischen Ziel dienen.
+Die Alternativen sollen sich in der didaktischen Vorgehensweise unterscheiden, nicht nur in den Zahlen. Halte das gewählte Ziel bei; falls eine Zieländerung nötig erscheint, begründe sie ausdrücklich und frage nach meiner Entscheidung.
+Falls ich eine eigene Idee mitgebe, prüfe sie fachlich und entwickle sie weiter. Ersetze sie nicht ohne Begründung. Fehlen Ziel oder entscheidende Angaben, stelle zunächst höchstens zwei gezielte Rückfragen statt unpassende Alternativen zu erfinden. Nur wenn die Angaben für einen bedingten Entwurf reichen, formuliere Vorschläge ausdrücklich unter einer offenen Arbeitsannahme. Trenne einen noch nötigen diagnostischen Prüfschritt von Förderung und späterer Erfolgskontrolle. Keine Diagnose aus einer einzelnen Fehllösung.
+Gib für jede Alternative an: Idee und didaktischer Zweck; Bezug zu den tatsächlich gegebenen Informationen und zum Ziel; ein kleiner konkreter Aufgabenauftrag; getrennte fachliche Lösung; ein beobachtbares Prüfkriterium; benötigte Hilfen oder Material; wann die Idee NICHT passend wäre. Erfinde keine Beobachtungen und keine Kinderantworten. Prüfe Rechnungen, Einheiten und Darstellungen. Behaupte keine gesicherte Lernwirkung oder wissenschaftliche Validierung des Entwurfs.
+Liefere noch keinen ganzen Förderplan und keine verpflichtende Reihenfolge. Ich kann eine Idee auswählen, verändern, kombinieren oder eine eigene verwenden. Eine Idee gilt erst nach meiner fachlichen Prüfung als ausgewählt.`, safeguards.replace('Arbeite nur am ausgewählten Format und am genannten Lernziel.','Orientiere die Alternativen am genannten Lernziel. Ein vorgegebenes Format ist nicht erforderlich.'))
+  };
   const fractionCase = "Fiktiver Ausgangsfall, Klasse 6: Zu ½ + ⅓ wurde ⅖ notiert. Der Denkweg ist unbekannt.";
   window.HANDOUT_TRIAL_EXAMPLE = {
     grade: "6",
@@ -25,7 +37,11 @@ Ausgangslage (beobachtete Lösung oder Äußerung, offene Vermutungen und ausdr�
     {title:"PIKAS: Tipps und Herausforderungen am gemeinsamen Gegenstand",url:"https://pikas-mi.dzlm.de/leitideen/aufgaben-adaptieren/tipps-und-herausforderungen-bereithalten/hintergrund"},
     {title:"Mathe sicher können: Gleichwertige Brüche und Bruchaddition (B2–B4)",url:"https://mathe-sicher-koennen.dzlm.de/material-sek/brueche-prozente-und-dezimalzahlen"},
     {title:"PIKAS: Subtrahieren mit Entbündeln",url:"https://pikas-mi.dzlm.de/node/719"},
-    {title:"PIKAS: Entdeckendes Üben und Aufgabenpäckchen",url:"https://pikas-mi.dzlm.de/leitideen/effektiv-%C3%BCben/entdeckendes-%C3%BCben/unterricht"}
+    {title:"PIKAS: Entdeckendes Üben und Aufgabenpäckchen",url:"https://pikas-mi.dzlm.de/leitideen/effektiv-%C3%BCben/entdeckendes-%C3%BCben/unterricht"},
+    {title:"MaHiKo: Zahlen zerlegen",url:"https://mahiko.dzlm.de/zahlraum-bis-20-ueberblick/zahlen-zerlegen/uebungen"},
+    {title:"Mathe sicher können: Dezimale Stellenwerte (D1)",url:"https://mathe-sicher-koennen.dzlm.de/material-sek/brueche-prozente-und-dezimalzahlen"},
+    {title:"PIKAS: Subtraktion verstehen",url:"https://pikas.dzlm.de/pikasfiles/uploads/upload/Material/diagnose_und_foerderung/klasse2/zr10_zr20_ov_subtraktionverstehen_hr220811.pdf"},
+    {title:"PIKAS: Grundsituationen der Division",url:"https://pikas-mi.dzlm.de/inhalte/operationsvorstellungen-multiplikation-und-division/hintergrund/grundsituationen"}
   ];
   window.HANDOUT_VARIANT_ROUTES = [
     {
@@ -70,6 +86,33 @@ Ausgangslage (beobachtete Lösung oder Äußerung, offene Vermutungen und ausdr�
       formats:["exit-ticket-ohne-ki","verzweigte-anschlussaufgaben"], sources:[0],
       examples:[{title:"Neue Rechnung mit eigener Begründung",task:"Berechne 2/3 + 1/4. Erkläre mit einer eigenen Skizze oder in Worten, warum du diese Teile zusammenzählen darfst. Keine KI und keine eingeblendete Lösung; sonstige erlaubte Hilfsmittel vorher festlegen.",solution:"8/12 + 3/12 = 11/12. Beide Brüche werden wertgleich als Zwölftel desselben Bezugs-Ganzen dargestellt.",criterion:"Wertgleiches Erweitern, gemeinsame Teilgröße, richtige Summe und passende Erklärung zusammen betrachten.",limit:"Nur verwenden, wenn die Aufgabe nicht schon vorgeführt wurde. Eine gelungene Bearbeitung belegt keine dauerhafte Beherrschung; weitere Beobachtungen bleiben nötig."}]
     }
+  ];
+
+  window.HANDOUT_MORE_EXAMPLES = [
+    {id:"zahlzerlegungen",title:"Zahlzerlegungen verändern",formats:["handlung-bild-symbol","eigene-aufgabe-erfinden"],sources:[6],
+      condition:"Anderer Beispielfall: Unter der Arbeitsannahme, dass Zahlzerlegungen noch wenig verfügbar sind. Ziel ist, Teil-Ganzes-Beziehungen zu nutzen.",
+      task:"Lege acht Plättchen in eine Fünfer- und eine Dreiergruppe. Verschiebe ein Plättchen von der Fünfergruppe zur Dreiergruppe. Welche Zerlegung entsteht? Was bleibt gleich? Finde eine weitere Zerlegung und erkläre sie.",
+      solution:"8 = 5 + 3 = 4 + 4; eine weitere Möglichkeit ist 8 = 6 + 2. Ein Teil wird kleiner, der andere entsprechend größer. Die Gesamtzahl bleibt acht.",
+      criterion:"Das Kind erklärt die unveränderte Gesamtzahl und die gegenläufige Veränderung der beiden Teile.",
+      limit:"Materialhandlungen oder auswendig genannte Zerlegungen allein belegen noch keine flexible Nutzung. Zählen ist als Vorgehen nicht pauschal zu verbieten."},
+    {id:"dezimalstellen",title:"Zehntel und Hundertstel zuordnen",formats:["darstellungen-zuordnen"],sources:[7],
+      condition:"Anderer Beispielfall: Unter der Arbeitsannahme, dass die Bedeutung dezimaler Stellen geklärt werden soll. Ziel ist, wertgleiche Schreibweisen zu erklären.",
+      task:"Welche Karten zeigen dieselbe Zahl: 3,4; 3 + 4/10; 3 + 40/100; 3,04? Begründe mit einer Stellenwerttafel oder einer Darstellung. Lege bei Material oder Bild fest, was für ein Ganzes steht.",
+      solution:"Die ersten drei Karten zeigen 3,4 = 3,40. Vier Zehntel sind vierzig Hundertstel. 3,04 enthält vier Hundertstel und ist daher nicht gleich 3,4.",
+      criterion:"Das Kind begründet die Beziehung zwischen Zehnteln und Hundertsteln, statt nur gleiche Ziffern zu suchen.",
+      limit:"Richtiges Zuordnen belegt noch kein sicheres Rechnen mit Dezimalzahlen. Das Verständnis später an einer neuen Darstellung oder Aufgabe betrachten."},
+    {id:"subtraktion-ergaenzen",title:"Subtraktion als Ergänzen verstehen",formats:["umkehr-ergaenzungsaufgaben"],sources:[8],
+      condition:"Anderer Beispielfall: Unter der Arbeitsannahme, dass Subtraktion bisher vor allem als Wegnehmen genutzt wird. Ziel ist, Ergänzen und Subtrahieren miteinander zu verbinden.",
+      task:"Mila hat acht Karten und möchte dreizehn haben. Wie viele fehlen? Zeige deinen Weg mit Material oder am Rechenstrich. Welche Plusaufgabe und welche Minusaufgabe beschreiben dieselbe fehlende Anzahl?",
+      solution:"8 + 5 = 13 und 13 − 8 = 5. Am Rechenstrich kann von 8 bis 10 und dann bis 13 ergänzt werden: 2 + 3 = 5.",
+      criterion:"Das Kind erklärt die Fünf als fehlenden Teil beziehungsweise Abstand und verbindet beide Gleichungen mit der Situation.",
+      limit:"Wegnehmen ist ebenfalls ein gültiger Lösungsweg. Ein anders gewählter Weg beweist nicht, dass die Ergänzungsvorstellung fehlt."},
+    {id:"division-kontexte",title:"Gleiche Rechnung mit unterschiedlicher Bedeutung",formats:["sachkontexte-operation"],sources:[9],
+      condition:"Anderer Beispielfall: Unter der Arbeitsannahme, dass die Ergebniszahl noch nicht sicher auf die gesuchte Größe bezogen wird. Ziel ist, Gruppenzahl und Gruppengröße zu unterscheiden.",
+      task:"A: Verteile 24 Plättchen gleichmäßig auf sechs Kinder. Wie viele erhält jedes? B: Packe jeweils sechs von 24 Plättchen in eine Tüte. Wie viele Tüten entstehen? Zeige beide Situationen. Was bedeutet die Vier jeweils?",
+      solution:"Beide Male gilt 24 : 6 = 4. In A erhält jedes Kind vier Plättchen. In B entstehen vier Tüten mit jeweils sechs Plättchen.",
+      criterion:"Das Kind ordnet die Zahlen der Handlung zu und unterscheidet die gesuchte Gruppengröße von der gesuchten Anzahl der Gruppen.",
+      limit:"Die Fachwörter Aufteilen und Verteilen müssen Kinder nicht nennen können. Entscheidend ist die Bedeutung der Zahlen im jeweiligen Kontext."}
   ];
 
   window.HANDOUT_FORMATS = [

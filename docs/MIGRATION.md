@@ -27,7 +27,7 @@ Die neue Version schreibt ausschließlich `digitale-handouts-v2`. Beim ersten St
 
 Alle alten Werte, auch unbekannte Felder, Modultexte und Modulhäkchen, bleiben zusätzlich in `legacyOriginal` und `legacy.original` enthalten. Sie sind im Förderentwurf aufklappbar. Der alte Schlüssel wird weder verändert noch gelöscht. Frühere Prüfcheckboxen ohne ID wurden schon durch die alte Website nicht persistiert und können nicht wiederhergestellt werden.
 
-Die alte Maske erfasste Aufgabe und Schülerlösung gemeinsam. Dieser Text bleibt vollständig im neuen Ausgangslagenfeld; eine eigene Aufgabe wird nicht automatisch aus dem Fehlertext geraten. Für die Diagnosehilfe Aufgabe und vorliegende beziehungsweise ausdrücklich fiktive Schülerlösung bereitstellen. Ein Aufgabenziel oder Förderziel ist dafür keine Voraussetzung. Erst für den späteren Förderprompt werden ein gewähltes Förderziel und genau ein Format benötigt.
+Die alte Maske erfasste Aufgabe und Schülerlösung gemeinsam. Dieser Text bleibt vollständig im neuen Ausgangslagenfeld; eine eigene Aufgabe wird nicht automatisch aus dem Fehlertext geraten. Für die Diagnosehilfe Aufgabe und vorliegende beziehungsweise ausdrücklich fiktive Schülerlösung bereitstellen. Ein Aufgabenziel oder Förderziel ist dafür keine Voraussetzung. Erst für den späteren Förderprompt werden ein gewähltes Förderziel und eine gewählte Vorgehensweise (Vorlage oder eigene Idee) benötigt.
 
 ## Optionale Diagnose- und Zielhilfe innerhalb von Version 2
 
@@ -62,6 +62,14 @@ Vor dem Archivieren wird die Grenze von 500 Bibliotheksarchiven geprüft. Bei Ü
 ## Prompts
 
 Geänderte Fallangaben überschreiben bearbeitete Prompts nicht. Ein Kontextvergleich warnt vor früheren Falltexten. Neuerzeugung fragt nach, sofern ein Prompt vorhanden ist. Vor dem Kopieren wird bei veraltetem Kontext oder verbliebenen Platzhaltern ausdrücklich bestätigt. Der manuelle Kopierdialog ist die Ausweichmöglichkeit, falls die Clipboard-API nicht verfügbar ist.
+
+### Freie Vorgehensweise und offene Ideen
+
+Die optionalen Textfelder `customFormat`, `formatIdeasPrompt`, `formatIdeasPromptSource` und `formatIdeasResult` ergänzen Förderentwürfe weiterhin innerhalb Version 2. Alte gültige Stände bekommen leere Standardwerte; vorhandene Angaben bleiben erhalten. `format: "custom"` bezeichnet eine bewusst gewählte eigene Vorgehensweise. Erst die Auswahl und ein nichtleerer Ideentext erlauben den entsprechenden Förderprompt. Ein Kategorie-Filterwechsel löscht die freie Wahl nicht. Neue KI-Vorschläge überschreiben weder die gewählte Idee noch Material oder Ergebnisfelder. Der Quellenvergleich berücksichtigt den eigenen Text, wenn er ausgewählt ist.
+
+Der freie H3-Eintrag `freie-foerderideen` nutzt dieselben Draft-, Ergebnis-, Notiz- und Archivregeln wie die 28 vorhandenen Vorlagen. Er ist kein zusätzliches Pflichtformat. Auch ein eigener Text ohne generierten Prompt bleibt speicher- und druckbar. Bei Kontextwechsel werden frühere Ergebnisse erst beim bestätigten Neubefüllen archiviert. Alle neuen Angaben sind im JSON-Export/-Import enthalten.
+
+Die Volltextansicht verändert den Prompt nicht. Kopieren und Textdownload verwenden genau den aktuell im Feld stehenden Text. Textdateien eignen sich zur weiteren Bearbeitung, nicht als rückimportierbare Zustandssicherung. Der allgemeine, schreibgeschützte Promptbauplan ist statischer Inhalt und wird nach dem Kopieren im eigenen Dokument oder KI-System angepasst. Kein KI-Aufruf, keine automatische Ergebnisübernahme und keine automatische Auswahl erfolgen.
 
 ## Sicherungen sind unterschiedlich
 

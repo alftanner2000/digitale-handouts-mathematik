@@ -293,6 +293,14 @@
     .preserve-lines { white-space:pre-wrap; }
     .route-reference,.variant-sources { font-size:14px; line-height:1.6; }
     .variant-sources { margin-top:24px; }
+    .more-example-section { margin-top:24px; font-size:16px; line-height:1.6; }
+    .prompt-workflow { margin-top:24px; padding:22px 24px; background:var(--paper-2); }
+    .prompt-workflow h3 { margin:0 0 12px; font-size:20px; }
+    .prompt-workflow ol { padding-left:24px; margin:0; }
+    .prompt-workflow li { padding:4px 0; line-height:1.55; }
+    .prompt-workflow p { margin:12px 0 0; line-height:1.55; }
+    .prompt-tools { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
+    .prompt-tools button { font-size:14px; }
     .prompt-detail textarea { min-height:280px; }
     .prompt-detail dt { font-weight:750; margin-top:14px; }.prompt-detail dd { margin:5px 0; line-height:1.55; }
     .context-alert { color:#8a4100; background:#fff5e8; padding:10px; line-height:1.5; }

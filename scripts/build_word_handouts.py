@@ -159,14 +159,14 @@ def make_h1():
     d.title('Handout 1 Hypothesenbildung','Praxisphase 1')
     d.p('Sie sichern höchstens zwei vorläufige Hypothesen und einen geplanten Prüfschritt zu einer konkreten Aufgabe. Ohne weitere tatsächliche Antwort bleibt die Hypothese offen. Förderübungen und Förderplanung gehören erst in Praxisphase 2.')
     d.h('Arbeitsweg')
-    for t in ['1. Einen vorbereiteten Fall wählen oder einen fiktiven beziehungsweise vollständig anonymisierten eigenen Fall notieren. Aufgabe und vorliegende Lösung reichen für den Einstieg.', '2. Ein eigenes Aufgabenziel oder Vermutungen nur ergänzen, wenn vorhanden. Sonst mit dem Prompt auf Seite 2 Vorschläge anfordern.', '3. Die KI-Antwort fachlich prüfen. Original-Lösung unverändert lassen; Beobachtung und Deutung getrennt halten.', '4. Erst danach das Aufgabenziel, höchstens zwei Hypothesen, einen Prüfschritt und offene Informationen sichern.']:
+    for t in ['1. Einen vorbereiteten, fiktiven oder vollständig anonymisierten eigenen Fall notieren. Aufgabe und vorliegende Lösung reichen; eigene Ziele oder Vermutungen sind optional.', '2. Den vollständigen Prompt auf Seite 2 lesen, Platzhalter ersetzen und bei Bedarf anpassen. Dann kopieren, in ein freigegebenes KI-System einfügen und dort selbst absenden.', '3. Die KI-Antwort fachlich prüfen. Die Original-Lösung unverändert lassen; Beobachtung und Deutung getrennt halten. Es erfolgt keine automatische Übertragung.', '4. Relevante geprüfte Aussagen zu Aufgabenziel, höchstens zwei Hypothesen, Prüfschritt und offenen Informationen in diese Word-Datei, die Maske oder ein eigenes Dokument übertragen.']:
         d.p(t,after=70)
     d.h('Vorbereitete Fälle')
     d.p('Wählen Sie genau einen Fall. Die notierten Ergebnisse sind fiktiv und erlauben noch keinen sicheren Schluss auf den Denkweg.',after=90)
     d.table([['Fall','Klasse','Aufgabe','Notierte Lösung'],['1','1','15 − 7','15 − 7 = 12'],['2','2','Zahlwort sechzehn notieren','61'],['3','3','503 − 78','503 − 78 = 575'],['4','4','6 · 7','6 · 7 = 13'],['5','6','½ + ⅓','½ + ⅓ = ⅖'],['6','5','3,5 + 12','3,5 + 12 = 4,7']],[550,800,3600,4688])
     d.field('Mein Fall oder eigene Aufgabe und Lösung','Fallnummer oder fiktive Aufgabe samt notierter Lösung …',180)
     d.field('Konkretes Aufgabenziel zunächst optional','Eigenes Ziel oder später fachlich geprüften KI-Vorschlag eintragen. Kein Nachweis des Lernstands.',140)
-    d.p('Eine Zuordnung zu basalen Kompetenzen oder Grundvorstellungen ist hier keine Voraussetzung. Alltagssprachlich begründete Vermutungen sind zulässig.',size=20)
+    d.p('Fachbegriffe und eine Kompetenzzuordnung sind keine Voraussetzung. Die Vorlagen sind Orientierung: Eigene Prompts sind möglich; einen übertragbaren Bauplan finden Sie in Handout 3.',size=20)
     d.h('Bearbeitbarer Prompt',page=True)
     d.p('Unterstütze mich bei einer ersten mathematischen Klärung. Klasse: [Klasse]. Aufgabe: [Aufgabe]. Vorliegende oder ausdrücklich fiktive Schülerlösung beziehungsweise Äußerung: [Lösung]. Tatsächlich bekannte Zusatzinformationen: [Angaben oder „keine“]. Aufgabenziel und eigene Vermutungen, falls vorhanden: [Angaben oder leer].')
     d.p('Fehlt ein Ziel, schlage ein enges Aufgabenziel vor: Was verlangt die Aufgabe? Behaupte damit keinen Lernstand des Kindes. Behalte ein passendes vorhandenes Ziel bei oder präzisiere es. Fehlt die Aufgabe oder Lösung, frage danach; erfinde keine Kinderaussage. Markiere fiktive Angaben als fiktiv.')
@@ -181,10 +181,10 @@ def make_h1():
     d.p('Sichern Sie diesen Arbeitsstand für Handout 2. Dort klären Sie später den Stand der Ausgangslage, bevor Sie einen Förderbaustein entwickeln. Dieser Übergang bestätigt noch keine Hypothese.',size=20)
     d.save()
 
-def make_h2():
+def make_h2(data=None):
     d=Handout(2)
     d.title('Handout 2 Förderbaustein entwickeln','Praxisphase 2')
-    d.p('Entwickeln Sie einen kleinen fachlich geprüften Förderbaustein zu genau einem beobachtbaren Ziel. Diese Word-Vorlage ist ein gleichwertiges Arbeitsmittel zur Eingabemaske auf der Website. Sichern Sie neue Entwürfe unter einem eigenen Namen.')
+    d.p('Entwickeln Sie einen fachlich geprüften Förderbaustein zu einem beobachtbaren Ziel. Word, Eingabemaske oder ein eigenes Dokument sind gleichwertige Arbeitsmittel. Eigene Ideen und Materialien sind auch ohne KI möglich. Sichern Sie Entwürfe unter einem eigenen Namen.')
     d.h('Zwei gleichwertige Einstiege')
     d.p('A  Fall aus Praxisphase 1 übernehmen: Aufgabe und Original-Lösung sowie bereits geprüfte Angaben kopieren. Neue tatsächliche Antworten gesondert ergänzen. Die Diagnosehilfe unten ist dann nur bei Bedarf nötig.')
     d.p('B  Neuen Fall beginnen: Aufgabe und vorliegende oder ausdrücklich fiktive Lösung notieren. Ein vorbereitetes Beispiel aus Handout 1 ist möglich; Handout 1 muss nicht bearbeitet sein. Ziel, Hypothesen und Fachbegriffe dürfen zunächst fehlen.')
@@ -193,7 +193,7 @@ def make_h2():
     d.field('Vorliegende Schülerlösung oder Äußerung','Original unverändert übernehmen; fiktive Angaben ausdrücklich kennzeichnen.',90)
     d.field('Weitere tatsächlich bekannte Informationen','Vorliegende Zusatzinformationen oder weitere Antwort; sonst „keine“.',70)
     d.h('Optionale Diagnosehilfe für den neuen Fall')
-    d.p('Kopieren Sie diesen Prompt mit den Ausgangsdaten. Prüfen Sie die Antwort und füllen Sie erst danach die passenden Felder auf Seite 2. Die KI-Antwort ersetzt die Original-Lösung nicht.',size=20)
+    d.p('Prompt lesen und anpassen, dann kopieren, in einem freigegebenen KI-System einfügen und dort absenden. Antwort prüfen und relevante Aussagen in die Felder auf Seite 2 oder ein eigenes Dokument übertragen. Eigene Angaben dürfen schon vorher stehen; die Original-Lösung bleibt unverändert.',size=20)
     d.p('Klasse: [Klasse]. Aufgabe: [Aufgabe]. Vorliegende oder ausdrücklich fiktive Lösung: [Lösung]. Bekannte Zusatzinformationen: [Angaben oder „keine“]. Vorhandene Ziele, Hypothesen oder Prüfschritte: [Angaben oder leer]. Kläre diesen Fall wie in einer ersten förderorientierten Diagnose. Ein Ziel oder eigene Hypothesen sind keine Voraussetzung. Fehlt die Aufgabe oder Lösung, frage nach; erfinde keine Lösung und keine fallbezogene Hypothese. Kennzeichne fiktive Angaben.')
     d.p('Schlage ein enges Aufgabenziel vor, wenn es fehlt; beschreibe die Anforderung der Aufgabe, keinen Lernstand. Beschreibe Beobachtbares getrennt von höchstens zwei vorsichtigen Hypothesen. Nutze nur vorhandene Hinweise, erfinde keinen Denkweg. Gib je Hypothese eine offene Rückfrage oder Kontrastaufgabe und mögliche stützende oder widersprechende Antworten, ausdrücklich hypothetisch. Empfiehl einen Prüfschritt. Keine gesicherte Diagnose, Übungen oder Förderpläne.')
     d.p('Ausgabe: KONKRETES AUFGABENZIEL; BEOBACHTUNG; OFFENE HYPOTHESEN; GEPLANTER PRÜFSCHRITT; NOCH FEHLENDE INFORMATIONEN.',bold=True,size=20)
@@ -208,21 +208,21 @@ def make_h2():
     d.p('Kopieren Sie den geprüften Arbeitsstand mit diesem Prompt. Ein bestehendes Förderziel oder ein Aufgabenformat ist nicht nötig. Prüfen Sie die Vorschläge und wählen Sie bewusst genau ein Ziel aus.',size=20)
     d.p('Geprüfter Arbeitsstand: [Klasse, Aufgabe, Original-Lösung, Beobachtung, bekannte Informationen, offene Hypothesen, Prüfschritt, fehlende Angaben und Status einsetzen]. Vorhandenes Förderziel, falls vorhanden: [Ziel oder leer]. Schlage höchstens zwei alternative enge Förderziele vor oder präzisiere mein Ziel. Nenne jeweils eine beobachtbare mathematische Handlung, Darstellung oder Erklärung, die Bedingung und erlaubte Hilfsmittel sowie ein konkretes Prüfkriterium mit neuer kurzer Prüfung ohne KI. Keine willkürlichen Prozentwerte. Formuliere bei Unsicherheit ausdrücklich bedingt, erfinde keine Diagnose. Frage bei fehlenden Informationen gezielt nach. Erstelle jetzt keine Übungen und keinen ganzen Förderbaustein. Ich prüfe und wähle selbst genau ein Ziel; nichts gilt automatisch als bestätigt.')
     d.field('Ein bewusst ausgewähltes und fachlich geprüftes Förderziel','Das Kind erklärt, zeigt oder bearbeitet unter diesen Bedingungen …; daran erkennbar …',90)
-    d.field('Genau ein Schwerpunkt','Zum Beispiel Handlung Bild Symbol, gestufte Hilfen oder strukturierte Rechenpäckchen.',70)
-    d.p('Eine begründete Zuordnung zu Grundvorstellungen oder basalen Kompetenzen ist optional. Eine fehlende Zuordnung verhindert die Arbeit nicht.',size=20)
+    d.field('Schwerpunkt oder eigene Vorgehensweise','Vorlage, eigene Idee oder begründete Kombination; zum gewählten Ziel passend.',70)
+    d.p('Grundvorstellungen und basale Kompetenzen müssen nicht vorab benannt werden. Die Felder sind Orientierung, kein Pflichtformat. Weitere Vorschläge liefert bei Bedarf der offene Ideenprompt am Ende.',size=20)
     d.h('Prompt für einen Förderbaustein',page=True)
     for t in [
-        'Unterstütze mich beim Entwurf eines kleinen Förderbausteins. Klasse: [Klasse]. Aufgabe: [Aufgabe]. Ein beobachtbares Lernziel: [Ziel]. Tatsächliche Beobachtungen: [Beobachtungen]. Weitere tatsächlich vorliegende Antworten: [Antworten oder „keine“]. Offene Hypothesen: [Hypothesen oder „keine“]. Ausdrücklich gesetzte Arbeitsannahme: [Annahme oder „keine“]. Gewählter Schwerpunkt: [genau ein Schwerpunkt].',
+        'Unterstütze mich beim Entwurf eines kleinen Förderbausteins. Klasse: [Klasse]. Aufgabe: [Aufgabe]. Ein beobachtbares Lernziel: [Ziel]. Tatsächliche Beobachtungen: [Beobachtungen]. Weitere tatsächlich vorliegende Antworten: [Antworten oder „keine“]. Offene Hypothesen: [Hypothesen oder „keine“]. Ausdrücklich gesetzte Arbeitsannahme: [Annahme oder „keine“]. Geplante Vorgehensweise: [Schwerpunkt, eigene Idee oder begründete Kombination].',
         'Trenne Beobachtungen, offene Deutungen und Annahmen. Erfinde keine Antworten des Kindes. Benenne fehlende Angaben. Bei ungesicherter Ausgangslage plane ausdrücklich bedingt: „Unter der Annahme, dass …“. Wenn eine verantwortbare Planung ohne weitere Angabe nicht möglich ist, stelle eine gezielte Rückfrage.',
         'Entwirf zu genau diesem Ziel eine kurze fachlich korrekte Erklärung oder Darstellung und eine überschaubare Folge von drei bis fünf passenden Aufgaben. Zeige mindestens eine gestufte Hilfe: offene Orientierungsfrage, Darstellungshinweis und bei Bedarf konkreterer Teilimpuls. Lass einen wesentlichen Denkschritt beim Kind. Füge eine neue Aufgabe zur selbstständigen Erfolgskontrolle ohne KI hinzu.',
         'Gib die fachlich geprüften Lösungen und kurze Beobachtungskriterien für die Lehrkraft getrennt aus. Prüfe Zahlen, Einheiten, gleich große Teile und das gemeinsame Ganze, soweit sie zur Aufgabe gehören. Erkläre knapp, wie Aufgaben und Hilfe zum Ziel passen. Variiere Unterstützung statt ausschließlich die Zahlengröße. Benenne, was vor dem Einsatz noch geprüft werden muss. Der Entwurf ist weder eine Bestätigung der Diagnose noch ein Nachweis der Lernwirkung.'
     ]:d.p(t)
     d.h('Entwurf prüfen und überarbeiten')
-    d.p('Übernehmen Sie die KI-Antwort zunächst als Entwurf. Prüfen Sie die Rechnungen unabhängig, lesen Sie jede Darstellung und testen Sie, ob die neue Kontrollaufgabe wirklich ohne die gleiche Hilfe bearbeitet werden kann.')
+    d.p('Lesen und verändern Sie den vollständigen Prompt vor dem Kopieren; auch die vorgeschlagene Anzahl und Struktur der Aufgaben sind anpassbar. Senden Sie ihn selbst in einem freigegebenen KI-System ab. Prüfen Sie Rechnungen, Darstellungen und die Passung zum Ziel. Übertragen Sie relevante geprüfte Aussagen, den vollständigen Entwurf bei Bedarf zusätzlich.')
     d.field('Meine fachlichen Korrekturen','Welche Rechnung, Darstellung, Formulierung oder Hilfe ändere ich und warum?',240)
-    d.field('Verwendeter Prompt oder Ablage des vollständigen Entwurfs','Angepassten Prompt und KI-Entwurf in dieser Datei ergänzen oder ihren Speicherort notieren …',200)
+    d.field('Verwendeter Prompt und KI-Entwurf oder eigene Ausarbeitung','Optional hier festhalten oder Speicherort notieren; eigenen Prompt und Material können Sie ohne die Maske weiterverwenden.',200)
     d.h('Geprüfte Fassung für den Einsatz',page=True)
-    d.p('Hier steht die überarbeitete Fassung, mit der Sie weiterarbeiten. Erweitern Sie die Felder bei Bedarf. Der Baustein bleibt auf ein Ziel und einen Schwerpunkt begrenzt.')
+    d.p('Hier steht die geprüfte Fassung für den Einsatz. Sie können KI-Entwürfe überarbeiten, eigene Materialien einfügen oder die Felder verändern. Die folgende Aufgabenfolge ist ein Vorschlag. Entscheidend sind der Bezug zum Ziel und eine passende eigene Bearbeitung des Kindes.')
     d.field('Kurze Erklärung oder Darstellung','Fachlich geprüften Text, Handlung oder genaue Bildbeschreibung einfügen …',340)
     d.h('Überschaubare Aufgabenfolge')
     d.table([['Nr','Aufgabe und gegebenenfalls Begründungsauftrag'],['1','Hier eintragen …'],['2','Hier eintragen …'],['3','Hier eintragen …'],['4','Optional'],['5','Optional']],[650,8988])
@@ -235,22 +235,30 @@ def make_h2():
     d.field('Neue Kontrollaufgabe ohne KI','Neue passende Aufgabe mit eigenständiger Erklärung oder Darstellung …',220)
     d.field('Lösung und Beobachtungskriterien der Kontrolle','Woran erkennen Sie die zum Ziel gehörende Leistung? Was bleibt bei einer richtigen Zahl noch offen?',260)
     d.h('Prüfung vor dem Einsatz')
-    for t in ['[ ] Ausgangslage ist belegt oder als Annahme gekennzeichnet.', '[ ] Ein Ziel verbindet Erklärung, drei bis fünf Aufgaben und Hilfe.', '[ ] Rechnungen und Darstellungen stimmen; Lösungen liegen getrennt vor.', '[ ] Eine neue Kontrollaufgabe wird ohne KI und ohne dieselbe Hilfe bearbeitet.', '[ ] Sprache, Material und Hilfen passen zur Lerngruppe; persönliche Daten fehlen.']:
+    for t in ['[ ] Ausgangslage ist belegt oder als Annahme gekennzeichnet.', '[ ] Ein Ziel verbindet Erklärung, passende Aufgaben und Hilfe.', '[ ] Rechnungen und Darstellungen stimmen; Lösungen liegen getrennt vor.', '[ ] Eine neue Kontrollaufgabe wird ohne KI und ohne dieselbe Hilfe bearbeitet.', '[ ] Sprache, Material und Hilfen passen zur Lerngruppe; persönliche Daten fehlen.']:
         d.p(t,after=50,size=20)
     d.field('Einsatz und Beobachtung danach','Sozialform, Material, Zeitpunkt; danach tatsächliche Beobachtung und nötige Anpassung …',140)
     d.p('Die fachliche Endkontrolle und die didaktische Verantwortung bleiben bei der Lehrkraft. Ein Materialentwurf belegt noch keine Lernwirkung.',bold=True,size=20)
+    if data:
+        d.h('Eigene Ideen entwickeln oder weiterführen',page=True)
+        d.p('Sie sind nicht auf die Vorlagen beschränkt. Entwerfen Sie eigenes Material, prüfen Sie eine vorhandene Idee oder nutzen Sie den folgenden offenen Prompt. Die Auswahl und Kombination bleibt bei Ihnen. Für die spätere Arbeit ohne Maske können Sie den Bauplan in Handout 3 verwenden.')
+        d.p('Prompt lesen und anpassen → kopieren → in einem freigegebenen KI-System selbst absenden → Antwort fachlich prüfen → ausgewählte Aussagen und Materialien hier oder in einem eigenen Dokument sichern.',bold=True,size=20)
+        d.h('Offener Ideenprompt')
+        for part in data['freeIdeas']['prompt'].split('\n\n'):
+            d.p(part,after=90,size=21)
+        d.field('Meine Auswahl oder eigene Idee','Begründung der Passung zum Ziel; verwendete Materialien und Ablage …',120)
     d.save()
 
 def library_data():
-    script="const fs=require('fs'),vm=require('vm');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),c);process.stdout.write(JSON.stringify({formats:c.window.HANDOUT_FORMATS,extras:c.window.HANDOUT_EXTRAS,trial:c.window.HANDOUT_TRIAL_EXAMPLE,routes:c.window.HANDOUT_VARIANT_ROUTES,sources:c.window.HANDOUT_VARIANT_SOURCES}));"
+    script="const fs=require('fs'),vm=require('vm');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),c);process.stdout.write(JSON.stringify({formats:c.window.HANDOUT_FORMATS,extras:c.window.HANDOUT_EXTRAS,trial:c.window.HANDOUT_TRIAL_EXAMPLE,routes:c.window.HANDOUT_VARIANT_ROUTES,sources:c.window.HANDOUT_VARIANT_SOURCES,moreExamples:c.window.HANDOUT_MORE_EXAMPLES,freeIdeas:c.window.HANDOUT_FREE_IDEAS}));"
     return json.loads(subprocess.check_output([NODE,'-e',script,str(ROOT/'library-data.js')],text=True))
 
 def make_h3(data):
     d=Handout(3)
     d.title('Handout 3 Tool und Promptbibliothek','Offene Vertiefung')
-    d.p('Wählen Sie ein Format nach seinem didaktischen Zweck. Die Bibliothek ist unabhängig von Praxisphase 1 und 2 nutzbar. Sie enthält 22 Aufgabenformate und sechs ergänzende Vorlagen. Für die begrenzte Hypothesenbildung nutzen Sie Handout 1, für einen zusammenhängenden Förderbaustein Handout 2. Acht konkrete Erprobungsbeispiele zum selben fiktiven Bruchfall finden Sie ab Seite 17. Die Auswahlhilfe ab Seite 21 verbindet sechs didaktische Zwecke mit passenden Formaten und weiteren Beispielen.')
+    d.p('Die Bibliothek bietet 22 Aufgabenformate und sechs ergänzende Vorlagen, keine abschließende Liste. Eigene Ideen und Kombinationen sind möglich. Handout 1 unterstützt Hypothesenbildung, Handout 2 die Förderplanung; diese Bibliothek ist auch unabhängig nutzbar. Acht Bruchbeispiele beginnen auf Seite 17, sechs beispielhafte Zugänge auf Seite 21. Weitere Fälle, ein offener Ideenprompt und ein Bauplan für eigene Prompts folgen danach.')
     d.h('So verwenden Sie die Vorlagen')
-    d.p('Ein vollständiger Prompt besteht aus dem gemeinsamen Rahmen auf dieser Seite und genau einem formatspezifischen Auftrag. Kopieren Sie beides zusammen und ersetzen Sie die Platzhalter. Die digitale Bibliothek setzt beide Teile automatisch zusammen und lässt sie vor dem Kopieren bearbeiten. Ein neuer Fall benötigt neue Angaben; alte Falltexte nicht unbemerkt übernehmen. Fehlt ein Ziel, nutzen Sie zunächst die Diagnosehilfe in Handout 1 oder 2 für einen aufgabenbezogenen Vorschlag. Für ein beobachtbares Förderziel bietet Handout 2 eine eigene Hilfe; prüfen und wählen Sie das Ziel selbst.')
+    d.p('Für eine Formatvorlage verbinden Sie den gemeinsamen Rahmen mit dem gewünschten Auftrag. Lesen und bearbeiten Sie den vollständigen Prompt, ersetzen Sie die Platzhalter und kopieren Sie ihn. In einem freigegebenen KI-System einfügen und dort selbst absenden. Antwort prüfen und relevante Aussagen in Word, die Maske oder ein eigenes Dokument übertragen. Die Website zeigt den gesamten erzeugten Prompt, sendet ihn aber nicht an eine KI. Bei neuen Fällen die Angaben erneuern. Fehlt ein Ziel, lassen Sie einen Vorschlag machen und prüfen Sie ihn; Fachbegriffe sind keine Voraussetzung.')
     d.h('Gemeinsamer Rahmen für jeden Prompt')
     first=data['formats'][0]['prompt'];context,instruction,safeguards=first.split('\n\n',2)
     d.p(context)
@@ -293,7 +301,7 @@ def make_h3(data):
     for i,route in enumerate(data.get('routes',[])):
         if i==0:
             d.h('Auswahlhilfe für den nächsten Lernschritt',page=True)
-            d.p('Wählen Sie ausgehend von der erarbeiteten Ausgangslage und Ihrem Ziel einen passenden Zweck. Die Beispiele sind eigene, fachlich durchgesehene Entwürfe und keine empirisch geprüften Förderprogramme. Sie ersetzen den eigenen Fall nicht. Die Quellen am Ende erläutern didaktische Prinzipien.',size=21,after=100)
+            d.p('Diese sechs Zugänge sind Beispiele, keine vollständige oder verpflichtende Reihenfolge. Wählen, verändern oder kombinieren Sie passende Ideen zu Ihrer Ausgangslage und Ihrem Ziel; eigene Vorschläge sind möglich. Die Beispiele sind eigene, fachlich durchgesehene Entwürfe, keine empirisch geprüften Förderprogramme. Die Quellen erläutern didaktische Prinzipien.',size=21,after=100)
         d.h(f'{i+1} {route["title"]}',page=i>0)
         d.p('Zweck: '+route['phase']+'. '+route['purpose'],after=100)
         d.p('Wann passend: '+route['condition'],after=100)
@@ -306,14 +314,35 @@ def make_h3(data):
             d.p('Beobachtungskriterium: '+example['criterion'],after=100)
             d.p('Grenze der Aussage: '+example['limit'],after=130)
         d.p('Didaktischer Bezug: '+', '.join('Quelle '+str(s+1) for s in route['sources'])+' im Quellenverzeichnis am Ende.',size=20,italic=True)
+    for i,example in enumerate(data.get('moreExamples',[])):
+        if i==0:
+            d.h('Weitere Beispiele für andere Lerngegenstände',page=True)
+            d.p('Die folgenden vier Fälle zeigen zusätzliche Möglichkeiten. Sie sind keine Fortsetzung einer Diagnose des Bruchfehlers. Prüfen Sie jeweils die angenommene Ausgangslage, das Ziel und die tatsächliche Bearbeitung.',size=21,after=100)
+        d.h(example['title'],page=i>0 and i%2==0)
+        d.p('Ausgangslage: '+example['condition'],after=65)
+        d.p('Auftrag: '+example['task'],after=65)
+        d.p('Lösung: '+example['solution'],after=65)
+        d.p('Beobachtungskriterium: '+example['criterion'],after=65)
+        d.p('Grenze der Aussage: '+example['limit'],after=65)
+        names=[f'{lookup[f][0]} {lookup[f][1]}' for f in example['formats']]
+        d.p('Passende Vorlagen: '+'; '.join(names)+'. Didaktischer Bezug: '+', '.join('Quelle '+str(s+1) for s in example['sources'])+'.',size=20,after=100)
+    if data.get('freeIdeas'):
+        d.h('Offene Ideen und eigene Prompts',page=True)
+        d.p('Die 28 Vorlagen begrenzen Ihre Möglichkeiten nicht. Der folgende vollständige Prompt lässt weitere Ideen entwickeln oder eine eigene Idee prüfen. Lesen und bearbeiten Sie ihn vor dem Kopieren. Senden Sie ihn selbst in einer freigegebenen KI ab und übertragen Sie anschließend nur fachlich geprüfte Aussagen.',size=21)
+        d.p('Offener Ideenprompt',bold=True,size=23,keep=True,after=70)
+        for part in data['freeIdeas']['prompt'].split('\n\n'):
+            d.p(part,after=90,size=21)
+        d.h('Bauplan für einen eigenen Prompt ohne Maske')
+        d.p('Formulieren Sie in Alltagssprache. Sie müssen keine wissenschaftliche Kompetenzbezeichnung kennen. Die folgenden Bausteine können Sie direkt kopieren und ersetzen.',size=21)
+        d.p('Kontext: [Klasse und Aufgabe]. Beobachtung: [Was steht tatsächlich in der Lösung?]. Offene Vermutung oder Arbeitsannahme: [ausdrücklich kennzeichnen, sonst leer]. Ziel: [Was soll das Kind tun oder erklären? Falls unklar: Bitte einen engen Zielvorschlag machen]. Auftrag: [Was soll die KI dafür entwerfen, prüfen oder vergleichen?]. Ausgabe: [zum Beispiel Aufgabe, Hilfe und getrennte Lösung]. Prüfung: Keine Kinderantworten erfinden. Fehlende Angaben erfragen. Rechnungen und Darstellungen prüfen. Nenne ein beobachtbares Kriterium und die Grenzen des Vorschlags.',size=21)
     if data.get('sources'):
         d.h('Quellen zur Auswahl der Aufgabenformate',page=True)
-        d.p('Die folgenden Materialien von PIKAS und Mathe sicher können beim Deutschen Zentrum für Lehrkräftebildung Mathematik erläutern die Unterscheidung von Diagnose und Förderung, das Nutzen von Aufgabenbeziehungen und das gezielte Anpassen von Unterstützung. Sie begründen die Auswahlprinzipien; die konkreten Beispiele dieser Auswahlhilfe sind eigene Entwürfe.')
+        d.p('Die Materialien von PIKAS, MaHiKo und Mathe sicher können beim Deutschen Zentrum für Lehrkräftebildung Mathematik erläutern Diagnose und Förderung, Aufgabenbeziehungen und passende Unterstützung. Sie begründen Auswahlprinzipien; die konkreten Beispiele dieser Bibliothek sind eigene Entwürfe.')
         for i,source in enumerate(data['sources']):
-            d.p(f'{i+1} {source["title"]}',bold=True,size=23,before=150,after=90,keep=True)
-            d.p(source['url'],size=21,after=160)
+            d.p(f'{i+1} {source["title"]}',bold=True,size=23,before=100,after=70,keep=True)
+            d.p(source['url'],size=21,after=110)
         d.h('Den eigenen Fall weiterbearbeiten')
-        d.p('Übernehmen Sie Aufgabe, tatsächliche Beobachtungen, offene Hypothesen und gegebenenfalls eine ausdrücklich gewählte Arbeitsannahme aus Handout 2. Nutzen Sie das passende Format mit genau einem Förderziel. Für eine noch offene Hypothesenprüfung ist noch kein fertiges Förderziel nötig.')
+        d.p('Übernehmen Sie Aufgabe, tatsächliche Beobachtungen, offene Hypothesen und gegebenenfalls eine ausdrücklich gewählte Arbeitsannahme aus Handout 2 oder einem eigenen Dokument. Wählen oder entwerfen Sie eine passende Vorgehensweise zum Förderziel. Für eine noch offene Hypothesenprüfung ist noch kein fertiges Förderziel nötig.')
         d.p('Die digitale Bibliothek setzt die gewählten Fallangaben in den jeweiligen Prompt ein. Prüfen Sie, ob der Kontext stimmt, bevor Sie ihn kopieren. Bereits erarbeitete Vorlagen bleiben erhalten und werden nur auf Ihren ausdrücklichen Wunsch neu befüllt.')
         d.p('Halten Sie verwendete Hilfen und die tatsächliche neue Bearbeitung getrennt fest. Eine richtige Zahl, eine passende KI-Erklärung oder ein gelungener Materialentwurf allein belegen noch keine dauerhafte Beherrschung des Lernziels.')
     d.save()
@@ -326,6 +355,6 @@ if __name__=='__main__':
     data=library_data()
     assert len(data['formats'])==22 and len(data['extras'])==6
     if args.handout in (None,'1'):make_h1()
-    if args.handout in (None,'2'):make_h2()
+    if args.handout in (None,'2'):make_h2(data)
     if args.handout in (None,'3'):make_h3(data)
     print('Created selected output(s); legacy files and preserve-only package parts unchanged.')

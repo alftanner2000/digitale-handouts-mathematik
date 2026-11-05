@@ -22,7 +22,7 @@
     return {id:uid(),title:item?.title || 'Eigener Fall',grade:item?.grade || '',task:item?.task || '',solution:item?.solution || '',goal:item?.goal || '',known:'',observation:'',hypothesis1:'',hypothesis2:'',check:'',missing:'',prompt:'',promptSource:''};
   }
   function builder(source) {
-    return {id:uid(),title:source?.title || 'Neuer Förderentwurf',grade:source?.grade || '',topic:'',task:source?.task || '',observation:source?.solution || '',noticed:source?.observation || '',known:source?.known || '',taskGoal:source?.goal || '',hypotheses:source ? [source.hypothesis1,source.hypothesis2].filter(Boolean).join('\n') : '',hypothesisPrompt:'',hypothesisPromptSource:'',plannedCheck:source?.check || '',missing:source?.missing || '',evidenceStatus:'open',evidence:'',assumption:'',conception:'',goal:'',goalPrompt:'',goalPromptSource:'',goalCandidate:'',focus:'A',format:'',draft:'',adjustments:'',final:'',use:'',success:'',checks:[],prompt:'',promptSource:''};
+    return {id:uid(),title:source?.title || 'Neuer Förderentwurf',grade:source?.grade || '',topic:'',task:source?.task || '',observation:source?.solution || '',noticed:source?.observation || '',known:source?.known || '',taskGoal:source?.goal || '',hypotheses:source ? [source.hypothesis1,source.hypothesis2].filter(Boolean).join('\n') : '',hypothesisPrompt:'',hypothesisPromptSource:'',plannedCheck:source?.check || '',missing:source?.missing || '',evidenceStatus:'open',evidence:'',assumption:'',conception:'',goal:'',goalPrompt:'',goalPromptSource:'',goalCandidate:'',focus:'A',format:'',customFormat:'',formatIdeasPrompt:'',formatIdeasPromptSource:'',formatIdeasResult:'',draft:'',adjustments:'',final:'',use:'',success:'',checks:[],prompt:'',promptSource:''};
   }
   function empty() { const d=diagnostic(cases[0]); return {version:2,diagnostics:[d],builders:[],activeDiagnosticId:d.id,activeBuilderId:'',library:{mode:'blank',grade:'',task:'',goal:'',baseline:'',drafts:{}},legacy:{},updatedAt:''}; }
   function migrateLegacy(raw) {
@@ -200,11 +200,12 @@ Die Lehrkraft prüft die Vorschläge fachlich, wählt genau ein Ziel aus und üb
   }
   function builderPrompt(b, format) {
     const context=contextForBuilder(b);
-    const specific=format ? fillTemplate(format.prompt,{grade:b.grade,task:b.task,goal:b.goal,baseline:context}) : '[Genau ein Format auswählen]';
+    const own=b.format==='custom';
+    const specific=own ? `Gewählte eigene oder fachlich geprüfte KI-Idee: ${b.customFormat?.trim() || '[Eigene Vorgehensweise ergänzen]'}\nSetze diese Idee passend zum Förderziel um. Eine begründete Kombination von Darstellungen, Aufgaben und Hilfen ist möglich. Bei fehlender Passung erkläre den Konflikt und schlage eine Anpassung vor. Beschränke dich nicht auf einen vorgegebenen Formatkatalog.` : format ? fillTemplate(format.prompt,{grade:b.grade,task:b.task,goal:b.goal,baseline:context}) : '[Vorgehensweise auswählen oder eigene Idee ergänzen]';
     return `Entwirf einen kleinen Förderbaustein für den Mathematikunterricht, keine Unterrichtsreihe.
 ${context}
 
-Gewählter Schwerpunkt: ${format?.title || 'noch offen'}
+Gewählter Schwerpunkt: ${own?'Eigene Vorgehensweise / ausgewählter KI-Vorschlag':format?.title || 'noch offen'}
 Formatspezifischer Auftrag:
 ${specific}
 
