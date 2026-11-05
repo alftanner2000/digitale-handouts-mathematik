@@ -1,0 +1,75 @@
+{
+  "title": "Mein Lernstand · Brüche verstehen",
+  "eyebrow": "Mathematik · Brüche verstehen · Klasse 6/7",
+  "description": "Interaktive Selbsteinschätzung zum Bruchverständnis mit kurzen Aufgaben und einem kopierbaren Lernprompt aus der eigenen Auswahl. Keine automatische Diagnose oder Benotung.",
+  "author": "Arne Abel",
+  "subject": "Mathematik",
+  "grade": "Klasse 6/7",
+  "scope": "Brüche als Anteile, wertgleiche Brüche und Bruchaddition",
+  "goalPlaceholder": "Zum Beispiel: Ich möchte erklären können, warum eine Hälfte drei Sechstel sind.",
+  "storageKey": "arne-abel-mathe-bruchverstaendnis-selbstcheck-v1",
+  "skills": [
+    {
+      "id": "ganzes",
+      "short": "Das Ganze und seine Teile",
+      "text": "Ich erkenne, auf welches Ganze sich ein Bruch bezieht und ob es in gleich große Teile geteilt ist.",
+      "links": [],
+      "practice": "Zeichne zwei unterschiedlich große Rechtecke. Markiere jeweils die Hälfte. Sind die markierten Flächen gleich groß? Begründe.",
+      "coachHints": ["Unterscheide gleichen Anteil und gleich große absolute Menge. Eine Hälfte zweier unterschiedlich großer Ganzer muss nicht gleich groß sein. Für den Vergleich von Bruchstreifen denselben Maßstab und gleich große Bezugs-Ganze verwenden.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "darstellen",
+      "short": "Bruch, Bild und Bedeutung",
+      "text": "Ich stelle einen Bruch am Streifen dar und erkläre, was Zähler und Nenner bedeuten.",
+      "links": [],
+      "practice": "Zeichne einen Streifen für 3/4. Zeige, wo du die 4 und wo du die 3 in deiner Zeichnung wiederfindest.",
+      "coachHints": ["Der Nenner bezeichnet die Anzahl gleich großer Teile, in die das Bezugs-Ganze geteilt wird. Der Zähler zählt die betrachteten Teile. Ein gezeichneter Streifen ist bildlich; tatsächliches Falten oder Legen ist handelnd. Lass die Verbindung zur Bruchschreibweise erklären.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "wertgleich",
+      "short": "Wertgleiche Brüche",
+      "text": "Ich erkläre am Streifen, warum beim Erweitern der Wert des Bruchs gleich bleibt.",
+      "links": [],
+      "practice": "Markiere 1/2 eines Streifens. Unterteile ihn anschließend in sechs gleich große Teile. Beschreibe, was sich ändert und was gleich bleibt.",
+      "coachHints": ["Beim Erweitern ändern sich Anzahl und Größe der Teilstücke, nicht die markierte Menge und nicht das Bezugs-Ganze. Nutze zum Beispiel 1/2 = 3/6. Verlange eine Begründung am Bild statt nur die Regel, Zähler und Nenner mit derselben Zahl zu multiplizieren.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "vergleichen",
+      "short": "Brüche vergleichen",
+      "text": "Ich vergleiche Brüche und begründe meine Entscheidung mit gleich großen Bezugs-Ganzen.",
+      "links": [],
+      "practice": "Was ist größer: 1/3 oder 1/4? Zeige beide Anteile an gleich langen Streifen und begründe.",
+      "coachHints": ["Bei Stammbrüchen mit gleichem Bezugs-Ganzen bedeutet eine größere Anzahl gleicher Teile kleinere Teilstücke. Ein größerer Nenner macht bei gleichem positivem Zähler den Bruch kleiner. Verallgemeinere dies nicht auf beliebig verschiedene Zähler.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "gleichnamig",
+      "short": "Gleichnamige Brüche addieren",
+      "text": "Ich addiere gleichnamige Brüche und erkläre, warum der Nenner dabei gleich bleibt.",
+      "links": [],
+      "practice": "Berechne 2/7 + 3/7. Zeige am Streifen, welche Teile du zählst und warum es weiterhin Siebtel sind.",
+      "coachHints": ["Beim Addieren gleichnamiger Brüche werden gleich große Teilstücke desselben Bezugs-Ganzen gezählt. Die Anzahl ändert sich, die Teilgröße bleibt gleich. In diesem Einstieg zunächst positive Brüche und Summen bis 1 verwenden.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "ungleichnamig",
+      "short": "Eine gemeinsame Einheit finden",
+      "text": "Ich addiere ungleichnamige Brüche und erkläre, warum ich sie in gleich große Teile umbenenne.",
+      "links": [],
+      "practice": "Berechne 1/2 + 1/3 mithilfe gleich langer Bruchstreifen. Welche gleich großen Teilstücke passen zu beiden Brüchen? Begründe.",
+      "coachHints": ["Hälften und Drittel lassen sich nicht unmittelbar als gleich große Teile zählen. Die wertgleiche Umbenennung in 3/6 und 2/6 liefert eine gemeinsame Einheit. Ein gemeinsamer Nenner genügt; der kleinste ist nicht zwingend erforderlich. Verwende gut überschaubare Nenner und lasse Darstellung und Rechnung verbinden.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    },
+    {
+      "id": "pruefen",
+      "short": "Eine Lösung prüfen und begründen",
+      "text": "Ich prüfe eine Bruchaddition und erkläre mit einem Bild oder Größenvergleich, ob das Ergebnis passen kann.",
+      "links": [],
+      "practice": "Jemand notiert 1/2 + 1/3 = 2/5. Vergleiche 2/5 mit 1/2: Kann die Summe stimmen? Begründe und verbessere sie.",
+      "coachHints": ["Bei 1/2 + 1/3 muss die Summe größer als 1/2 sein, weil ein positiver Anteil hinzukommt; 2/5 ist kleiner als 1/2. Eine Plausibilitätsprüfung ersetzt noch nicht die vollständige Berechnung. Trenne den beobachteten Fehler von vermuteten Ursachen und frage nach dem Denkweg.", "Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]
+    }
+  ],
+  "chatLinks": [
+    ["ChatGPT", "https://chatgpt.com/"],
+    ["Duck.ai", "https://duck.ai/"],
+    ["Gemini", "https://gemini.google.com/"],
+    ["Copilot", "https://copilot.com/"]
+  ]
+}

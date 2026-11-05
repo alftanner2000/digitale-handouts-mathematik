@@ -20,6 +20,14 @@ Alle erzeugten Prompts sind sichtbar, bearbeitbar, vollständig aufklappbar, kop
 
 ## Lokal öffnen
 
+### Interaktives Beispiel zur Diagnoseorientierung
+
+[Mein Lernstand · Brüche verstehen](https://alftanner2000.github.io/digitale-handouts-mathematik/lernstand-brueche.html) ist eine eigenständig nutzbare HTML-Datei für Klasse 6/7. Sieben Selbsteinschätzungen erzeugen einen sichtbaren, kopierbaren Lernprompt ausschließlich aus der tatsächlichen Auswahl. Unbeantwortete Aussagen bleiben offen. Die Einschätzungen sind keine gesicherte Diagnose; passende Aufgaben sollen sie überprüfen. Es werden keine Angaben automatisch an einen KI-Dienst übertragen.
+
+Der Bogen ist unter `individualisierung.html#diagnose` mit Beschreibung, QR-Code, ausgeschriebener Adresse und HTML-Download ergänzt. Die heruntergeladene Datei funktioniert eigenständig und kann als Moodle-Dateiressource eingebunden werden; die Ausführung von JavaScript hängt von der Moodle-Konfiguration ab. Fachliche Konfiguration: [docs/lernstand-brueche.json](docs/lernstand-brueche.json), Layoutvorlage: [docs/lernstand-brueche-template.html](docs/lernstand-brueche-template.html).
+
+Prüfung am 05.11.2026: 21 Generatorprüfungen sowie 11 Prüfgruppen mit allen 16.384 Auswahlkombinationen der erzeugten Datei bestanden. Kopieren, Vorschau und Zurücksetzen wurden im Browser geprüft, ebenso eine schmale Ansicht ohne horizontalen Überlauf. Die vier Chat-Einstiege waren per HTTP-GET erreichbar; dies ist keine schulische oder datenschutzrechtliche Freigabe.
+
 `index.html` oder `Digitale Handouts Mathematik.html` im Browser öffnen. Beide Einstiege sind identisch und verwenden dieselben lokalen Dateien: `handouts.css`, `handouts-core.js`, `library-data.js`, `handouts.js`. Deshalb das gesamte Projekt herunterladen, nicht nur eine einzelne HTML-Datei. Kein Framework und keine Installation erforderlich. Für zuverlässige Browser-Speicherung und Zwischenablage ist ein lokaler HTTP-Server empfehlenswert:
 
 ```sh
