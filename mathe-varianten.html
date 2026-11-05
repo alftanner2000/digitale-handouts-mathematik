@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Aufgabenpool, Comic und Quiz zur Bruchaddition. Aufgaben erproben, Begründungen prüfen und eigene Varianten entwickeln.">
+  <title>Brüche verstehen: Aufgabenvarianten</title>
+  <style>
+    :root { --bg:#f6f7f9; --ink:#111; --muted:#515963; --line:#dce1e5; --cyan:#3498b5; --tint:#eef7fa; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:24px; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.6 Arial,Helvetica,sans-serif; }
+    a { color:#17667d; text-underline-offset:3px; }
+    a:hover { color:#0b4354; }
+    button,input,textarea { font:inherit; }
+    button,a { touch-action:manipulation; }
+    button { cursor:pointer; }
+    button:disabled { cursor:not-allowed; opacity:.5; }
+    :focus-visible { outline:3px solid #185f76; outline-offset:4px; }
+    [hidden] { display:none !important; }
+    .skip { position:absolute; left:12px; top:-100px; z-index:5; background:#fff; padding:12px; }
+    .skip:focus { top:12px; }
+    .page { width:min(1100px,calc(100% - 40px)); margin:40px auto; padding:60px 70px; background:#fff; border:1px solid #e9ecef; border-radius:12px; }
+    .eyebrow { margin:0 0 18px; color:var(--muted); font-size:15px; font-weight:700; letter-spacing:.04em; }
+    h1,h2,h3,h4 { color:#111; line-height:1.16; }
+    h1 { margin:0; max-width:850px; font-size:clamp(34px,5.3vw,58px); letter-spacing:-.045em; }
+    h2 { margin:10px 0 24px; font-size:clamp(30px,4vw,42px); letter-spacing:-.03em; }
+    h3 { margin:0 0 18px; font-size:25px; letter-spacing:-.02em; }
+    h4 { margin:0 0 12px; font-size:20px; }
+    p { margin:0 0 18px; }
+    .lead { max-width:780px; margin:24px 0 28px; font-size:21px; }
+    .intro-line { border-left:4px solid var(--cyan); padding:4px 0 4px 20px; margin:28px 0; }
+    .intro-line p { margin:0; }
+    .math { white-space:nowrap; font-variant-numeric:lining-nums tabular-nums; }
+    .big-math { font-size:36px; font-weight:700; letter-spacing:-.025em; }
+    nav { display:flex; flex-wrap:wrap; gap:10px 28px; margin:34px 0 16px; padding:22px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    nav a { font-weight:700; text-decoration:none; }
+    .actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:22px 0 12px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:11px 20px; border:1px solid transparent; border-radius:6px; background:var(--cyan); color:#082c37; text-decoration:none; font-weight:700; line-height:1.25; }
+    .button:hover { background:#44a6c2; color:#082c37; }
+    .button.secondary { background:#fff; border-color:#bbc8ce; color:#174e5e; }
+    .button.secondary:hover { background:var(--tint); }
+    .small { color:var(--muted); font-size:15px; line-height:1.5; }
+    .note { background:var(--tint); border-left:4px solid var(--cyan); padding:18px 22px; margin:24px 0; }
+    .note p:last-child { margin-bottom:0; }
+    section { padding-top:64px; margin-top:24px; border-top:1px solid var(--line); }
+    section:first-of-type { margin-top:36px; }
+    .section-index { color:#216f86; font-weight:700; font-size:16px; }
+    .exercise { margin:34px 0; padding-bottom:30px; border-bottom:1px solid var(--line); }
+    .task-number { display:block; margin-bottom:8px; color:var(--muted); font-size:14px; font-weight:700; }
+    .task-body { max-width:850px; }
+    .task-body ol,.task-body ul { padding-left:24px; }
+    .task-body li { margin:8px 0; }
+    .work-label { display:block; margin:20px 0 8px; font-weight:700; font-size:16px; }
+    textarea { width:100%; min-height:110px; padding:14px; border:1px solid #acb6bf; border-radius:5px; color:#111; background:#fff; line-height:1.5; resize:vertical; }
+    textarea::placeholder { color:#69717a; opacity:1; }
+    .prompt { min-height:360px; font-size:16px; }
+    details { margin:12px 0; border:1px solid var(--line); border-radius:5px; }
+    summary { padding:13px 16px; font-size:16px; font-weight:700; cursor:pointer; }
+    summary:hover { background:#f6f9fa; }
+    .detail-body { padding:3px 20px 18px; font-size:17px; }
+    .detail-body p:last-child { margin:0; }
+    .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:22px 0; }
+    .match-card { padding:18px; border:1px solid var(--line); font-size:24px; font-weight:700; text-align:center; }
+    .match-card.wide { grid-column:span 2; font-size:19px; }
+    .match-card span { display:block; margin-bottom:7px; color:var(--muted); font-size:14px; }
+    .copy-status { min-height:24px; margin:8px 0; font-size:15px; color:#174e5e; }
+    .prompt-area { margin-top:42px; padding-top:28px; border-top:1px solid var(--line); }
+    figure { margin:32px 0 20px; }
+    figure img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:5px; }
+    figcaption { margin-top:12px; }
+    .quiz-item { margin:32px 0; padding:30px 0; border-bottom:1px solid var(--line); }
+    fieldset { padding:0; margin:0; border:0; min-width:0; }
+    legend { width:100%; padding:0; margin-bottom:20px; font-size:23px; line-height:1.35; font-weight:700; }
+    .choice { display:flex; align-items:flex-start; gap:12px; padding:13px 15px; margin:10px 0; border:1px solid var(--line); border-radius:5px; cursor:pointer; }
+    .choice:hover { background:#f8fbfc; }
+    .choice:has(input:checked) { border-color:#277d96; background:var(--tint); }
+    .choice input { flex:none; width:20px; height:20px; margin:4px 0 0; accent-color:#237d97; }
+    .choice span { flex:1; }
+    .feedback { padding:18px 20px; margin:18px 0; background:var(--tint); border-left:4px solid var(--cyan); }
+    .solution { padding:18px 20px; margin-top:18px; border:1px solid #aebcc3; }
+    .solution p:last-child { margin:0; }
+    .teacher-question { font-size:16px; color:var(--muted); margin-top:20px; }
+    .print-answer { display:none; white-space:pre-wrap; overflow-wrap:anywhere; }
+    footer { margin-top:60px; padding-top:24px; border-top:1px solid var(--line); }
+    noscript p { border:1px solid #b4a16f; padding:16px; background:#fff9e9; }
+    @media (max-width:700px) {
+      body { font-size:17px; }
+      .page { width:calc(100% - 20px); margin:10px auto; padding:30px 22px; border-radius:8px; }
+      .lead { font-size:19px; }
+      section { padding-top:42px; }
+      .cards { grid-template-columns:1fr; gap:8px; }
+      .match-card { text-align:left; font-size:22px; }
+      .match-card.wide { grid-column:auto; }
+      .match-card span { display:inline; margin-right:18px; }
+      .quiz-item { padding:20px 0; }
+      .button { width:100%; }
+      nav { gap:12px 24px; }
+      .prompt { min-height:440px; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+    @page { size:A4; margin:17mm; }
+    @media print {
+      body { background:#fff; font-size:11pt; line-height:1.45; }
+      .page { width:100%; margin:0; padding:0; border:0; border-radius:0; }
+      h1 { font-size:26pt; } h2 { font-size:21pt; } h3,legend { font-size:15pt; }
+      .lead { font-size:12pt; } .small,.teacher-question { font-size:10pt; }
+      nav,.skip,.actions,.copy-status,.no-print,.prompt-area { display:none !important; }
+      section { padding-top:20px; margin-top:25px; }
+      .exercise,.quiz-item,figure,.note,.solution,details { break-inside:avoid; }
+      h2,h3,h4,legend,.work-label { break-after:avoid; }
+      .exercise { margin:18px 0; padding-bottom:15px; }
+      .quiz-item { margin:15px 0; padding:16px 0; }
+      textarea { display:none; }
+      .print-answer { display:block; min-height:24px; padding:8px 0; }
+      .cards { grid-template-columns:repeat(3,1fr); }
+      .choice { padding:6px 9px; margin:5px 0; }
+      .choice input { width:14px; height:14px; }
+      .detail-body { font-size:11pt; }
+      summary { font-size:10pt; padding:8px 12px; }
+      details:not([open]) { display:none; }
+      figure img { max-height:180mm; object-fit:contain; border:0; }
+      a { color:#111; text-decoration:none; }
+      footer { margin-top:30px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#aufgabenpool">Zum Aufgabenpool</a>
+  <main class="page">
+    <header>
+      <p class="eyebrow">Mathematische Basiskompetenzen · Klasse 6/7</p>
+      <h1>Brüche verstehen:<br>Aufgabenvarianten</h1>
+      <p class="lead">Derselbe mathematische Gedanke in unterschiedlichen Formen: Anteile darstellen, eine Begründung entwickeln und das Verständnis an einer neuen Aufgabe prüfen.</p>
+      <div class="intro-line">
+        <p class="big-math">½ + ⅓</p>
+        <p>Unser Ziel: erklären, warum wir beim Addieren gleich große Teile <strong>desselben Ganzen</strong> brauchen.</p>
+      </div>
+      <nav aria-label="Aufgabenformate">
+        <a href="#aufgabenpool">01 Aufgabenpool</a>
+        <a href="#comic">02 Comic</a>
+        <a href="#quiz">03 Quiz mit Hinweisen</a>
+      </nav>
+      <div class="actions"><button class="button secondary" type="button" id="print-page">Aufgaben und eigene Einträge drucken</button></div>
+      <p class="small">Die Formate sind Alternativen, keine verpflichtende Reihenfolge. Erst selbst bearbeiten, dann Hinweise oder Lösungen nutzen. Beim Drucken erscheinen eigene Einträge und bereits geöffnete Lösungen.</p>
+      <noscript><p>Die Aufgaben und aufklappbaren Lösungen funktionieren ohne JavaScript. Für Kopierknöpfe, Quiz-Hinweise und den Ausdruck eigener Einträge bitte JavaScript aktivieren. Prompts lassen sich auch direkt markieren und kopieren.</p></noscript>
+    </header>
+
+    <section id="aufgabenpool" aria-labelledby="pool-title">
+      <span class="section-index">01 · Aufgabenpool</span>
+      <h2 id="pool-title">Fünf Wege zum gleichen Ziel</h2>
+      <p>Alle Bruchstreifen stehen für ein gleich großes Ganzes. Nutzen Sie Papier oder ein eigenes Dokument. Die Notizfelder sind optional.</p>
+
+      <article class="exercise">
+        <span class="task-number">AUFGABE 1</span>
+        <h3>Zeichnen und erklären</h3>
+        <div class="task-body">
+          <p>Zeichne zwei gleich lange Streifen. Markiere im ersten <span class="math">½</span>, im zweiten <span class="math">⅓</span>. Finde eine gemeinsame Einteilung, bei der die kleinen Teile gleich groß sind. Verändere dabei die markierten Anteile nicht.</p>
+          <p>Zeige die Summe auf einem dritten, gleich langen Streifen. Erkläre: Was ändert sich beim Unterteilen? Was bleibt gleich?</p>
+        </div>
+        <label class="work-label" for="pool-1">Meine Erklärung oder Verweis auf meine Zeichnung</label>
+        <textarea id="pool-1" class="printable" autocomplete="off" placeholder="Zum Beispiel: Meine Zeichnung befindet sich auf …"></textarea><div class="print-answer" data-print-for="pool-1"></div>
+        <details><summary>Lösung ansehen</summary><div class="detail-body"><p><span class="math">½ = 3/6</span> und <span class="math">⅓ = 2/6</span>. Zusammen sind es <span class="math">5/6</span>. Durch die feinere Einteilung entstehen mehr, kleinere Teilstücke. Die markierte Länge und die Länge des Ganzen bleiben gleich.</p></div></details>
+        <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Sechstel sind eine mögliche gemeinsame Einteilung, nicht die einzige. Auch Zwölftel sind fachlich richtig. Prüfen Sie die Verbindung zwischen Zeichnung, Rechnung und Erklärung. Eine gelungene Zeichnung allein belegt noch kein selbstständiges Verständnis der Addition.</p></div></details>
+      </article>
+
+      <article class="exercise">
+        <span class="task-number">AUFGABE 2</span>
+        <h3>Zuordnen und begründen</h3>
+        <p>Welche Karten beschreiben denselben Wert? Begründe die Zuordnung mit gleich großen Teilen desselben Ganzen. Begründe auch, warum eine Karte nicht dazugehört.</p>
+        <div class="cards" aria-label="Vier Zahlkarten und eine Streifenbeschreibung">
+          <div class="match-card"><span>Karte A</span>½ + ⅓</div>
+          <div class="match-card"><span>Karte B</span>3/6 + 2/6</div>
+          <div class="match-card"><span>Karte C</span>5/6</div>
+          <div class="match-card"><span>Karte D</span>2/5</div>
+          <div class="match-card wide"><span>Karte E</span>Ein Ganzes in sechs gleich große Teile geteilt, davon fünf markiert.</div>
+        </div>
+        <label class="work-label" for="pool-2">Meine Zuordnung und Begründung</label>
+        <textarea id="pool-2" class="printable" autocomplete="off"></textarea><div class="print-answer" data-print-for="pool-2"></div>
+        <details><summary>Lösung ansehen</summary><div class="detail-body"><p>A, B, C und E haben den Wert <span class="math">5/6</span>. D zeigt <span class="math">2/5</span>. Dabei sind zwei von fünf gleich großen Teilen gemeint, nicht fünf Sechstel. Außerdem ist <span class="math">2/5</span> kleiner als <span class="math">½</span> und kann daher nicht die Summe aus <span class="math">½</span> und einem positiven Drittel sein.</p></div></details>
+        <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Die Begründung ist wichtiger als das bloße Zuordnen. Die Karten liefern bereits mögliche Ergebnisse. Eine richtige Auswahl beweist deshalb noch nicht, dass das Kind die Summe ohne Vorgaben selbst berechnen kann.</p></div></details>
+      </article>
+
+      <article class="exercise">
+        <span class="task-number">AUFGABE 3</span>
+        <h3>Einen erfundenen Fehler prüfen</h3>
+        <p>In einer <strong>fiktiven</strong> Lösung steht: <span class="math">½ + ⅓ = 2/5</span>.</p>
+        <p>Erkläre mit einem Streifen oder in Worten, warum das nicht passen kann. Die Aussage „Man darf die Nenner nicht addieren“ genügt allein noch nicht. Zeige, wie du die Rechnung korrigierst.</p>
+        <label class="work-label" for="pool-3">Meine Begründung</label>
+        <textarea id="pool-3" class="printable" autocomplete="off"></textarea><div class="print-answer" data-print-for="pool-3"></div>
+        <details><summary>Lösung ansehen</summary><div class="detail-body"><p>Hälften und Drittel haben am gleichen Ganzen unterschiedliche Größen. Durch das Addieren von 2 und 3 entstehen keine passenden Fünftel. Erst mit einer gemeinsamen Teilgröße können wir die Anzahlen zusammenzählen: <span class="math">3/6 + 2/6 = 5/6</span>. Die Größenkontrolle <span class="math">2/5 &lt; ½</span> widerlegt das falsche Ergebnis zusätzlich.</p></div></details>
+        <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Dies ist ein vorgegebener Fehler zum Begründen. Daraus folgt keine Aussage darüber, welche Fehlvorstellung ein bestimmtes Kind hat. Bei einer echten Bearbeitung zunächst offen nach dem Denkweg fragen. Eine Größenkontrolle entdeckt den Fehler, liefert aber allein noch nicht den richtigen Rechenweg.</p></div></details>
+      </article>
+
+      <article class="exercise">
+        <span class="task-number">AUFGABE 4</span>
+        <h3>Eine Erklärung vervollständigen</h3>
+        <p>Vervollständige die Sätze. Zeige deine Erklärung zusätzlich an einem Streifen.</p>
+        <div class="note"><p>„Die beiden Streifen stehen für …“<br>„Eine Hälfte und ein Drittel sind unterschiedlich große …“<br>„Wenn ich beide Streifen in Sechstel unterteile, bleibt …“<br>„Jetzt kann ich drei und zwei … zusammenzählen.“</p></div>
+        <label class="work-label" for="pool-4">Meine vollständige Erklärung</label>
+        <textarea id="pool-4" class="printable" autocomplete="off"></textarea><div class="print-answer" data-print-for="pool-4"></div>
+        <details><summary>Eine mögliche Lösung ansehen</summary><div class="detail-body"><p>„Die beiden Streifen stehen für dasselbe Ganze. Eine Hälfte und ein Drittel sind unterschiedlich große Teile. Wenn ich beide Streifen in Sechstel unterteile, bleibt die markierte Länge gleich. Jetzt kann ich drei und zwei gleich große Sechstel zusammenzählen. Das sind fünf Sechstel.“ Andere fachlich passende Formulierungen sind ebenso möglich.</p></div></details>
+        <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Die Satzstarter unterstützen die sprachliche Darstellung und geben schon Teile des Gedankengangs vor. Notieren Sie diese Hilfe getrennt. Anschließend an einer neuen Aufgabe ohne dieselben Satzstarter prüfen, ob das Kind die Beziehung selbst erklärt.</p></div></details>
+      </article>
+
+      <article class="exercise">
+        <span class="task-number">AUFGABE 5</span>
+        <h3>Auf eine neue Aufgabe übertragen</h3>
+        <p class="big-math">½ + ¼ = ?</p>
+        <p>Löse die Aufgabe zunächst ohne KI und ohne Musterlösung. Wähle eine eigene Zeichnung oder Erklärung. Warum darfst du deine Teile jetzt zusammenzählen? Prüfe anschließend, ob dein Ergebnis größer als <span class="math">½</span> und kleiner als 1 ist.</p>
+        <label class="work-label" for="pool-5">Meine Rechnung und Erklärung</label>
+        <textarea id="pool-5" class="printable" autocomplete="off"></textarea><div class="print-answer" data-print-for="pool-5"></div>
+        <details><summary>Lösung ansehen</summary><div class="detail-body"><p><span class="math">½ = 2/4</span>, also <span class="math">2/4 + 1/4 = 3/4</span>. Die Viertel sind gleich große Teile desselben Ganzen. Drei Viertel sind größer als eine Hälfte und kleiner als ein Ganzes.</p></div></details>
+        <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Diese Aufgabe liefert nur dann einen Hinweis auf neue selbstständige Anwendung, wenn sie zuvor nicht bereits bearbeitet oder vorgeführt wurde. Comic und Quiz greifen sie ebenfalls auf. Für eine spätere erneute Prüfung eine andere passende Aufgabe verwenden. Eine einzelne richtige Bearbeitung belegt keine dauerhafte Beherrschung.</p></div></details>
+      </article>
+
+      <div class="prompt-area">
+        <h3>Weitere zielgleiche Varianten entwerfen</h3>
+        <p>Den vollständigen Prompt lesen und anpassen, kopieren und in einem freigegebenen KI-System selbst absenden. Anschließend Aufgaben, Darstellungen und Lösungen fachlich prüfen.</p>
+        <label class="work-label" for="variants-prompt">Bearbeitbarer Prompt</label>
+        <textarea id="variants-prompt" class="prompt" autocomplete="off" spellcheck="false">Kontext: Mathematik, Klasse 6/7. Fiktives Unterrichtsbeispiel: 1/2 + 1/3. Beide Brüche beziehen sich auf dasselbe beziehungsweise ein gleich großes Ganzes. Es liegen keine tatsächlichen Kinderantworten vor.
+
+Ziel: Das Kind erklärt mit einer eigenen Darstellung und Rechnung, warum für die Addition eine gemeinsame Teilgröße nötig ist. Es begründet beim Erweitern, dass der Wert des Anteils gleich bleibt.
+
+Auftrag: Entwickle drei unterschiedliche Aufgabenvarianten zu diesem Ziel. Verändere die didaktische Vorgehensweise, nicht nur die Zahlen: zum Beispiel darstellen, zuordnen, einen fiktiven Fehler begründen oder eine Erklärung entwickeln. Weitere eigene Formate sind möglich. Die Varianten sind Alternativen, keine verpflichtende Reihe. Wenn du das Ziel ändern möchtest, begründe dies und frage nach meiner Entscheidung.
+
+Ausgabe je Variante: kurzer Auftrag für das Kind; nötiges Material und eine optional gestufte Hilfe; getrennte fachliche Lösung; beobachtbares Kriterium; Grenze der Aussage. Kennzeichne, welche Hilfe die Antwort bereits beeinflusst. Ergänze eine neue, zuvor nicht vorgeführte Aufgabe ohne Lösungshinweis für das Kind und einen getrennten Erwartungshorizont für die Lehrkraft.
+
+Prüfung: Gleiche Bezugsgröße ausdrücklich erhalten. Bruchteile müssen gleich groß sein. Rechnungen, Bilder und Einheiten prüfen. Keine Kinderantworten erfinden, keine gesicherte Fehlvorstellung aus einer einzelnen Lösung ableiten, keine wissenschaftliche Validierung behaupten. Falls wichtige Angaben fehlen, frage gezielt nach. Die Lehrkraft prüft das Material vor dem Einsatz.</textarea>
+        <div class="actions"><button class="button copy" type="button" data-copy="variants-prompt">Prompt kopieren</button><a class="button secondary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT öffnen</a></div>
+        <p class="copy-status" id="variants-prompt-status" role="status" aria-live="polite"></p>
+        <p class="small">Der Link öffnet nur ChatGPT. Er übergibt und sendet keinen Prompt. Fügen Sie den kopierten Text dort selbst ein. Die Nutzung setzt eine passende schulische Freigabe voraus.</p>
+      </div>
+    </section>
+
+    <section id="comic" aria-labelledby="comic-title">
+      <span class="section-index">02 · Comic</span>
+      <h2 id="comic-title">Einen Gedankengang nachvollziehen</h2>
+      <p>Betrachte den Dialog. Zeige an den Streifen, welche Aussage sich auf die Größe der Teile und welche sich auf ihre Anzahl bezieht.</p>
+      <figure>
+        <img src="comic-bruchstreifen.png" alt="Comic zur Addition einer Hälfte und eines Drittels mit gleich langen Bruchstreifen. Die gemeinsame Einteilung in Sechstel erhält die markierten Anteile." loading="lazy" decoding="async">
+        <figcaption class="small"><a href="comic-bruchstreifen.png" download>Originalbild herunterladen</a> · Auch für einen Ausdruck geeignet.</figcaption>
+      </figure>
+      <h3>Danach selbst erklären</h3>
+      <p>Lege den Comic beiseite. Bearbeite <span class="math">½ + ¼</span> zunächst ohne Musterlösung. Erkläre an einer eigenen Skizze, warum dein Ergebnis passt. Falls du die Aufgabe schon kennst, wähle mit der Lehrkraft eine andere passende Aufgabe.</p>
+      <label class="work-label" for="comic-answer">Meine eigene Begründung</label>
+      <textarea id="comic-answer" class="printable" autocomplete="off"></textarea><div class="print-answer" data-print-for="comic-answer"></div>
+      <details><summary>Lösung erst nach dem eigenen Versuch ansehen</summary><div class="detail-body"><p><span class="math">½ + ¼ = 2/4 + 1/4 = 3/4</span>. Eine Hälfte entspricht zwei Vierteln desselben Ganzen. Mit einem weiteren Viertel sind es drei gleich große Viertel.</p></div></details>
+      <details><summary>Hinweis für die Lehrkraft</summary><div class="detail-body"><p>Ein vorgelesener Comic kann eine Erklärung anbieten, ersetzt aber keine eigene Begründung. Fragen Sie nach dem tatsächlich gezeigten Denkweg. Eine einzelne falsche oder knappe Antwort erlaubt noch keine gesicherte Zuordnung zu einer Fehlvorstellung. Der Comic ist eine vorbereitete Lernhilfe, kein diagnostischer Test.</p></div></details>
+      <div class="prompt-area">
+        <h3>Eine ähnliche Comicidee entwickeln</h3>
+        <label class="work-label" for="comic-prompt">Optionaler bearbeitbarer Prompt</label>
+        <textarea id="comic-prompt" class="prompt" autocomplete="off" spellcheck="false">Entwirf einen kurzen Dialog für einen Mathematikcomic in Klasse 6/7. Thema: Warum braucht 1/2 + 1/3 eine gemeinsame Teilgröße? Ziel: den Zusammenhang zwischen Ganzem, Teilgröße, Anzahl und Rechnung begründen.
+
+Verwende zwei fiktive Figuren. Kennzeichne einen möglichen Fehler ausdrücklich als erfundene Aussage, nicht als Diagnose eines echten Kindes. Eine Figur fragt nach der Bedeutung der Brüche. Danach erklären beide an gleich langen Streifen die wertgleichen Darstellungen 1/2 = 3/6 und 1/3 = 2/6. Die markierten Längen müssen beim Unterteilen erhalten bleiben. Die Summe ist 5/6.
+
+Gib ein knappes Drehbuch mit höchstens sechs Bildern aus: je Bild kurze Sprechtexte und eine genaue mathematische Beschreibung der Streifen. Halte Text und Darstellung konsistent. Keine unnötigen Schmuckelemente oder langen Monologe.
+
+Ergänze danach einen getrennten Auftrag: 1/2 + 1/4 zunächst ohne Comic und ohne Musterlösung selbst darstellen und begründen. Gib die Lösung getrennt für die Lehrkraft an. Falls diese Aufgabe schon bekannt ist, schlage eine andere passende Transferaufgabe vor. Benenne Grenzen: Ein Comic bietet eine Hilfe; eine richtige Antwort allein belegt kein tragfähiges Verständnis. Prüfe alle Rechnungen und Darstellungen. Die Lehrkraft kontrolliert das Material vor dem Einsatz.</textarea>
+        <div class="actions"><button class="button copy" type="button" data-copy="comic-prompt">Prompt kopieren</button><a class="button secondary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT öffnen</a></div>
+        <p class="copy-status" id="comic-prompt-status" role="status" aria-live="polite"></p>
+        <p class="small">Keine automatische KI-Anbindung. Text erst selbst einfügen und absenden. Ein erzeugtes Bild muss ebenso geprüft werden wie das Drehbuch.</p>
+      </div>
+    </section>
+
+    <section id="quiz" aria-labelledby="quiz-title">
+      <span class="section-index">03 · Quiz mit Hinweisen</span>
+      <h2 id="quiz-title">Antworten und Begründungen prüfen</h2>
+      <p>Wähle zunächst eine Antwort und notiere deine Begründung. „Prüfen“ gibt einen Hinweis zu deiner Auswahl. Du kannst erneut versuchen oder die Lösung ausdrücklich aufdecken.</p>
+      <p class="small">Die freien Begründungen werden nicht automatisch bewertet. Es gibt keine Note, Rangliste oder Einstufung deiner Kompetenz.</p>
+
+      <article class="quiz-item" data-quiz="whole">
+        <fieldset><legend>1. Welche Bedingung brauchen die Streifen für <span class="math">½ + ⅓</span>?</legend>
+          <label class="choice"><input type="radio" name="whole" value="same"><span>Beide Streifen sind gleich lang und stehen jeweils für dasselbe Ganze.</span></label>
+          <label class="choice"><input type="radio" name="whole" value="marked"><span>Die markierte Hälfte und das markierte Drittel müssen gleich lang sein.</span></label>
+          <label class="choice"><input type="radio" name="whole" value="any"><span>Die Streifen dürfen beliebig lang sein. Die Bruchzahlen allein genügen.</span></label>
+        </fieldset>
+        <label class="work-label" for="reason-whole">Warum passt deine Auswahl?</label><textarea id="reason-whole" class="printable reason" autocomplete="off" placeholder="Beschreibe die Beziehung zwischen den beiden Ganzen. Du kannst auch eine offene Frage notieren."></textarea><div class="print-answer" data-print-for="reason-whole"></div>
+        <div class="actions"><button class="button check" type="button">Prüfen</button><button class="button secondary retry" type="button">Neuer Versuch</button><button class="button secondary reveal" type="button" disabled>Lösung zusätzlich aufdecken</button></div>
+        <div class="feedback" role="status" aria-live="polite" hidden></div><div class="solution" hidden><h4>Lösung</h4><p>Die erste Aussage passt. Beide Streifen repräsentieren dasselbe Ganze und haben dieselbe Länge. Daran sind eine Hälfte und ein Drittel unterschiedlich lange Anteile. Nur so vergleichen wir die Teilgrößen bezogen auf dieselbe Einheit.</p></div>
+        <p class="teacher-question">Prüffrage für die Lehrkraft: Unterscheidet die Begründung zwischen der Länge des Ganzen und der Länge des markierten Anteils?</p>
+      </article>
+
+      <article class="quiz-item" data-quiz="denominator">
+        <fieldset><legend>2. Was beschreibt die 6 im Bruch <span class="math">5/6</span>?</legend>
+          <label class="choice"><input type="radio" name="denominator" value="marked"><span>Sechs Teile sind markiert.</span></label>
+          <label class="choice"><input type="radio" name="denominator" value="unit"><span>Das Ganze ist in sechs gleich große Teile geteilt.</span></label>
+          <label class="choice"><input type="radio" name="denominator" value="add"><span>Die 6 sagt, dass ich fünf und sechs addieren soll.</span></label>
+        </fieldset>
+        <label class="work-label" for="reason-denominator">Erkläre außerdem die Rolle der 5.</label><textarea id="reason-denominator" class="printable reason" autocomplete="off" placeholder="Was legen Nenner und Zähler in einer Streifendarstellung fest?"></textarea><div class="print-answer" data-print-for="reason-denominator"></div>
+        <div class="actions"><button class="button check" type="button">Prüfen</button><button class="button secondary retry" type="button">Neuer Versuch</button><button class="button secondary reveal" type="button" disabled>Lösung zusätzlich aufdecken</button></div>
+        <div class="feedback" role="status" aria-live="polite" hidden></div><div class="solution" hidden><h4>Lösung</h4><p>Die Aussage zur Einteilung passt. Der Nenner 6 legt die Einteilung in sechs gleich große Teile fest. Der Zähler 5 zählt fünf dieser Sechstel. Am gleich großen Ganzen bezeichnet ein Sechstel eine gemeinsame Teilgröße.</p></div>
+        <p class="teacher-question">Prüffrage für die Lehrkraft: Verbindet das Kind den Nenner mit der gleichmäßigen Einteilung und den Zähler mit der Anzahl dieser Teile?</p>
+      </article>
+
+      <article class="quiz-item" data-quiz="equivalent">
+        <fieldset><legend>3. Warum gilt <span class="math">½ = 3/6</span>?</legend>
+          <label class="choice"><input type="radio" name="equivalent" value="larger"><span>Weil 3 und 6 größere Zahlen sind, wird auch der markierte Anteil größer.</span></label>
+          <label class="choice"><input type="radio" name="equivalent" value="denonly"><span>Es genügt, den Nenner von 2 auf 6 zu ändern und den Zähler 1 zu lassen.</span></label>
+          <label class="choice"><input type="radio" name="equivalent" value="preserve"><span>Jede Hälfte wird in drei gleich große Teile unterteilt. Die markierte Hälfte bleibt gleich lang.</span></label>
+        </fieldset>
+        <label class="work-label" for="reason-equivalent">Was ändert sich, was bleibt gleich?</label><textarea id="reason-equivalent" class="printable reason" autocomplete="off" placeholder="Beziehe Teilgröße, Anzahl und markierte Länge aufeinander."></textarea><div class="print-answer" data-print-for="reason-equivalent"></div>
+        <div class="actions"><button class="button check" type="button">Prüfen</button><button class="button secondary retry" type="button">Neuer Versuch</button><button class="button secondary reveal" type="button" disabled>Lösung zusätzlich aufdecken</button></div>
+        <div class="feedback" role="status" aria-live="polite" hidden></div><div class="solution" hidden><h4>Lösung</h4><p>Die Aussage zum Unterteilen passt. Aus einer markierten Hälfte werden drei markierte Sechstel. Die Teilstücke sind kleiner und zahlreicher. Das Ganze und die markierte Länge bleiben unverändert. Nur den Nenner zu ändern würde den Wert verändern: <span class="math">1/6 ≠ 1/2</span>.</p></div>
+        <p class="teacher-question">Prüffrage für die Lehrkraft: Erklärt das Kind die Wertgleichheit oder nennt es nur die Rechenregel „oben und unten mal drei“?</p>
+      </article>
+
+      <article class="quiz-item" data-quiz="transfer">
+        <fieldset><legend>4. Welche Summe passt zu <span class="math">½ + ¼</span>?</legend>
+          <label class="choice"><input type="radio" name="transfer" value="twosixths"><span><span class="math">2/6</span></span></label>
+          <label class="choice"><input type="radio" name="transfer" value="threequarters"><span><span class="math">3/4</span></span></label>
+          <label class="choice"><input type="radio" name="transfer" value="twoquarters"><span><span class="math">2/4</span></span></label>
+        </fieldset>
+        <label class="work-label" for="reason-transfer">Begründe mit gleich großen Teilen.</label><textarea id="reason-transfer" class="printable reason" autocomplete="off" placeholder="Wie lässt sich die Hälfte als Viertel beschreiben? Warum passt deine Summe?"></textarea><div class="print-answer" data-print-for="reason-transfer"></div>
+        <div class="actions"><button class="button check" type="button">Prüfen</button><button class="button secondary retry" type="button">Neuer Versuch</button><button class="button secondary reveal" type="button" disabled>Lösung zusätzlich aufdecken</button></div>
+        <div class="feedback" role="status" aria-live="polite" hidden></div><div class="solution" hidden><h4>Lösung</h4><p><span class="math">½ + ¼ = 2/4 + 1/4 = 3/4</span>. Die Hälfte sind zwei Viertel desselben Ganzen. Mit einem weiteren Viertel sind es drei Viertel. Das Ergebnis muss größer als eine Hälfte sein.</p></div>
+        <p class="teacher-question">Prüffrage für die Lehrkraft: Verbindet die Begründung das Umteilen der Hälfte mit der Addition der Viertel? Falls die Aufgabe schon bekannt war, eine neue passende Aufgabe wählen.</p>
+      </article>
+
+      <h3>Meine Erklärung zum Mitnehmen</h3>
+      <p>Warum brauchen wir gleich große Teile beim Addieren? Schreibe eine eigene Erklärung und ein Beispiel auf. Notiere auch, welche Hilfe du benutzt hast oder was noch unklar ist.</p>
+      <label class="work-label" for="final-explanation">Eigene Begründung, verwendete Hilfe und offene Frage</label>
+      <textarea id="final-explanation" class="printable" style="min-height:180px" autocomplete="off"></textarea><div class="print-answer" data-print-for="final-explanation"></div>
+      <div class="actions"><button class="button secondary" type="button" id="print-end">Aufgaben und eigene Einträge drucken</button></div>
+      <p class="small">Der Ausdruck enthält die aktuell geöffnete Lösung und die zuletzt angezeigten Hinweise. Schließen Sie Lösungen über den jeweiligen Knopf, wenn sie nicht auf den Ausdruck sollen. In der Druckvorschau können Sie einzelne Seiten wählen.</p>
+      <div class="prompt-area">
+        <h3>Ähnliches HTML-Quiz erstellen</h3>
+        <p>Dieser Bauprompt ist eine bearbeitbare Vorlage für die Lehrkraft. Passen Sie Aufgabe und Lernziel an. Eine erzeugte Datei vor dem Einsatz fachlich und technisch prüfen.</p>
+        <label class="work-label" for="quiz-prompt">Bearbeitbarer Bauprompt</label>
+        <textarea id="quiz-prompt" class="prompt" autocomplete="off" spellcheck="false">Erstelle ein direkt nutzbares Mathematikquiz als einzelne HTML-Datei mit eingebettetem CSS und JavaScript, ohne externe Bibliotheken. Zielgruppe: Klasse 6/7. Ausgangsaufgabe: 1/2 + 1/3. Lernziel: gemeinsame Bezugsgröße und Teilgröße verstehen, wertgleich erweitern und eine Summe begründen. Es liegen keine tatsächlichen Kinderantworten vor.
+
+Inhalt: Vier kurze Fragen zu demselben Ganzen, zur Bedeutung des Nenners und Zählers, zu 1/2 = 3/6 und zur Übertragung auf 1/2 + 1/4. Pro Frage genau eine fachlich richtige Auswahl und zwei klar unterscheidbare Alternativen. Die richtige Auswahl soll nicht immer an derselben Position stehen. Prüfe vor der Ausgabe alle Rechnungen, Formulierungen und gegebenenfalls Darstellungen. Streifen stehen für gleich große Ganze und besitzen gleich große Teilstücke innerhalb einer Einteilung.
+
+Ablauf: Das Kind wählt zuerst eine Antwort und schreibt eine eigene Begründung oder offene Frage. Erst nach dem Knopf „Prüfen“ folgt ein kurzer, auf diese Auswahl zugeschnittener Hinweis. Die Lösung nicht sofort vollständig anzeigen. Erneute Bearbeitung ermöglichen. Die vollständige Lösung lässt sich erst durch einen gesonderten Knopf aufdecken. Wenn eine Eingabe geändert wird, veraltete Hinweise und Lösungen wieder ausblenden.
+
+Grenzen: Die freie Begründung nicht automatisch bewerten. Keine Note, Punktzahl, Rangliste oder Kompetenzstufe berechnen. Aus einer falschen Auswahl keine gesicherte Fehlvorstellung ableiten. Pro Frage eine qualitative Prüffrage für die Lehrkraft ergänzen. Verwendete Hilfe und anschließende Eigenleistung getrennt betrachten. Wenn die Transferaufgabe schon gezeigt wurde, eine andere passende neue Aufgabe vereinbaren.
+
+Gestaltung und Technik: Weißer Inhaltsbereich auf hellgrauem Hintergrund, große schwarze Schrift, dezente cyanfarbene Knöpfe, viel Weißraum. Responsive und mit Tastatur nutzbar. Sichtbare Beschriftungen, Fokusmarkierungen und zugängliche Statusmeldungen. Abschlussfeld für eigene Erklärung, verwendete Hilfe und offene Frage. Druckansicht mit vollständig sichtbaren Einträgen und nur ausdrücklich geöffneten Lösungen. Keine automatische Netzwerkübertragung, KI-Anbindung, Speicherung, Analyse oder Telemetrie. Hinweise verständlich in Deutsch. Alle Beispiele als vorbereitete fiktive Unterrichtsentwürfe kennzeichnen, nicht als wissenschaftlich validierten Test.
+
+Ausgabe: Vollständigen HTML-Code liefern und knapp erklären, wie die Datei lokal geöffnet wird. Behaupte nicht, die Datei sei bereits im Browser getestet, falls du keinen Browsertest ausgeführt hast. Nenne fachliche und technische Prüfschritte für die Lehrkraft.</textarea>
+        <div class="actions"><button class="button copy" type="button" data-copy="quiz-prompt">Prompt kopieren</button><a class="button secondary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT öffnen</a></div>
+        <p class="copy-status" id="quiz-prompt-status" role="status" aria-live="polite"></p>
+        <p class="small">Der Link öffnet ChatGPT ohne Textübertragung. Prompt selbst einfügen und absenden. Ein funktionierender HTML-Entwurf ist noch kein Nachweis der Lernwirkung.</p>
+      </div>
+    </section>
+
+    <footer>
+      <p class="small"><strong>Einordnung:</strong> Die Aufgaben sind vorbereitete, fiktive Unterrichtsbeispiele. Sie sind keine wissenschaftlich validierten Diagnoseinstrumente. Auswahl, fachliche Prüfung und Auswertung tatsächlicher Antworten bleiben bei der Lehrkraft.</p>
+      <p class="small"><strong>Ihre Einträge:</strong> Diese Seite überträgt Eingaben nicht und legt keine lokale Speicherung an. Nach dem Schließen oder Neuladen können Einträge verloren gehen. Rechtzeitig drucken oder in ein eigenes Dokument kopieren. Es gibt keine Analyse- oder Trackingdienste. Externe Seiten öffnen Sie nur selbst über die gekennzeichneten Links.</p>
+    </footer>
+  </main>
+  <script>
+    'use strict';
+    (() => {
+      const feedbackByQuestion = {
+        whole: {
+          same:'Diese Auswahl passt zur gemeinsamen Bezugsgröße. Prüfe deine Erklärung: Müssen auch die markierte Hälfte und das markierte Drittel gleich lang sein? Zeige den Unterschied zwischen Ganzem und Anteil.',
+          marked:'Vergleiche eine Hälfte und ein Drittel an zwei gleich langen ganzen Streifen. Welcher markierte Anteil ist länger? Überlege, welche Länge gleich bleiben muss: die des Ganzen oder die des Anteils.',
+          any:'Denke an eine halbe kleine und eine halbe große Pizza. Die Bruchzahl ist gleich, die Menge nicht. Welche gemeinsame Bezugsgröße brauchst du für unsere Streifen?'
+        },
+        denominator: {
+          unit:'Diese Auswahl passt. Verbinde nun deine Erklärung mit der 5: Was wird gezählt, und warum sind die gezählten Teile vergleichbar?',
+          marked:'Zeichne einen Streifen mit sechs gleich großen Feldern und markiere fünf davon. Welche Zahl beschreibt die Einteilung, welche zählt die markierten Felder?',
+          add:'Ein Bruch ist hier keine Aufforderung, die beiden Zahlen zu addieren. Zeichne ein Ganzes mit sechs gleichen Feldern und markiere fünf. Welche Aufgabe hat jede Zahl?'
+        },
+        equivalent: {
+          preserve:'Diese Auswahl erhält die markierte Länge. Prüfe, ob deine Begründung auch die Anzahl und Größe der Teile erklärt. Was passiert mit der unmarkierten Hälfte?',
+          larger:'Zeichne zuerst eine Hälfte und unterteile dann beide Hälften, ohne etwas zusätzlich zu markieren. Ist die markierte Länge wirklich gewachsen? Unterscheide die Zahl der Teile von der Größe des Anteils.',
+          denonly:'Vergleiche einen markierten Teil von zwei mit einem markierten Teil von sechs am selben Ganzen. Sind sie gleich lang? Wie viele Sechstel brauchst du für die ursprüngliche Hälfte?'
+        },
+        transfer: {
+          threequarters:'Diese Summe passt. Prüfe deine Begründung: Wie viele Viertel stecken in der Hälfte, und warum darfst du diese mit dem weiteren Viertel zusammenzählen?',
+          twosixths:'Du fügst zu einer Hälfte einen positiven Anteil hinzu. Ist 2/6 größer oder kleiner als eine Hälfte? Stelle beide Summanden am gleichen Ganzen dar und suche eine gemeinsame Teilgröße.',
+          twoquarters:'2/4 beschreibt bereits eine Hälfte. In der Aufgabe kommt noch ein Viertel hinzu. Zeige an einem in Viertel geteilten Streifen, wo dieser zusätzliche Anteil bleibt.'
+        }
+      };
+
+      const updatePrint = field => {
+        const output = document.querySelector('[data-print-for="' + field.id + '"]');
+        if (output) output.textContent = field.value.trim() || 'Noch kein Eintrag.';
+      };
+      document.querySelectorAll('textarea.printable').forEach(field => {
+        updatePrint(field);
+        field.addEventListener('input', () => updatePrint(field));
+      });
+      const printPage = () => {
+        document.querySelectorAll('textarea.printable').forEach(updatePrint);
+        window.print();
+      };
+      document.getElementById('print-page').addEventListener('click', printPage);
+      document.getElementById('print-end').addEventListener('click', printPage);
+      window.addEventListener('beforeprint', () => document.querySelectorAll('textarea.printable').forEach(updatePrint));
+
+      document.querySelectorAll('.copy').forEach(button => {
+        button.addEventListener('click', async () => {
+          const field = document.getElementById(button.dataset.copy);
+          const status = document.getElementById(field.id + '-status');
+          let copied = false;
+          if (!field.value.trim()) {
+            status.textContent = 'Der Prompt ist leer. Bitte zuerst Text eintragen.';
+            field.focus();
+            return;
+          }
+          if (navigator.clipboard && window.isSecureContext) {
+            try { await navigator.clipboard.writeText(field.value); copied = true; } catch (_) { /* Local fallback below. */ }
+          }
+          if (!copied) {
+            field.focus();
+            field.select();
+            field.setSelectionRange(0, field.value.length);
+            try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+          }
+          status.textContent = copied
+            ? 'Prompt kopiert. Im freigegebenen KI-System selbst einfügen und absenden.'
+            : 'Der Prompt ist markiert. Bitte mit Strg+C bzw. ⌘C oder dem Kopieren-Menü kopieren.';
+        });
+      });
+
+      document.querySelectorAll('.quiz-item').forEach(item => {
+        const id = item.dataset.quiz;
+        const reason = item.querySelector('.reason');
+        const feedback = item.querySelector('.feedback');
+        const solution = item.querySelector('.solution');
+        const reveal = item.querySelector('.reveal');
+        const clearFeedback = () => {
+          feedback.hidden = true;
+          feedback.textContent = '';
+          solution.hidden = true;
+          reveal.disabled = true;
+          reveal.textContent = 'Lösung zusätzlich aufdecken';
+          reveal.setAttribute('aria-expanded', 'false');
+        };
+        solution.id = 'solution-' + id;
+        reveal.setAttribute('aria-controls', solution.id);
+        reveal.setAttribute('aria-expanded', 'false');
+        item.querySelectorAll('input[type="radio"]').forEach(radio => radio.addEventListener('change', clearFeedback));
+        reason.addEventListener('input', clearFeedback);
+        item.querySelector('.check').addEventListener('click', () => {
+          const selected = item.querySelector('input[type="radio"]:checked');
+          feedback.hidden = false;
+          if (!selected) {
+            feedback.textContent = 'Wähle zuerst eine Antwort. Du kannst deine Unsicherheit in der Begründung festhalten.';
+            item.querySelector('input[type="radio"]').focus();
+            return;
+          }
+          if (!reason.value.trim()) {
+            feedback.textContent = 'Notiere zuerst deine Begründung oder eine konkrete offene Frage. Dein Text wird nicht automatisch bewertet.';
+            reason.focus();
+            return;
+          }
+          feedback.textContent = feedbackByQuestion[id][selected.value] + ' Deine freie Begründung wird nicht automatisch beurteilt.';
+          reveal.disabled = false;
+        });
+        reveal.addEventListener('click', () => {
+          solution.hidden = !solution.hidden;
+          reveal.textContent = solution.hidden ? 'Lösung zusätzlich aufdecken' : 'Lösung wieder schließen';
+          reveal.setAttribute('aria-expanded', String(!solution.hidden));
+        });
+        item.querySelector('.retry').addEventListener('click', () => {
+          item.querySelectorAll('input[type="radio"]').forEach(radio => { radio.checked = false; });
+          reason.value = '';
+          updatePrint(reason);
+          clearFeedback();
+          item.querySelector('input[type="radio"]').focus();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
