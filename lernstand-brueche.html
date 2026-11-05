@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Arne Abel">
+<meta name="description" content="Interaktive Selbsteinschätzung zum Bruchverständnis mit kurzen Aufgaben und einem kopierbaren Lernprompt aus der eigenen Auswahl. Keine automatische Diagnose oder Benotung.">
+<title>Mein Lernstand · Brüche verstehen</title>
+<style>
+:root{color-scheme:light;--ink:#172e49;--muted:#526379;--line:#dce4ed;--paper:#fff;--soft:#f3f6fa;--accent:#185e75;--accentsoft:#e7f2f5;--focus:#cc6e13;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45;color:var(--ink);background:#f4f6f9}
+*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button,a,input,textarea,summary{-webkit-tap-highlight-color:transparent}button,a,input,textarea,summary:focus-visible{outline-color:var(--focus)}:focus-visible{outline:3px solid var(--focus);outline-offset:3px}button{cursor:pointer}a{color:#145b83;text-underline-offset:3px}a:hover{text-decoration-thickness:2px}.wrap{max-width:1120px;margin:32px auto;padding:0 26px 32px}.sheet{background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 10px 40px #21395807}header{padding:28px 32px 23px;border-top:6px solid var(--ink)}.eyebrow{font-size:.75rem;font-weight:750;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 9px}.title-row{display:flex;align-items:start;justify-content:space-between;gap:20px}h1{font-size:clamp(1.85rem,4vw,2.5rem);line-height:1.1;letter-spacing:-.04em;margin:0 0 13px}h2{font-size:1.15rem;margin:0 0 7px;line-height:1.25}.intro{font-size:1rem;max-width:720px;margin:0;color:var(--muted)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.btn{min-height:44px;border:1px solid #bdcbd9;padding:9px 15px;border-radius:9px;background:white;color:var(--ink);font-weight:650;white-space:nowrap}.btn:hover{background:var(--soft)}.btn-primary{background:var(--ink);border-color:var(--ink);color:white}.btn-primary:hover{background:#254766}.btn:disabled{opacity:.45;cursor:not-allowed}.guide{padding:15px 32px;background:var(--soft);border-block:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:.9rem}.guide p{margin:0}.progress{font-weight:700;white-space:nowrap;color:var(--accent)}.competencies{width:100%;border-collapse:collapse;table-layout:fixed}.competencies thead{background:#fbfcfd;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.competencies th{text-align:left;padding:12px 22px;border-bottom:1px solid var(--line)}.competencies th:nth-child(1){width:48%;padding-left:32px}.competencies th:nth-child(2){width:22%}.competencies th:nth-child(3){width:30%;padding-right:32px}.competencies td{padding:17px 22px;border-bottom:1px solid var(--line);vertical-align:middle}.competencies td:first-child{padding-left:32px}.competencies td:last-child{padding-right:32px}.competence{display:flex;gap:13px;align-items:start}.number{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--soft);border:1px solid var(--line);width:27px;height:27px;border-radius:8px;font-size:.78rem;font-weight:750;margin-top:1px}.competence p{margin:0;font-size:.94rem}.competence strong{font-weight:700}.links{display:flex;align-items:start;gap:8px;flex-direction:column}.practice-note{font-size:.82rem;color:var(--muted);margin:0}.links a{font-size:.82rem;font-weight:650;display:inline-flex;align-items:center;min-height:44px}.ratings{border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.choice{position:relative;display:flex;min-height:48px;text-align:center;align-items:center;justify-content:center;border:1px solid #c9d4df;border-radius:8px;background:white;cursor:pointer;padding:6px 3px;font-size:.75rem;font-weight:620;line-height:1.2}.choice input{position:absolute;opacity:0;width:1px;height:1px}.choice:has(input:checked){border:2px solid var(--accent);background:var(--accentsoft);color:#124b60;padding:5px 2px}.choice:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}.choice:hover{background:var(--soft)}.choice input:checked + span::before{content:"✓ ";font-weight:800}.learn{padding:24px 32px;display:grid;grid-template-columns:1fr 1fr;gap:28px}.learn p{font-size:.9rem;color:var(--muted);margin:0 0 12px}.priority-label{display:block;font-size:.84rem;font-weight:650;margin:14px 0 6px}textarea{width:100%;border:1px solid #b9c8d8;border-radius:8px;background:#fff;color:var(--ink);padding:10px 12px;resize:vertical;line-height:1.5;min-height:82px}textarea::placeholder{color:#6b7785}.focus-list{font-size:.9rem;line-height:1.5;padding-left:21px;margin:10px 0}.focus-list li+li{margin-top:5px}.chat-links{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.chat-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 14px;border:1px solid #bdcbd9;border-radius:9px;background:#fff;font-size:.84rem;font-weight:650;text-decoration:none;color:var(--ink)}.chat-link:hover{background:var(--accentsoft);border-color:var(--accent)}.chat-link span{margin-left:8px;color:var(--accent)}.prompt-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:13px 0 9px}.copy-status{font-size:.8rem;color:var(--accent);min-height:1.4em}.learn .small{font-size:.79rem}.prompt-details{margin-top:10px;font-size:.85rem}.prompt-details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:650;color:var(--accent);list-style:none}.prompt-details summary::before{content:"+";display:inline-flex;width:24px;font-weight:800;font-size:1.15rem}.prompt-details[open] summary::before{content:"−"}.prompt-box{min-height:240px;font-size:.81rem;background:#f8fafc}.foot{padding:15px 32px;border-top:1px solid var(--line);display:flex;align-items:center;gap:20px;justify-content:space-between}.save-status{margin:0;font-size:.78rem;max-width:740px;color:var(--muted)}.reset{font-size:.78rem;color:var(--muted);background:none;border:0;min-height:44px;padding:6px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}.no-script{padding:16px 32px;background:#fff2d7;color:#64400c}.print-note{display:none}.print-choice{display:none}
+@media(max-width:850px){.wrap{margin:16px auto;padding:0 16px 24px}header{padding:24px}.title-row{display:block}.toolbar{margin-top:17px}.guide{padding:15px 24px;align-items:start;flex-direction:column;gap:7px}.competencies th,.competencies td{padding:15px}.competencies th:first-child,.competencies td:first-child{padding-left:24px}.competencies th:last-child,.competencies td:last-child{padding-right:24px}.competencies th:nth-child(1){width:44%}.competencies th:nth-child(2){width:20%}.competencies th:nth-child(3){width:36%}.learn{padding:24px;gap:24px}.foot{padding:12px 24px}.choice{font-size:.72rem}}
+@media(max-width:640px){.wrap{padding:0 10px 16px;margin:10px auto}.sheet{border-radius:12px}header{padding:22px 20px}.guide{padding:14px 20px}.competencies,.competencies tbody,.competencies tr,.competencies td{display:block;width:100%}.competencies thead{display:none}.competencies tr{position:relative;padding:18px 20px;border-bottom:1px solid var(--line)}.competencies td,.competencies td:first-child,.competencies td:last-child{padding:0;border:0}.competencies td:nth-child(2){padding:10px 0 12px 40px}.competencies td:last-child{padding-left:40px}.links{flex-direction:row;gap:16px;flex-wrap:wrap}.links a{min-height:44px}.choice{font-size:.79rem;min-height:48px}.learn{display:block;padding:22px 20px}.learn>div+div{border-top:1px solid var(--line);margin-top:22px;padding-top:21px}.foot{display:block;padding:14px 20px}.reset{margin-top:4px}.prompt-actions .btn{width:100%}}
+@media print{@page{size:A4 portrait;margin:11mm}html,body{background:white!important;color:#142235}.wrap{max-width:none;margin:0;padding:0}.sheet{border:0;border-radius:0;box-shadow:none}header{padding:0 0 11px;border-top:0}.eyebrow{font-size:8pt;margin-bottom:5px}h1{font-size:24pt;margin-bottom:8px}.intro{font-size:9.5pt}.toolbar,.prompt-column,.prompt-details,.foot,.no-script{display:none!important}.guide{background:#f4f6f8!important;padding:8px 0;border-top:1px solid #aaa;font-size:9pt}.competencies{font-size:9pt}.competencies thead{font-size:8pt}.competencies th{padding:8px!important}.competencies td{padding:11px 8px!important}.competencies th:first-child,.competencies td:first-child{padding-left:0!important}.competencies th:last-child,.competencies td:last-child{padding-right:0!important}.competence{gap:9px}.competence p{font-size:9pt}.number{height:20px;width:20px;border-radius:5px;font-size:8pt}.links{gap:3px}.links a{font-size:8pt;min-height:0;color:#174e6a}.choice{font-size:7.5pt;min-height:32px;border-radius:5px}.choice:has(input:checked){background:#e3ecf0!important;border:2px solid #163e53}.ratings{gap:4px}.competencies tr{break-inside:avoid}.learn{display:block;padding:14px 0 0;break-inside:avoid}.learn h2{font-size:11pt}.learn p,.focus-list{font-size:9pt}.focus-list{margin:5px 0}.priority-label{font-size:9pt;margin:8px 0 4px}textarea#priority{min-height:54px;font-size:9pt;border-color:#a9b5c2;resize:none;padding:7px}.print-note{display:block!important;font-size:8pt;color:#526379;margin:10px 0 0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<main class="wrap"><div class="sheet">
+<header>
+<p class="eyebrow">Mathematik · Brüche verstehen · Klasse 6/7</p>
+<div class="title-row"><div><h1>Mein Lernstand</h1><p class="intro">Was klappt schon? Wähle für jede Aussage eine Stufe. <strong>Selbstständig</strong> heißt: Du kannst es erklären und an einem neuen Beispiel anwenden.</p></div><div class="toolbar"><button class="btn" type="button" id="print">Bogen drucken</button></div></div>
+<p class="intro" style="margin-top:12px;font-size:.9rem">Deine Einschätzung ist ein Ausgangspunkt, keine Note oder sichere Diagnose. Prüfe sie an den Aufgaben und besprich offene Fragen mit deiner Lehrkraft.</p>
+<p style="margin:14px 0 0;font-size:.85rem"><a href="lernstand-brueche.html" download>HTML-Datei herunterladen</a> · <a href="individualisierung.html#diagnose">Zur Fortbildung: Diagnoseorientierung</a></p>
+</header>
+<noscript><div class="no-script">Für Speichern und Lernprompt muss JavaScript eingeschaltet sein. Die Aussagen und Übungslinks kannst du auch ohne JavaScript nutzen.</div></noscript>
+<section aria-label="Selbsteinschätzung">
+<div class="guide"><p><strong>Ehrlich einschätzen, gezielt üben.</strong> Probiere die kurzen Aufgaben. Du darfst Aussagen zunächst offenlassen.</p><p class="progress" id="progress" role="status" aria-live="polite">0 von 7 eingeschätzt</p></div>
+<table class="competencies">
+<caption class="sr-only">7 Kompetenzen mit Übungslinks und jeweils drei Stufen zur Selbsteinschätzung.</caption>
+<thead><tr><th scope="col">Das kann ich</th><th scope="col">Hier übe ich</th><th scope="col">Mein Stand</th></tr></thead>
+<tbody id="competency-body">
+<tr><td><div class="competence"><span class="number" aria-hidden="true">1</span><p id="skill-ganzes">Ich erkenne, auf welches Ganze sich ein Bruch bezieht und ob es in gleich große Teile geteilt ist.</p></div></td><td><div class="links"><p class="practice-note">Zeichne zwei unterschiedlich große Rechtecke. Markiere jeweils die Hälfte. Sind die markierten Flächen gleich groß? Begründe.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich erkenne, auf welches Ganze sich ein Bruch bezieht und ob es in gleich große Teile geteilt ist.</legend><label class="choice"><input type="radio" name="ganzes" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="ganzes" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="ganzes" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">2</span><p id="skill-darstellen">Ich stelle einen Bruch am Streifen dar und erkläre, was Zähler und Nenner bedeuten.</p></div></td><td><div class="links"><p class="practice-note">Zeichne einen Streifen für 3/4. Zeige, wo du die 4 und wo du die 3 in deiner Zeichnung wiederfindest.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich stelle einen Bruch am Streifen dar und erkläre, was Zähler und Nenner bedeuten.</legend><label class="choice"><input type="radio" name="darstellen" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="darstellen" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="darstellen" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">3</span><p id="skill-wertgleich">Ich erkläre am Streifen, warum beim Erweitern der Wert des Bruchs gleich bleibt.</p></div></td><td><div class="links"><p class="practice-note">Markiere 1/2 eines Streifens. Unterteile ihn anschließend in sechs gleich große Teile. Beschreibe, was sich ändert und was gleich bleibt.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich erkläre am Streifen, warum beim Erweitern der Wert des Bruchs gleich bleibt.</legend><label class="choice"><input type="radio" name="wertgleich" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="wertgleich" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="wertgleich" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">4</span><p id="skill-vergleichen">Ich vergleiche Brüche und begründe meine Entscheidung mit gleich großen Bezugs-Ganzen.</p></div></td><td><div class="links"><p class="practice-note">Was ist größer: 1/3 oder 1/4? Zeige beide Anteile an gleich langen Streifen und begründe.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich vergleiche Brüche und begründe meine Entscheidung mit gleich großen Bezugs-Ganzen.</legend><label class="choice"><input type="radio" name="vergleichen" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="vergleichen" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="vergleichen" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">5</span><p id="skill-gleichnamig">Ich addiere gleichnamige Brüche und erkläre, warum der Nenner dabei gleich bleibt.</p></div></td><td><div class="links"><p class="practice-note">Berechne 2/7 + 3/7. Zeige am Streifen, welche Teile du zählst und warum es weiterhin Siebtel sind.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich addiere gleichnamige Brüche und erkläre, warum der Nenner dabei gleich bleibt.</legend><label class="choice"><input type="radio" name="gleichnamig" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="gleichnamig" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="gleichnamig" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">6</span><p id="skill-ungleichnamig">Ich addiere ungleichnamige Brüche und erkläre, warum ich sie in gleich große Teile umbenenne.</p></div></td><td><div class="links"><p class="practice-note">Berechne 1/2 + 1/3 mithilfe gleich langer Bruchstreifen. Welche gleich großen Teilstücke passen zu beiden Brüchen? Begründe.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich addiere ungleichnamige Brüche und erkläre, warum ich sie in gleich große Teile umbenenne.</legend><label class="choice"><input type="radio" name="ungleichnamig" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="ungleichnamig" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="ungleichnamig" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+<tr><td><div class="competence"><span class="number" aria-hidden="true">7</span><p id="skill-pruefen">Ich prüfe eine Bruchaddition und erkläre mit einem Bild oder Größenvergleich, ob das Ergebnis passen kann.</p></div></td><td><div class="links"><p class="practice-note">Jemand notiert 1/2 + 1/3 = 2/5. Vergleiche 2/5 mit 1/2: Kann die Summe stimmen? Begründe und verbessere sie.</p></div></td><td><fieldset class="ratings"><legend class="sr-only">Ich prüfe eine Bruchaddition und erkläre mit einem Bild oder Größenvergleich, ob das Ergebnis passen kann.</legend><label class="choice"><input type="radio" name="pruefen" value="1"><span>noch unsicher</span></label><label class="choice"><input type="radio" name="pruefen" value="2"><span>mit Hilfe</span></label><label class="choice"><input type="radio" name="pruefen" value="3"><span>selbstständig</span></label></fieldset></td></tr>
+</tbody>
+</table>
+</section>
+<section class="learn" aria-label="Meine nächsten Schritte">
+<div>
+<h2>Damit mache ich weiter</h2>
+<p id="focus-intro">Schätze dich oben ein. Hier erscheinen bis zu zwei passende Schwerpunkte.</p>
+<ol id="focus-list" class="focus-list" hidden></ol>
+<label class="priority-label" for="priority">Meine Frage oder mein Lernziel <span style="font-weight:400">(freiwillig)</span></label>
+<textarea id="priority" maxlength="400" rows="2" placeholder="Zum Beispiel: Ich möchte erklären können, warum eine Hälfte drei Sechstel sind."></textarea>
+<p class="print-note">Übe zuerst bei „noch unsicher“, danach bei „mit Hilfe“. Kurze Aufgaben stehen in der Tabelle.</p>
+</div>
+<div class="prompt-column">
+<h2>Dein Lernprompt</h2>
+<p>Deine Auswahl wird zu einem Übungsauftrag für einen Lernchat. Kopiere ihn in einen schulisch erlaubten KI-Dienst.</p>
+<div class="prompt-actions"><button class="btn btn-primary" type="button" id="copy" disabled>Lernprompt kopieren</button><span class="copy-status" id="copy-status" role="status" aria-live="polite"></span></div>
+<p class="small"><strong>Prompt kopieren → Chat öffnen → Prompt einfügen.</strong> Nutze einen schulisch erlaubten Dienst.</p>
+<nav class="chat-links" aria-label="KI-Chat öffnen">
+<a class="chat-link" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" aria-label="ChatGPT öffnen (neuer Tab)">ChatGPT <span aria-hidden="true">↗</span></a>
+<a class="chat-link" href="https://duck.ai/" target="_blank" rel="noopener noreferrer" aria-label="Duck.ai öffnen (neuer Tab)">Duck.ai <span aria-hidden="true">↗</span></a>
+<a class="chat-link" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Gemini öffnen (neuer Tab)">Gemini <span aria-hidden="true">↗</span></a>
+<a class="chat-link" href="https://copilot.com/" target="_blank" rel="noopener noreferrer" aria-label="Copilot öffnen (neuer Tab)">Copilot <span aria-hidden="true">↗</span></a>
+</nav>
+<p class="small">Die Links öffnen nur den jeweiligen Dienst. Es werden keine Einschätzungen oder Prompts automatisch übertragen. Beachte schulische Freigaben, Altersvorgaben und die Bedingungen des Dienstes.</p>
+<p class="small">Nach einer Änderung erneut kopieren. Du brauchst keine Dateien mitzugeben. Gib im Lernchat keine persönlichen Daten ein.</p>
+<details class="prompt-details" id="prompt-details"><summary>Lernprompt ansehen</summary><label class="sr-only" for="prompt">Persönlicher Lernprompt zum Kopieren</label><textarea class="prompt-box" id="prompt" readonly spellcheck="false" aria-describedby="prompt-info"></textarea><p class="small" id="prompt-info">Falls Kopieren nicht klappt: Text markieren und selbst kopieren.</p></details>
+</div>
+</section>
+<footer class="foot"><p id="save-status" class="save-status" role="status" aria-live="polite">Deine Auswahl wird nur in diesem Browser gespeichert und nicht an Moodle übertragen.</p><button type="button" class="reset" id="reset">Auswahl zurücksetzen</button></footer>
+</div></main>
+<script>
+'use strict';
+const CONFIG = {"title":"Mein Lernstand · Brüche verstehen","eyebrow":"Mathematik · Brüche verstehen · Klasse 6/7","description":"Interaktive Selbsteinschätzung zum Bruchverständnis mit kurzen Aufgaben und einem kopierbaren Lernprompt aus der eigenen Auswahl. Keine automatische Diagnose oder Benotung.","subject":"Mathematik","grade":"Klasse 6/7","scope":"Brüche als Anteile, wertgleiche Brüche und Bruchaddition","goalPlaceholder":"Zum Beispiel: Ich möchte erklären können, warum eine Hälfte drei Sechstel sind.","storageKey":"arne-abel-mathe-bruchverstaendnis-selbstcheck-v1","author":"Arne Abel","skills":[{"id":"ganzes","short":"Das Ganze und seine Teile","text":"Ich erkenne, auf welches Ganze sich ein Bruch bezieht und ob es in gleich große Teile geteilt ist.","links":[],"practice":"Zeichne zwei unterschiedlich große Rechtecke. Markiere jeweils die Hälfte. Sind die markierten Flächen gleich groß? Begründe.","coachHints":["Unterscheide gleichen Anteil und gleich große absolute Menge. Eine Hälfte zweier unterschiedlich großer Ganzer muss nicht gleich groß sein. Für den Vergleich von Bruchstreifen denselben Maßstab und gleich große Bezugs-Ganze verwenden.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"darstellen","short":"Bruch, Bild und Bedeutung","text":"Ich stelle einen Bruch am Streifen dar und erkläre, was Zähler und Nenner bedeuten.","links":[],"practice":"Zeichne einen Streifen für 3/4. Zeige, wo du die 4 und wo du die 3 in deiner Zeichnung wiederfindest.","coachHints":["Der Nenner bezeichnet die Anzahl gleich großer Teile, in die das Bezugs-Ganze geteilt wird. Der Zähler zählt die betrachteten Teile. Ein gezeichneter Streifen ist bildlich; tatsächliches Falten oder Legen ist handelnd. Lass die Verbindung zur Bruchschreibweise erklären.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"wertgleich","short":"Wertgleiche Brüche","text":"Ich erkläre am Streifen, warum beim Erweitern der Wert des Bruchs gleich bleibt.","links":[],"practice":"Markiere 1/2 eines Streifens. Unterteile ihn anschließend in sechs gleich große Teile. Beschreibe, was sich ändert und was gleich bleibt.","coachHints":["Beim Erweitern ändern sich Anzahl und Größe der Teilstücke, nicht die markierte Menge und nicht das Bezugs-Ganze. Nutze zum Beispiel 1/2 = 3/6. Verlange eine Begründung am Bild statt nur die Regel, Zähler und Nenner mit derselben Zahl zu multiplizieren.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"vergleichen","short":"Brüche vergleichen","text":"Ich vergleiche Brüche und begründe meine Entscheidung mit gleich großen Bezugs-Ganzen.","links":[],"practice":"Was ist größer: 1/3 oder 1/4? Zeige beide Anteile an gleich langen Streifen und begründe.","coachHints":["Bei Stammbrüchen mit gleichem Bezugs-Ganzen bedeutet eine größere Anzahl gleicher Teile kleinere Teilstücke. Ein größerer Nenner macht bei gleichem positivem Zähler den Bruch kleiner. Verallgemeinere dies nicht auf beliebig verschiedene Zähler.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"gleichnamig","short":"Gleichnamige Brüche addieren","text":"Ich addiere gleichnamige Brüche und erkläre, warum der Nenner dabei gleich bleibt.","links":[],"practice":"Berechne 2/7 + 3/7. Zeige am Streifen, welche Teile du zählst und warum es weiterhin Siebtel sind.","coachHints":["Beim Addieren gleichnamiger Brüche werden gleich große Teilstücke desselben Bezugs-Ganzen gezählt. Die Anzahl ändert sich, die Teilgröße bleibt gleich. In diesem Einstieg zunächst positive Brüche und Summen bis 1 verwenden.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"ungleichnamig","short":"Eine gemeinsame Einheit finden","text":"Ich addiere ungleichnamige Brüche und erkläre, warum ich sie in gleich große Teile umbenenne.","links":[],"practice":"Berechne 1/2 + 1/3 mithilfe gleich langer Bruchstreifen. Welche gleich großen Teilstücke passen zu beiden Brüchen? Begründe.","coachHints":["Hälften und Drittel lassen sich nicht unmittelbar als gleich große Teile zählen. Die wertgleiche Umbenennung in 3/6 und 2/6 liefert eine gemeinsame Einheit. Ein gemeinsamer Nenner genügt; der kleinste ist nicht zwingend erforderlich. Verwende gut überschaubare Nenner und lasse Darstellung und Rechnung verbinden.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]},{"id":"pruefen","short":"Eine Lösung prüfen und begründen","text":"Ich prüfe eine Bruchaddition und erkläre mit einem Bild oder Größenvergleich, ob das Ergebnis passen kann.","links":[],"practice":"Jemand notiert 1/2 + 1/3 = 2/5. Vergleiche 2/5 mit 1/2: Kann die Summe stimmen? Begründe und verbessere sie.","coachHints":["Bei 1/2 + 1/3 muss die Summe größer als 1/2 sein, weil ein positiver Anteil hinzukommt; 2/5 ist kleiner als 1/2. Eine Plausibilitätsprüfung ersetzt noch nicht die vollständige Berechnung. Trenne den beobachteten Fehler von vermuteten Ursachen und frage nach dem Denkweg.","Eine Selbsteinschätzung ist kein Kompetenznachweis. Prüfe das Verständnis an der tatsächlichen Antwort, ohne eine gesicherte Diagnose abzuleiten."]}],"chatLinks":[["ChatGPT","https://chatgpt.com/"],["Duck.ai","https://duck.ai/"],["Gemini","https://gemini.google.com/"],["Copilot","https://copilot.com/"]]};
+const SKILLS = CONFIG.skills;
+const LEVELS = {1:'noch unsicher',2:'mit Hilfe',3:'selbstständig'};
+const STORAGE_KEY = CONFIG.storageKey;
+function normalizeState(raw) {
+ const ratings={};
+ if(raw && typeof raw==='object' && raw.ratings && typeof raw.ratings==='object') {
+  for(const skill of SKILLS) {const value=Number(raw.ratings[skill.id]);if([1,2,3].includes(value))ratings[skill.id]=value;}
+ }
+ return {ratings,priority:typeof raw?.priority==='string'?raw.priority.slice(0,400):''};
+}
+function getFocus(state) {
+ const selected=SKILLS.filter(s=>state.ratings[s.id]);
+ const needs=selected.filter(s=>state.ratings[s.id]<3).sort((a,b)=>state.ratings[a.id]-state.ratings[b.id]);
+ if(needs.length)return {skills:needs.slice(0,2),review:false};
+ return {skills:selected.slice(-2),review:true};
+}
+function buildPrompt(state) {
+ const selected=SKILLS.filter(s=>state.ratings[s.id]);
+ if(!selected.length)return '';
+ const focus=getFocus(state);
+ const hints=[...new Set(focus.skills.flatMap(s=>s.coachHints||[]))];
+ return [
+  'Du bist mein geduldiger Lerncoach für '+CONFIG.subject+' ('+CONFIG.grade+'). Mein Unterrichtsthema: '+CONFIG.scope+'.',
+  '',
+  'Mein tatsächlich eingeschätzter Lernstand:',
+  ...selected.map(s=>'- '+s.text+' — '+LEVELS[state.ratings[s.id]]),
+  'Nur diese Aussagen habe ich eingeschätzt. Nicht genannte Kompetenzen sind unbewertet und dürfen weder als Schwäche noch als Stärke behandelt werden. Ergänze keine erfundenen Bewertungen oder weiteren Lernschwerpunkte.',
+  '',
+  (focus.review?'Alles von mir Bewertete habe ich als selbstständig eingeschätzt. Prüfe es an einem neuen Beispiel mit höchstens diesen zwei Startschwerpunkten:':'Beginne mit diesen höchstens zwei Startschwerpunkten; noch unsicher kommt vor mit Hilfe:'),
+  ...focus.skills.map(s=>'- '+s.short+': '+s.text),
+  ...(state.priority.trim()?['','Meine eigene Frage / mein Lernziel: '+state.priority.trim(),'Berücksichtige mein Lernziel ausdrücklich innerhalb dieser ausgewählten Themen. Wenn es einem Startschwerpunkt widerspricht oder nicht dazu passt, frage zuerst kurz nach, bevor du die Aufgabe stellst. Leite daraus keine zusätzliche Selbsteinschätzung ab.']:[]),
+  ...(hints.length?['','Passende fachliche Hinweise zu meinen Startschwerpunkten:',...hints.map(h=>'- '+h)]:[]),
+  '',
+  'So soll unser Lernchat ablaufen:',
+  '1. Stelle immer nur eine kurze Aufgabe und warte auf meine Antwort. Beginne mit einem anschaulichen neuen Beispiel zum Startschwerpunkt. Gib alle benötigten Angaben direkt in der Aufgabe an; keine Dateien, Links oder Kursunterlagen sind nötig.',
+  '2. Erkläre ungewohnte Begriffe kurz, bevor ich sie brauche. Passe Schwierigkeit und Hilfen an meine tatsächliche Einschätzung an. Bei „selbstständig“ prüfe die Anwendung in einem neuen Zusammenhang, statt ungefragt die Grundlagen zu wiederholen.',
+  '3. Verrate die Lösung nicht vor meiner Antwort. Bei einem Fehler gib erst einen gezielten Hinweis und lass mich noch einmal versuchen. Nach zwei erfolglosen Versuchen zeige ein anderes, vollständig gelöstes Beispiel; stelle danach eine ähnliche neue Aufgabe, die ich selbst löse.',
+  '4. Passe die nächste Aufgabe an meine Antwort an. Bleibe bei höchstens zwei Startschwerpunkten. Beurteile meine Begründung, nicht nur mein Ergebnis. Ende mit einem kurzen Lernrückblick: Was kann ich jetzt selbst erklären, was sollte ich noch üben?',
+  '',
+  'Starte jetzt mit genau einer passenden Aufgabe; falls mein Lernziel erst geklärt werden muss, stelle stattdessen genau eine kurze Rückfrage.'
+ ].join('\n');
+}
+let state=normalizeState(null),storageAvailable=false;
+const $=id=>document.getElementById(id);
+function renderRows() {
+ const body=$('competency-body');body.replaceChildren();
+ SKILLS.forEach((skill,index)=>{
+  const row=document.createElement('tr');
+  const statement=document.createElement('td');
+  const box=document.createElement('div');box.className='competence';
+  const number=document.createElement('span');number.className='number';number.textContent=String(index+1);number.setAttribute('aria-hidden','true');
+  const text=document.createElement('p');text.id='skill-'+skill.id;text.textContent=skill.text;
+  box.append(number,text);statement.append(box);
+  const linkCell=document.createElement('td');const links=document.createElement('div');links.className='links';
+  skill.links.forEach(([label,url])=>{const a=document.createElement('a');a.href=url;a.textContent=label;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',label+' – '+skill.short+' (öffnet einen neuen Tab)');links.append(a)});
+  if(skill.practice){const practice=document.createElement('p');practice.className='practice-note';practice.textContent=skill.practice;links.append(practice)}
+  linkCell.append(links);
+  const choiceCell=document.createElement('td');const group=document.createElement('fieldset');group.className='ratings';
+  const legend=document.createElement('legend');legend.className='sr-only';legend.textContent=skill.text;group.append(legend);
+  Object.entries(LEVELS).forEach(([value,label])=>{
+   const option=document.createElement('label');option.className='choice';
+   const input=document.createElement('input');input.type='radio';input.name=skill.id;input.value=value;input.checked=state.ratings[skill.id]===Number(value);
+   input.addEventListener('change',()=>{state.ratings[skill.id]=Number(value);persist();update()});
+   const labelText=document.createElement('span');labelText.textContent=label;option.append(input,labelText);group.append(option);
+  });choiceCell.append(group);row.append(statement,linkCell,choiceCell);body.append(row);
+ });
+}
+function persist() {
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageAvailable=true;}
+ catch(error){storageAvailable=false;}
+ $('save-status').textContent=storageAvailable?'Deine Auswahl wird nur in diesem Browser gespeichert und nicht an Moodle übertragen. Auf einem anderen Gerät ist sie nicht automatisch vorhanden.':'Dieser Browser kann deine Auswahl nicht dauerhaft speichern. Sie bleibt nur, solange diese Seite geöffnet ist. Du kannst den ausgefüllten Bogen drucken.';
+}
+function update() {
+ const count=SKILLS.filter(s=>state.ratings[s.id]).length;
+ $('progress').textContent=count+' von '+SKILLS.length+' eingeschätzt';
+ const focus=getFocus(state);const list=$('focus-list');list.replaceChildren();list.hidden=!count;
+ $('focus-intro').textContent=!count?'Schätze dich oben ein. Hier erscheinen bis zu zwei passende Schwerpunkte.':focus.review?'Alles bisher Markierte hast du als selbstständig eingeschätzt. Prüfe es an einem neuen Beispiel zu:':'Beginne mit „noch unsicher“, danach mit „mit Hilfe“. Deine nächsten Schwerpunkte:';
+ focus.skills.forEach(skill=>{const item=document.createElement('li');item.textContent=skill.short;list.append(item)});
+ $('prompt').value=buildPrompt(state);$('copy').disabled=count===0;$('copy-status').textContent=count===0?'Schätze zuerst mindestens eine Aussage ein.':'';
+}
+try {const saved=localStorage.getItem(STORAGE_KEY);if(saved)state=normalizeState(JSON.parse(saved));} catch(error){}
+renderRows();$('priority').value=state.priority;persist();update();
+$('priority').addEventListener('input',()=>{state.priority=$('priority').value.slice(0,400);persist();update()});
+$('print').addEventListener('click',()=>window.print());
+$('reset').addEventListener('click',()=>{
+ if(!window.confirm('Alle Einschätzungen und dein freiwilliges Lernziel auf diesem Gerät zurücksetzen?'))return;
+ state=normalizeState(null);document.querySelectorAll('.ratings input').forEach(input=>input.checked=false);$('priority').value='';persist();update();$('reset').focus();
+});
+$('copy').addEventListener('click',async()=>{
+ const text=buildPrompt(state);if(!text)return;
+ try{
+  if(!navigator.clipboard || !navigator.clipboard.writeText)throw new Error('Clipboard unavailable');
+  await navigator.clipboard.writeText(text);$('copy-status').textContent=text===buildPrompt(state)?'Kopiert. Im Lernchat einfügen.':'Deine Auswahl wurde inzwischen geändert. Bitte erneut kopieren.';
+ }catch(error){
+  $('prompt-details').open=true;$('prompt').focus();$('prompt').select();
+  $('copy-status').textContent='Bitte den markierten Text selbst kopieren.';
+ }
+});
+// Pure functions are also exposed for local, offline logic checks.
+window.SelfAssessment=Object.freeze({config:CONFIG,skills:SKILLS,normalizeState,getFocus,buildPrompt});
+// Compatibility for existing local checks of the original workbook.
+window.AlgorithmSelfCheck=window.SelfAssessment;
+</script>
+</body>
+</html>
