@@ -12,6 +12,8 @@ Erst danach kann unter „2 · Ein enges Ziel“ die optionale Hilfe **Förderzi
 
 Für die Erprobung in Handout 3 kann der aktuelle Förderentwurf oder eine ausdrücklich fiktive Bruchauswertung als Kontext gewählt werden. Die acht festen Beispiele bleiben als Orientierung separat vom bearbeitbaren Prompt. Bei bewusstem Neubefüllen mit gleichem Kontext bleiben Ergebnis und Anmerkungen erhalten. Bei einem anderen Kontext wird eine vorhandene Erprobung zuvor als eigener Bibliotheksstand gesichert. Alle Stände sind im JSON-Export enthalten; eine volle Sammlung mit 500 Archiven lässt sich in eine unberührte Bibliothek zurückimportieren.
 
+Die Auswahlhilfe **Welcher nächste Schritt passt zu meiner Ausgangslage?** ergänzt sechs didaktische Zugänge: Denkweg klären, Bedeutung zeigen, Aufgabenbeziehungen nutzen, Unterstützung zurücknehmen, Fehler begründen und eine neue eigene Bearbeitung prüfen. Dazu gehören Päckchen mit gleichbleibender Summe, Ergänzungsaufgaben und eigene Aufgabenproduktionen sowie weitere Beispiele zum Entbündeln und Einmaleins. Jede Variante nennt Einsatzbedingung, Lösung, Beobachtungskriterium und Aussagegrenze. Die Schaltflächen öffnen vorhandene Formate mit dem gewählten Kontext, ohne den Beispielfall oder einen neuen Lernstand zu übernehmen. PIKAS und Mathe sicher können begründen die Auswahlprinzipien; die konkreten Entwürfe sind nicht empirisch validiert. Die Auswahlhilfe steht auch im Word-Handout 3 ab Seite 21 (insgesamt 27 Seiten).
+
 ## Lokal öffnen
 
 `index.html` oder `Digitale Handouts Mathematik.html` im Browser öffnen. Beide Einstiege sind identisch und verwenden dieselben lokalen Dateien: `handouts.css`, `handouts-core.js`, `library-data.js`, `handouts.js`. Deshalb das gesamte Projekt herunterladen, nicht nur eine einzelne HTML-Datei. Kein Framework und keine Installation erforderlich. Für zuverlässige Browser-Speicherung und Zwischenablage ist ein lokaler HTTP-Server empfehlenswert:
@@ -25,7 +27,7 @@ Dann `http://127.0.0.1:4186/` öffnen. Die Vorschau ist nur auf diesem Rechner e
 ## Daten und alte Links
 
 - Speicherung erfolgt nur im Browser. Keine automatische Übermittlung an KI-Anbieter, keine Telemetrie, keine Zugangsdaten.
-- „Alle Arbeitsstände als Datei sichern“ exportiert die Fälle, Förderentwürfe, bearbeiteten Bibliotheksvorlagen und erhaltenen Rückfallstände als JSON. Import ergänzt vorhandene Arbeitsstände; er ersetzt sie nicht.
+- „Alle Arbeitsstände als Datei sichern“ exportiert die Fälle, Förderentwürfe, bearbeiteten Bibliotheksvorlagen und erhaltenen Rückfallstände als JSON. Export und Import haben dieselbe Grenze von 10 MB; ein zu großer Export wird mit einer Meldung abgebrochen, ohne Eingaben zu entfernen. Import ergänzt vorhandene Bearbeitungen. Nur der völlig unveränderte automatische Startfall wird bei eintreffenden Fällen ersetzt, damit auch 500 gesicherte Fälle in einen frischen Zustand passen.
 - Originale des bisherigen Schlüssels `digitale-handouts-foerderbaustein` bleiben unverändert. Die neue Version verwendet `digitale-handouts-v2`. Zuordnung und Grenzen sind in [MIGRATION.md](docs/MIGRATION.md) beschrieben.
 - Bei blockierter Speicherung oder konkurrierenden Änderungen aus einem anderen Tab wird gewarnt. Dann vor dem Schließen exportieren. Browserbereinigung kann lokale Daten entfernen.
 - `#station1` bleibt Bibliothek, `#station2` bleibt Hypothesenbildung/Fehleranalyse und `#station3` bleibt Förderbaustein. Neue Links heißen `#bibliothek`, `#hypothesen`, `#foerderbaustein`.
@@ -47,6 +49,6 @@ node --check handouts-core.js
 node --check library-data.js
 ```
 
-Prüfstand 2026-11-04: 60 automatisierte Tests bestanden, einschließlich optionalem Aufgabenziel, H2-Diagnosehilfe, getrennter Speicherung von Schülerlösung und Beobachtung sowie Ergebnissen, Anmerkungen und Archiven der H3-Erprobung. Die Tests benötigen nur Node-Bordmittel. Sie ersetzen keine vollständige Browser-, Datenschutz- oder didaktische Validierung. [Tool-Linkcheck](docs/TOOL-LINKCHECK.md) dokumentiert Erreichbarkeit und Prüfgrenzen; historische Kostenangaben sind keine aktuelle Tarif- oder Schulfreigabe.
+Prüfstand 2026-11-05: 74 automatisierte Tests bestanden, einschließlich optionalem Aufgabenziel, H2-Diagnosehilfe, getrennter Speicherung von Schülerlösung und Beobachtung, Ergebnissen und Archiven der H3-Erprobung sowie Auswahlhilfe und Sicherungsgrenzen. Die Tests benötigen nur Node-Bordmittel. Sie ersetzen keine vollständige Browser-, Datenschutz- oder didaktische Validierung. [Tool-Linkcheck](docs/TOOL-LINKCHECK.md) dokumentiert Erreichbarkeit und Prüfgrenzen; historische Kostenangaben sind keine aktuelle Tarif- oder Schulfreigabe.
 
 Nach Änderungen an `index.html` den kompatiblen Dateieinstieg `Digitale Handouts Mathematik.html` identisch halten. Word-Handouts werden mit `scripts/build_word_handouts.py` aus den erhaltenen Originalen und der Bibliothek erzeugt; nach Änderungen erneut rendern und prüfen. QA-Dateien und Teilnehmerdaten gehören nicht ins Repository.

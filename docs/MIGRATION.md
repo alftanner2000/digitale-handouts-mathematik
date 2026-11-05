@@ -66,3 +66,11 @@ Geänderte Fallangaben überschreiben bearbeitete Prompts nicht. Ein Kontextverg
 ## Sicherungen sind unterschiedlich
 
 Git-Sicherung: Website-Dateien und veröffentlichte Vorlagen. JSON-Export: persönliche lokale Arbeitsstände. Word/Text/Druck: lesbare Dokumentation, kein vollständiges Rückimportformat. JSON-Dateien mit Teilnehmereingaben nicht ins öffentliche Repository laden.
+
+## Ergänzung 2026-11-05: Auswahlhilfe und Sicherungsgrenzen
+
+Die sechs neuen Auswahlrouten sind statische Inhalte und benötigen keine neue Speicherversion. Das Öffnen eines Formats aus der Auswahlhilfe verändert weder Fall noch gewählten Kontext und ersetzt keine schon bearbeitete Vorlage. Die bestehenden 28 Vorlagen und acht Formatbeispiele bleiben erhalten.
+
+Eine frische Sitzung enthält automatisch einen vorbereiteten Diagnosefall. Beim Import wird nur dieser exakt unveränderte einzelne Startfall ersetzt, sofern tatsächlich neue Diagnosefälle eintreffen. Jede geänderte oder zusätzliche Eigenschaft schützt ihn als eigene Bearbeitung. Dadurch kann eine Sicherung mit 500 Fällen in eine frische Sitzung zurückgelesen werden.
+
+`MAX_BACKUP_BYTES` begrenzt Import und Export auf 10.000.000 Byte. `serializeBackup` prüft die tatsächliche UTF-8-Größe einschließlich JSON-Formatierung und Rückfalltexten. Bei Überschreitung wird keine vermeintlich rückimportierbare Sicherung erzeugt; Eingaben bleiben erhalten. Sehr große Texte dann zunächst separat sichern und den Arbeitsstand bewusst reduzieren. Es gibt weiterhin keine automatische Löschung.

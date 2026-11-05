@@ -18,6 +18,60 @@ Ausgangslage (beobachtete Lösung oder Äußerung, offene Vermutungen und ausdr�
     baseline: "Fiktive notierte Lösung: 1/2 + 1/3 = 2/5. Offene Vermutung: Möglicherweise werden Zähler und Nenner getrennt addiert; der Denkweg ist unbekannt. Ausdrücklich gewählte Arbeitsannahme für Förderbeispiele: Die gemeinsame Teilgröße soll geklärt werden. Keine weitere Kinderantwort bekannt."
   };
 
+  // Auswahlhilfe: feste Muster bleiben vom aktuellen Fall und seinen Prompts getrennt.
+  window.HANDOUT_VARIANT_SOURCES = [
+    {title:"PIKAS: Diagnose- und Förderaufgaben unterscheiden",url:"https://pikas-mi.dzlm.de/leitideen/diagnosegeleitet-f%C3%B6rdern/diagnoseaufgaben-und-f%C3%B6rderaufgaben/hintergrund"},
+    {title:"PIKAS: Vernetzendes Üben und Ableitungsstrategien",url:"https://pikas-mi.dzlm.de/node/692"},
+    {title:"PIKAS: Tipps und Herausforderungen am gemeinsamen Gegenstand",url:"https://pikas-mi.dzlm.de/leitideen/aufgaben-adaptieren/tipps-und-herausforderungen-bereithalten/hintergrund"},
+    {title:"Mathe sicher können: Gleichwertige Brüche und Bruchaddition (B2–B4)",url:"https://mathe-sicher-koennen.dzlm.de/material-sek/brueche-prozente-und-dezimalzahlen"},
+    {title:"PIKAS: Subtrahieren mit Entbündeln",url:"https://pikas-mi.dzlm.de/node/719"},
+    {title:"PIKAS: Entdeckendes Üben und Aufgabenpäckchen",url:"https://pikas-mi.dzlm.de/leitideen/effektiv-%C3%BCben/entdeckendes-%C3%BCben/unterricht"}
+  ];
+  window.HANDOUT_VARIANT_ROUTES = [
+    {
+      id:"denkweg", title:"Denkweg zunächst klären", phase:"Diagnose",
+      condition:"Der Denkweg ist unbekannt oder mehrere Deutungen sind noch möglich. Ein fertiges Förderziel ist dafür nicht nötig.",
+      purpose:"Eine zusätzliche eigene Erklärung hilft, Vermutungen zu prüfen. Noch keine Lösung oder passende Unterteilung vorgeben.",
+      formats:["hypothesenbildung","diagnoseinterview"], sources:[0],
+      examples:[{title:"Kontrast statt sofortiger Erklärung",task:"Zum fiktiven Ergebnis ½ + ⅓ = ⅖: Zeige ½ + ½ und ½ + ⅓ an gleich langen, zunächst ungeteilten Streifen. Erkläre deinen Weg. Jeder Streifen steht für dasselbe Ganze.",solution:"½ + ½ = 1; ½ + ⅓ = 5/6. Gesucht ist zunächst der tatsächliche Denkweg, nicht das Nachsprechen dieser Ergebnisse. Hälften lassen sich direkt zählen; Hälften und Drittel benötigen zum Zusammenzählen eine gemeinsame Teilgröße.",criterion:"Originalaussage und Darstellung dokumentieren: Wie deutet das Kind Ganzes, Teilgröße und Addition? Was stützt oder widerspricht der bisherigen Hypothese?",limit:"Eine einzelne Antwort entscheidet nicht sicher zwischen Ursachen. Sprach- oder Materialverständnis können die Bearbeitung beeinflussen."}]
+    },
+    {
+      id:"bedeutung", title:"Die Bedeutung eines Schrittes zeigen", phase:"Förderung",
+      condition:"Eine tatsächliche Antwort oder eine ausdrücklich gewählte Arbeitsannahme legt nahe, eine Wertgleichheit oder Operation zu klären.",
+      purpose:"Handlung, Bild und Rechnung werden miteinander verbunden. Entscheidend ist die Erklärung der Beziehung, nicht nur das Benutzen von Material.",
+      formats:["handlung-bild-symbol","darstellungen-zuordnen"], sources:[3,4],
+      examples:[{title:"Brüche: Unterteilen ohne Wertänderung",task:"Markiere ⅔ eines Streifens. Teile jedes Drittel in zwei gleich große Teile. Beschrifte vorher und nachher. Warum gilt ⅔ = 4/6?",solution:"Aus zwei markierten Dritteln werden vier markierte Sechstel. Die Teilstücke sind kleiner und zahlreicher, aber die markierte Länge und das Bezugs-Ganze bleiben gleich.",criterion:"Das Kind verbindet 2 und 4 mit der Anzahl der markierten Teile und 3 und 6 mit der Einteilung desselben Ganzen.",limit:"Bloßes Abzählen der Sechstel zeigt noch nicht, dass die Wertgleichheit erklärt werden kann."},{title:"Anderer Fall: Stellenwerte beim Entbündeln",task:"Stelle 402 − 186 mit Stellenwertmaterial dar. Tausche die 402 wertgleich so um, dass du 1 Hunderter, 8 Zehner und 6 Einer wegnehmen kannst. Verbinde jeden Tausch mit der Schreibweise.",solution:"4 H + 0 Z + 2 E = 3 H + 10 Z + 2 E = 3 H + 9 Z + 12 E. Nach dem Wegnehmen bleiben 2 H + 1 Z + 6 E = 216.",criterion:"Das Kind erklärt 1 H = 10 Z und 1 Z = 10 E sowie die Wertgleichheit der Darstellungen von 402.",limit:"Dies ist ein anderer Beispielfall, keine Deutung des Bruchfehlers. Das Entbündeln nicht unbemerkt mit einem anderen schriftlichen Subtraktionsverfahren vermischen."}]
+    },
+    {
+      id:"beziehungen", title:"Aufgabenbeziehungen statt mehr Rechenmenge", phase:"Üben und vernetzen",
+      condition:"Die Grundidee ist geklärt. Nun soll das Kind Beziehungen erkennen, erklären und zum Rechnen nutzen.",
+      purpose:"Ein Päckchen kann eine gleichbleibende Summe untersuchen, eine Lücke begründet ergänzen oder zu einer eigenen passenden Aufgabe führen. Bekannte Teilaufgaben können neue Rechnungen erschließen.",
+      formats:["strukturierte-rechenpaeckchen","umkehr-ergaenzungsaufgaben","rechenwege-vergleichen"], sources:[1,5],
+      examples:[{title:"Drei Varianten aus einem Päckchen",task:"A · Vergleiche 1/6 + 5/6, 2/6 + 4/6 und 3/6 + 3/6. Warum bleibt die Summe gleich?\nB · Ergänze 4/6 + □ = 1 und begründe die Ergänzung.\nC · Erfinde eine weitere Aufgabe mit zwei positiven Sechstelbrüchen und Summe 1. Zeige sie am Streifen.",solution:"A: Jede Summe ist 6/6 = 1. Ein Summand wächst jeweils um 1/6, der andere sinkt um 1/6. B: 2/6. C: zum Beispiel 5/6 + 1/6 = 1. Das Ganze und die Teilgröße bleiben gleich.",criterion:"Das Kind begründet das Ausgleichen oder Ergänzen über die sechs gleich großen Teile, statt nur Ziffernfolgen fortzusetzen.",limit:"Dieses Päckchen übt Beziehungen mit gemeinsamer Teilgröße. Es prüft nicht allein, ob das Kind bei ungleichnamigen Brüchen selbst einen gemeinsamen Nenner findet."},{title:"Anderer Fall: 7 · 8 aus bekannten Aufgaben",task:"Zeige 7 · 8 am Punktefeld. Zerlege in 5 · 8 und 2 · 8. Falls die Teilaufgaben bekannt sind, vergleiche mit 10 · 8 − 3 · 8. Welcher Weg hilft dir und warum? Versuche anschließend 7 · 6.",solution:"7 · 8 = 40 + 16 = 56 oder 80 − 24 = 56. 7 · 6 = 30 + 12 = 42. Die Teilprodukte entsprechen Teilflächen beziehungsweise Gruppen von Reihen.",criterion:"Das Kind zeigt die Teilprodukte im Punktefeld und nutzt die Beziehung an der neuen Aufgabe; es nennt nicht nur die Ergebnisse.",limit:"Bekannte Kernaufgaben vorher klären. Zwei gleichzeitig unbekannte Ableitungswege können überfordern. Der Beispielwechsel verändert den gespeicherten Fall nicht."}]
+    },
+    {
+      id:"hilfen", title:"Unterstützung schrittweise zurücknehmen", phase:"Förderung",
+      condition:"Die Bedeutung wurde besprochen; einzelne Schritte gelingen aber noch nicht selbstständig.",
+      purpose:"Bedeutsame Lücken lassen Entscheidungen beim Kind. Später wird die Vorgabe reduziert; Hilfe und Eigenleistung werden getrennt festgehalten.",
+      formats:["teilweise-ausgearbeitete-loesungen","gestufte-hilfekarten","differenzierung-gemeinsames-lernziel"], sources:[2],
+      examples:[{title:"Lösungsbeispiel mit abnehmender Hilfe",task:"Ergänze und erkläre: 2/5 + 1/3 = 6/15 + □ = □. Warum bleibt beim Erweitern der Wert gleich? Bearbeite danach 3/5 + 1/4 ohne vorgegebenen Nenner. Bei Bedarf eine einzelne Hilfekarte anbieten.",solution:"6/15 + 5/15 = 11/15. Bei der neuen Aufgabe: 12/20 + 5/20 = 17/20. Die Bruchteile werden wertgleich in gleich große Teile desselben Ganzen umgeteilt.",criterion:"Welche Schritte und Erklärungen gelingen ohne Vorgabe? Die selbst gewählte gemeinsame Einheit getrennt vom bloßen Ergänzen einer Lücke beobachten.",limit:"Eine ausgefüllte Lücke belegt nicht die selbstständige Wahl des Nenners. Falls die neue Aufgabe bereits bekannt ist, eine andere verwenden."}]
+    },
+    {
+      id:"fehler", title:"Fehler erklären und Ergebnisse prüfen", phase:"Begründen",
+      condition:"Die gemeinsame Einheit ist Thema gewesen. Nun sollen Erklärung und unabhängige Ergebniskontrolle verbunden werden.",
+      purpose:"Ein begründetes Gegenargument verlangt mehr als die Regel zu wiederholen. Eine Größenkontrolle kann einen Fehler entdecken, ersetzt aber nicht die Rechnung.",
+      formats:["fehlerdetektiv","schaetzen-plausibilitaet"], sources:[0],
+      examples:[{title:"Fiktiven Lösungsweg untersuchen",task:"Prüfe den ausdrücklich erfundenen Weg 1/4 + 1/6 = 2/10. Welche Gleichsetzung ist falsch? Erkläre mit Teilgrößen. Kann die Summe kleiner als 1/4 sein?",solution:"Richtig ist 3/12 + 2/12 = 5/12. Viertel und Sechstel sind unterschiedlich große Teile desselben Ganzen. 2/10 ist kleiner als 1/4; das widerspricht bereits dem Addieren des positiven Bruchs 1/6.",criterion:"Das Kind benennt die unzulässige Gleichsetzung, begründet sie über die Teilgrößen und prüft die Größe der Summe.",limit:"Die Größenkontrolle widerlegt 2/10, liefert allein aber noch nicht 5/12. Den erfundenen Denkweg keinem realen Kind zuschreiben."}]
+    },
+    {
+      id:"uebertragen", title:"Eine neue eigene Bearbeitung prüfen", phase:"Lernstand erneut betrachten",
+      condition:"Nach der Förderung soll eine neue Aufgabe ohne KI und eingeblendete Hilfe zeigen, wie weitergearbeitet werden kann.",
+      purpose:"Nicht das Wiederholen der vorgeführten Lösung, sondern eine neue Erklärung liefert Anhaltspunkte für den nächsten Schritt.",
+      formats:["exit-ticket-ohne-ki","verzweigte-anschlussaufgaben"], sources:[0],
+      examples:[{title:"Neue Rechnung mit eigener Begründung",task:"Berechne 2/3 + 1/4. Erkläre mit einer eigenen Skizze oder in Worten, warum du diese Teile zusammenzählen darfst. Keine KI und keine eingeblendete Lösung; sonstige erlaubte Hilfsmittel vorher festlegen.",solution:"8/12 + 3/12 = 11/12. Beide Brüche werden wertgleich als Zwölftel desselben Bezugs-Ganzen dargestellt.",criterion:"Wertgleiches Erweitern, gemeinsame Teilgröße, richtige Summe und passende Erklärung zusammen betrachten.",limit:"Nur verwenden, wenn die Aufgabe nicht schon vorgeführt wurde. Eine gelungene Bearbeitung belegt keine dauerhafte Beherrschung; weitere Beobachtungen bleiben nötig."}]
+    }
+  ];
+
   window.HANDOUT_FORMATS = [
     {
       id: "handlung-bild-symbol",
@@ -145,9 +199,9 @@ Gib eine kurze gemeinsame Kontrollaufgabe ohne KI, getrennte Lösungen und Beoba
       purpose: "Aufgabenbeziehungen entdecken und zum Rechnen oder Begründen nutzen.",
       when: "Wenn eine Aufgabenserie eine bestimmte Beziehung sichtbar machen soll statt nur Rechenmenge zu erhöhen.",
       output: "Ein Päckchen mit vier bis fünf Aufgaben, Entdeckungsauftrag, Fortsetzungsaufgabe und getrennten Lösungen.",
-      check: "Verändert sich gezielt ein Merkmal, und lässt sich die daraus folgende Beziehung mathematisch erklären?",
-      prompt: prompt(`Erstelle ein strukturiertes Rechenpäckchen mit vier bis fünf Aufgaben zum Lernziel. Verändere gezielt genau ein relevantes Merkmal und halte die übrigen Merkmale zunächst konstant. Benenne für die Lehrkraft, welche Beziehung dadurch sichtbar werden soll.
-Lass das Kind zunächst rechnen oder darstellen, anschließend die Veränderung beschreiben und eine weitere passende Aufgabe selbst ergänzen. Formuliere eine Begründungsfrage wie „Warum verändert sich das Ergebnis auf diese Weise?“ statt nur „Wie geht die Reihe weiter?“ Gib eine gestufte Hilfe, die zum Vergleich zweier Aufgaben anregt.
+      check: "Wird eine bestimmte Aufgabenbeziehung gezielt variiert, und lässt sich die Änderung oder Konstanz des Ergebnisses erklären?",
+      prompt: prompt(`Erstelle ein strukturiertes Rechenpäckchen mit vier bis fünf Aufgaben zum Lernziel. Wähle genau eine mathematische Beziehung: zum Beispiel ein Summand wächst bei festem anderen Summanden; oder beide Summanden verändern sich gegensinnig um denselben Betrag, sodass die Summe gleich bleibt. Halte die übrigen Merkmale möglichst konstant. Benenne die Beziehung für die Lehrkraft.
+Lass das Kind rechnen oder darstellen, die Veränderung beschreiben und eine passende Aufgabe selbst ergänzen. Frage: „Warum verändert sich das Ergebnis – oder bleibt gleich?“ Ergänze eine Lückenaufgabe zur selben Beziehung. Gib eine Hilfe, die zum Vergleich zweier Aufgaben anregt.
 Liefere ein getrenntes Lösungsblatt mit der Beziehung und ihrer Begründung. Prüfe, ob die Serie das beabsichtigte Muster durchgehend trägt. Falls es mehrere sinnvolle Fortsetzungen gibt, benenne sie. Eine passende Fortsetzung allein ist noch kein Beleg dafür, dass die Beziehung verstanden wurde.`)
     },
     {

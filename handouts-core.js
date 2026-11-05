@@ -7,6 +7,7 @@
   'use strict';
   const KEY = 'digitale-handouts-v2';
   const LEGACY_KEY = 'digitale-handouts-foerderbaustein';
+  const MAX_BACKUP_BYTES = 10000000;
   const ALIASES = {station1:'bibliothek', station2:'hypothesen', station3:'foerderbaustein'};
   const cases = [
     {id:'zehner', title:'Zehnerübergang', grade:'1', task:'15 − 7 = ?', solution:'15 − 7 = 12', goal:'15 − 7 durch Zerlegen oder Ergänzen lösen und den Weg erklären.'},
@@ -69,12 +70,17 @@
   }
   function mergeImport(current, incoming) {
     validate(current);validate(incoming);
-    for(const kind of ['diagnostics','builders']) if(current[kind].length+incoming[kind].length>500)throw new Error('Der Import würde die Grenze von 500 Entwürfen je Handout überschreiten.');
+    const starter=current.diagnostics[0], starterTemplate=diagnostic(cases[0]);
+    // Replace only the exact, unedited automatic starter when actual cases arrive.
+    // Extra fields or any changed value make it existing work that must be kept.
+    const replaceStarter=incoming.diagnostics.length>0 && current.diagnostics.length===1 && current.activeDiagnosticId===starter.id && Object.keys(starter).length===Object.keys(starterTemplate).length && Object.keys(starterTemplate).every(key=>key==='id' || starter[key]===starterTemplate[key]);
+    for(const kind of ['diagnostics','builders']) if(current[kind].length-(kind==='diagnostics'&&replaceStarter?1:0)+incoming[kind].length>500)throw new Error('Der Import würde die Grenze von 500 Entwürfen je Handout überschreiten.');
     const lib=current.library;
     const untouchedLibrary=lib.mode==='blank' && Object.keys(lib).every(key=>['mode','grade','task','goal','baseline','drafts'].includes(key)) && ['grade','task','goal','baseline'].every(key=>lib[key]===undefined || lib[key]==='') && !Object.keys(lib.drafts||{}).length;
     const archiveGrowth=(incoming.importedLibraries?.length||0)+(untouchedLibrary?0:1);
     if((current.importedLibraries?.length||0)+archiveGrowth>500)throw new Error('Zu viele Bibliotheksarchive.');
     const next=JSON.parse(JSON.stringify(current));
+    if(replaceStarter)next.diagnostics=[];
     for(const kind of ['diagnostics','builders']) for(const original of incoming[kind]) {
       const copy={...(kind==='diagnostics'?diagnostic():builder()),...JSON.parse(JSON.stringify(original))}; copy.id=uid(); copy.title+=' (importiert)'; next[kind].push(copy);
     }
@@ -92,6 +98,12 @@
     if(incoming.recoveryRaw) { next.recoveredOriginals=next.recoveredOriginals||[];next.recoveredOriginals.push(incoming.recoveryRaw); }
     if(Array.isArray(incoming.recoveredOriginals)) { next.recoveredOriginals=next.recoveredOriginals||[];next.recoveredOriginals.push(...incoming.recoveredOriginals); }
     return validate(next);
+  }
+  function serializeBackup(state) {
+    validate(state);
+    const text=JSON.stringify(state,null,2);
+    if(new TextEncoder().encode(text).byteLength>MAX_BACKUP_BYTES) throw new Error('Die Sicherung überschreitet die gemeinsame Export-/Importgrenze von 10 MB. Sichern Sie große Texte zunächst separat und verkleinern Sie den Arbeitsstand anschließend bewusst.');
+    return text;
   }
   function refillLibraryDraft(state, id, newText, newSource) {
     validate(state);
@@ -206,5 +218,5 @@ Halte genau ein Förderziel ein. Der gemeinsame Ergebnisrahmen hat Vorrang vor e
 7. Separat: Lösungen mit nachvollziehbarer Prüfung sowie kurze beobachtbare Kriterien für die Lehrkraft.
 Ein guter Materialentwurf belegt weder die Diagnose noch eine Lernwirkung. Behaupte keine Prüfung durch die Lehrkraft. Kennzeichne nötige fachliche Kontrollen.`;
   }
-  return {KEY,LEGACY_KEY,ALIASES,cases,uid,diagnostic,builder,empty,migrateLegacy,validate,mergeImport,refillLibraryDraft,diagnosticPrompt,contextForBuilder,builderHypothesisPrompt,goalPrompt,fillTemplate,builderPrompt};
+  return {KEY,LEGACY_KEY,MAX_BACKUP_BYTES,ALIASES,cases,uid,diagnostic,builder,empty,migrateLegacy,validate,mergeImport,serializeBackup,refillLibraryDraft,diagnosticPrompt,contextForBuilder,builderHypothesisPrompt,goalPrompt,fillTemplate,builderPrompt};
 });

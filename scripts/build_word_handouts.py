@@ -7,6 +7,7 @@ import json
 import os
 import re
 import subprocess
+import argparse
 from lxml import etree as E
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -241,13 +242,13 @@ def make_h2():
     d.save()
 
 def library_data():
-    script="const fs=require('fs'),vm=require('vm');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),c);process.stdout.write(JSON.stringify({formats:c.window.HANDOUT_FORMATS,extras:c.window.HANDOUT_EXTRAS,trial:c.window.HANDOUT_TRIAL_EXAMPLE}));"
+    script="const fs=require('fs'),vm=require('vm');const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),c);process.stdout.write(JSON.stringify({formats:c.window.HANDOUT_FORMATS,extras:c.window.HANDOUT_EXTRAS,trial:c.window.HANDOUT_TRIAL_EXAMPLE,routes:c.window.HANDOUT_VARIANT_ROUTES,sources:c.window.HANDOUT_VARIANT_SOURCES}));"
     return json.loads(subprocess.check_output([NODE,'-e',script,str(ROOT/'library-data.js')],text=True))
 
 def make_h3(data):
     d=Handout(3)
     d.title('Handout 3 Tool und Promptbibliothek','Offene Vertiefung')
-    d.p('Wählen Sie ein Format nach seinem didaktischen Zweck. Die Bibliothek ist unabhängig von Praxisphase 1 und 2 nutzbar. Sie enthält 22 Aufgabenformate und sechs ergänzende Vorlagen. Für die begrenzte Hypothesenbildung nutzen Sie Handout 1, für einen zusammenhängenden Förderbaustein Handout 2. Acht konkrete Erprobungsbeispiele zum selben fiktiven Bruchfall finden Sie ab Seite 17.')
+    d.p('Wählen Sie ein Format nach seinem didaktischen Zweck. Die Bibliothek ist unabhängig von Praxisphase 1 und 2 nutzbar. Sie enthält 22 Aufgabenformate und sechs ergänzende Vorlagen. Für die begrenzte Hypothesenbildung nutzen Sie Handout 1, für einen zusammenhängenden Förderbaustein Handout 2. Acht konkrete Erprobungsbeispiele zum selben fiktiven Bruchfall finden Sie ab Seite 17. Die Auswahlhilfe ab Seite 21 verbindet sechs didaktische Zwecke mit passenden Formaten und weiteren Beispielen.')
     d.h('So verwenden Sie die Vorlagen')
     d.p('Ein vollständiger Prompt besteht aus dem gemeinsamen Rahmen auf dieser Seite und genau einem formatspezifischen Auftrag. Kopieren Sie beides zusammen und ersetzen Sie die Platzhalter. Die digitale Bibliothek setzt beide Teile automatisch zusammen und lässt sie vor dem Kopieren bearbeiten. Ein neuer Fall benötigt neue Angaben; alte Falltexte nicht unbemerkt übernehmen. Fehlt ein Ziel, nutzen Sie zunächst die Diagnosehilfe in Handout 1 oder 2 für einen aufgabenbezogenen Vorschlag. Für ein beobachtbares Förderziel bietet Handout 2 eine eigene Hilfe; prüfen und wählen Sie das Ziel selbst.')
     d.h('Gemeinsamer Rahmen für jeden Prompt')
@@ -288,11 +289,43 @@ def make_h3(data):
         d.p('Lösung und fachliche Einordnung für die Lehrkraft: '+example['solution'],after=65)
         d.p('Beobachtungskriterium: '+example['criterion'],after=65)
         d.p('Grenze der Aussage: '+example['limit'],after=100)
+    lookup={c['id']:(i+1,c['title'],3+i//2) for i,c in enumerate(entries)}
+    for i,route in enumerate(data.get('routes',[])):
+        if i==0:
+            d.h('Auswahlhilfe für den nächsten Lernschritt',page=True)
+            d.p('Wählen Sie ausgehend von der erarbeiteten Ausgangslage und Ihrem Ziel einen passenden Zweck. Die Beispiele sind eigene, fachlich durchgesehene Entwürfe und keine empirisch geprüften Förderprogramme. Sie ersetzen den eigenen Fall nicht. Die Quellen am Ende erläutern didaktische Prinzipien.',size=21,after=100)
+        d.h(f'{i+1} {route["title"]}',page=i>0)
+        d.p('Zweck: '+route['phase']+'. '+route['purpose'],after=100)
+        d.p('Wann passend: '+route['condition'],after=100)
+        names=[f'{lookup[f][0]} {lookup[f][1]} (Seite {lookup[f][2]})' for f in route['formats']]
+        d.p('Passende Vorlagen: '+'; '.join(names)+'.',bold=True,after=130)
+        for example in route['examples']:
+            d.p(example['title'],bold=True,size=23,before=110,after=80,keep=True)
+            d.p('Auftrag: '+example['task'],after=100)
+            d.p('Lösung und Einordnung: '+example['solution'],after=100)
+            d.p('Beobachtungskriterium: '+example['criterion'],after=100)
+            d.p('Grenze der Aussage: '+example['limit'],after=130)
+        d.p('Didaktischer Bezug: '+', '.join('Quelle '+str(s+1) for s in route['sources'])+' im Quellenverzeichnis am Ende.',size=20,italic=True)
+    if data.get('sources'):
+        d.h('Quellen zur Auswahl der Aufgabenformate',page=True)
+        d.p('Die folgenden Materialien von PIKAS und Mathe sicher können beim Deutschen Zentrum für Lehrkräftebildung Mathematik erläutern die Unterscheidung von Diagnose und Förderung, das Nutzen von Aufgabenbeziehungen und das gezielte Anpassen von Unterstützung. Sie begründen die Auswahlprinzipien; die konkreten Beispiele dieser Auswahlhilfe sind eigene Entwürfe.')
+        for i,source in enumerate(data['sources']):
+            d.p(f'{i+1} {source["title"]}',bold=True,size=23,before=150,after=90,keep=True)
+            d.p(source['url'],size=21,after=160)
+        d.h('Den eigenen Fall weiterbearbeiten')
+        d.p('Übernehmen Sie Aufgabe, tatsächliche Beobachtungen, offene Hypothesen und gegebenenfalls eine ausdrücklich gewählte Arbeitsannahme aus Handout 2. Nutzen Sie das passende Format mit genau einem Förderziel. Für eine noch offene Hypothesenprüfung ist noch kein fertiges Förderziel nötig.')
+        d.p('Die digitale Bibliothek setzt die gewählten Fallangaben in den jeweiligen Prompt ein. Prüfen Sie, ob der Kontext stimmt, bevor Sie ihn kopieren. Bereits erarbeitete Vorlagen bleiben erhalten und werden nur auf Ihren ausdrücklichen Wunsch neu befüllt.')
+        d.p('Halten Sie verwendete Hilfen und die tatsächliche neue Bearbeitung getrennt fest. Eine richtige Zahl, eine passende KI-Erklärung oder ein gelungener Materialentwurf allein belegen noch keine dauerhafte Beherrschung des Lernziels.')
     d.save()
 
 if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--handout',choices=['1','2','3'],help='Build only the selected handout; omit to build all three.')
+    args=parser.parse_args()
     QA.mkdir(exist_ok=True)
     data=library_data()
     assert len(data['formats'])==22 and len(data['extras'])==6
-    make_h1();make_h2();make_h3(data)
-    print('Created 3 new outputs; legacy files and preserve-only package parts unchanged.')
+    if args.handout in (None,'1'):make_h1()
+    if args.handout in (None,'2'):make_h2()
+    if args.handout in (None,'3'):make_h3(data)
+    print('Created selected output(s); legacy files and preserve-only package parts unchanged.')

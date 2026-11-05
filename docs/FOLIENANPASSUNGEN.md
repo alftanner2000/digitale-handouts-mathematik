@@ -21,3 +21,12 @@ Vergleich der Sicherung mit dem Export vom 2026-11-04, 23:06: weiterhin **115 Fo
 Nachkontrolle am 2026-11-05: Die drei doppelten Objekte auf Folie 36 wurden direkt in Firefox entfernt. Der neue Export enthält genau die drei ursprünglichen Objekte mit unveränderter Geometrie: Titel x 1,1 / y 1,9 cm, Erklärung x 1,1 / y 6,0 cm, QR x 16,0 / y 4,9 cm und 7,6 × 7,6 cm. Gegenüber dem vorherigen Kontrollstand änderte sich ausschließlich Folie 36. Alle 115 Notiztexte, die Reihenfolge und die 42 Ausblendungen bleiben unverändert. Die bereinigte Folie wurde visuell in Google Slides geprüft und gespeichert. Das QR-Bild ist byteidentisch zur zuvor unabhängig dekodierten Datei; der klickbare Link führt korrekt zu `#hypothesen`.
 
 Produktive Basisadresse nach der freigegebenen Veröffentlichung: `https://alftanner2000.github.io/digitale-handouts-mathematik/`. Historische Anker behalten ihre Bedeutung: `#station1` Bibliothek, `#station2` Hypothesenbildung, `#station3` Förderbaustein. Neue Folien verwenden die semantischen Links.
+
+## Konsistenzprüfung am 2026-11-05
+
+Zuordnung der Übersicht 33 und der Praxisfolien 36, 59 und 68 erneut mit Website und Word-Handouts abgeglichen. Nur zwei Notizformulierungen nachgebessert:
+
+- Folie 36: Ergebnisfelder können nach Prüfung einer KI-Antwort ergänzt werden; eigene Angaben sind auch vorher zulässig. KI-Nutzung ist keine Pflicht zum Ausfüllen.
+- Folie 37: Rückblick auf das Aufgabenziel fragt nach der Anforderung der Aufgabe. Ein Förderziel wird erst später auf Grundlage der geklärten oder ausdrücklich angenommenen Ausgangslage gewählt.
+
+Beide vollständigen Notiztexte vor und nach der Änderung in Firefox abgeglichen. Lesender Export um 07:26 mit dem Stand um 06:25 verglichen: ausschließlich `notesSlide36.xml` und `notesSlide37.xml` verändert, kein sichtbarer Folieninhalt. Keine Folie gelöscht oder umsortiert. Die neue Auswahlhilfe nutzt den bereits auf Praxisfolie 68 verlinkten Einstieg `#bibliothek`; kein neuer QR-Code erforderlich.

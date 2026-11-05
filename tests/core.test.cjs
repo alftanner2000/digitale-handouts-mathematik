@@ -15,6 +15,8 @@ const sandbox = {window: {}};
 vm.runInNewContext(read('library-data.js'), sandbox, {filename: 'library-data.js', timeout: 1000});
 const formats = clone(sandbox.window.HANDOUT_FORMATS);
 const extras = clone(sandbox.window.HANDOUT_EXTRAS);
+const variantRoutes = clone(sandbox.window.HANDOUT_VARIANT_ROUTES);
+const variantSources = clone(sandbox.window.HANDOUT_VARIANT_SOURCES);
 const html = read('index.html');
 const unicode = 'Äußere Größe: ½ + ⅓ = ⅚\n„Zähler“, € 3,50, <Bild> & Erklärung\nZweite Zeile – ohne Namen.';
 
@@ -238,6 +240,93 @@ test('500 cases are valid; merging past the limit fails without changing the cur
     assert.throws(() => C.validate(stateWithCount(kind, 501)));
   }
   assert.equal(C.mergeImport(stateWithCount('diagnostics', 499), C.empty()).diagnostics.length, 500);
+});
+
+test('500 diagnosis cases can be restored into a fresh state without counting its untouched starter', () => {
+  const current = C.empty(), incoming = stateWithCount('diagnostics', 500);
+  const originalStarterId = current.diagnostics[0].id;
+  const beforeCurrent = clone(current), beforeIncoming = clone(incoming);
+  const merged = C.mergeImport(current, incoming);
+  assert.equal(merged.diagnostics.length, 500);
+  assert.ok(!merged.diagnostics.some(d => d.id === originalStarterId));
+  assert.deepEqual(current, beforeCurrent);
+  assert.deepEqual(incoming, beforeIncoming);
+  assert.equal(C.mergeImport(C.empty(), clone(merged)).diagnostics.length, 500);
+});
+
+test('any changed or unknown starter field preserves the case and enforces the real import limit', () => {
+  const template = C.empty().diagnostics[0];
+  const mutations = Object.keys(template).filter(key => key !== 'id').map(key => state => {state.diagnostics[0][key] += ' Eigene Eingabe';});
+  mutations.push(state => {state.diagnostics[0].futureMaterial = 'Eigene zusätzliche Angabe';});
+  mutations.push(state => {state.activeDiagnosticId = '';});
+  mutations.push(state => {state.diagnostics.push(C.diagnostic(C.cases[0]));});
+  for (const mutate of mutations) {
+    const current = C.empty(); mutate(current);
+    const before = clone(current);
+    assert.throws(() => C.mergeImport(current, stateWithCount('diagnostics', 500)), /500/);
+    assert.deepEqual(current, before);
+    const merged = C.mergeImport(current, C.empty());
+    assert.deepEqual(merged.diagnostics.slice(0, current.diagnostics.length), before.diagnostics);
+  }
+});
+
+test('an untouched starter remains when the incoming file has no diagnosis cases', () => {
+  const current = C.empty(), incoming = C.empty();
+  incoming.diagnostics = []; incoming.activeDiagnosticId = '';
+  incoming.builders.push(C.builder());
+  const merged = C.mergeImport(current, incoming);
+  assert.deepEqual(merged.diagnostics, current.diagnostics);
+  assert.equal(merged.activeDiagnosticId, current.activeDiagnosticId);
+  assert.equal(merged.builders.length, 1);
+});
+
+test('backup serialization uses the common byte limit and preserves recovery data and version 2', () => {
+  const state = C.empty();
+  state.library.drafts.example = {text: unicode, source: 'Kontext', result: 'Ergebnis\n' + unicode, notes: 'Anmerkung'};
+  state.recoveryRaw = 'Unlesbarer ursprünglicher Text\n' + unicode;
+  const before = clone(state);
+  const text = C.serializeBackup(state);
+  assert.equal(C.MAX_BACKUP_BYTES, 10000000);
+  assert.deepEqual(JSON.parse(text), before);
+  assert.equal(JSON.parse(text).version, 2);
+  assert.deepEqual(state, before);
+  assert.ok(Buffer.byteLength(text, 'utf8') <= C.MAX_BACKUP_BYTES);
+});
+
+test('backup export accepts the exact UTF-8 size boundary and rejects one extra byte without mutation', () => {
+  const state = C.empty();
+  state.library.drafts.example = {text: '', source: 'Kontext'};
+  const overhead = Buffer.byteLength(JSON.stringify(state, null, 2), 'utf8');
+  state.library.drafts.example.text = 'x'.repeat(C.MAX_BACKUP_BYTES - overhead);
+  assert.equal(Buffer.byteLength(C.serializeBackup(state), 'utf8'), C.MAX_BACKUP_BYTES);
+  state.library.drafts.example.text += 'x';
+  const originalText = state.library.drafts.example.text;
+  assert.throws(() => C.serializeBackup(state), /Export-\/Importgrenze von 10 MB/);
+  assert.equal(state.library.drafts.example.text, originalText);
+});
+
+test('backup size measures UTF-8 bytes rather than JavaScript string length', () => {
+  const state = C.empty();
+  state.recoveryRaw = '😀'.repeat(2500000);
+  assert.ok(JSON.stringify(state, null, 2).length < C.MAX_BACKUP_BYTES);
+  assert.ok(Buffer.byteLength(JSON.stringify(state, null, 2), 'utf8') > C.MAX_BACKUP_BYTES);
+  assert.throws(() => C.serializeBackup(state), /10 MB/);
+});
+
+test('the export handler never downloads an oversized backup and import uses the same limit', () => {
+  const source = read('handouts.js');
+  const exportFunction = source.slice(source.indexOf('  function exportAll()'), source.indexOf('  async function importFile('));
+  const state = C.empty(), downloads = [], announcements = [];
+  const context = {C, state, recoveryRaw: '', save: () => true, download: (...args) => downloads.push(args), announce: value => announcements.push(value)};
+  vm.runInNewContext(exportFunction + '\nexportAll();', context);
+  assert.equal(downloads.length, 1);
+  assert.deepEqual(JSON.parse(downloads[0][1]), state);
+  context.recoveryRaw = 'x'.repeat(C.MAX_BACKUP_BYTES);
+  vm.runInNewContext('exportAll();', context);
+  assert.equal(downloads.length, 1);
+  assert.match(announcements.at(-1), /Keine Dateisicherung erstellt:.*10 MB/);
+  assert.match(announcements.at(-1), /Arbeitsstände wurden nicht entfernt/);
+  assert.match(source, /file\.size>C\.MAX_BACKUP_BYTES/);
 });
 
 test('library archive limit is checked before adding another imported archive', () => {
@@ -517,6 +606,123 @@ test('exactly eight library formats provide complete concrete examples with sepa
     assert.match(f.example.context, /Fiktiver Ausgangsfall/);
     assert.match(f.example.context, /Denkweg ist unbekannt/);
   }
+});
+
+test('six distinct variant routes link only existing formats and leave the 22 plus 6 offers intact', () => {
+  assert.deepEqual(variantRoutes.map(route => route.id), ['denkweg','bedeutung','beziehungen','hilfen','fehler','uebertragen']);
+  assert.equal(new Set(variantRoutes.map(route => route.id)).size, 6);
+  assert.equal(formats.length, 22);
+  assert.equal(extras.length, 6);
+  const ids = new Set([...formats, ...extras].map(format => format.id));
+  assert.equal(ids.size, 28);
+  for (const route of variantRoutes) {
+    for (const key of ['id','title','phase','condition','purpose']) assert.ok(typeof route[key] === 'string' && route[key].trim(), route.id + ': ' + key);
+    assert.ok(Array.isArray(route.formats) && route.formats.length, route.id);
+    assert.equal(new Set(route.formats).size, route.formats.length, route.id);
+    for (const id of route.formats) assert.ok(ids.has(id), route.id + ': ' + id);
+  }
+});
+
+test('every variant example has a task, separate solution, criterion and limit', () => {
+  for (const route of variantRoutes) {
+    assert.ok(Array.isArray(route.examples) && route.examples.length, route.id);
+    for (const example of route.examples) {
+      assert.deepEqual(Object.keys(example).sort(), ['title','task','solution','criterion','limit'].sort(), route.id);
+      for (const [key, value] of Object.entries(example)) assert.ok(typeof value === 'string' && value.trim(), route.id + ': ' + key);
+    }
+  }
+  const diagnostic = variantRoutes.find(route => route.id === 'denkweg');
+  assert.match(diagnostic.condition, /Denkweg ist unbekannt/);
+  assert.match(diagnostic.condition, /Förderziel.*nicht nötig/);
+  assert.match(diagnostic.purpose, /Noch keine Lösung/);
+  assert.match(variantRoutes.find(route => route.id === 'bedeutung').condition, /tatsächliche Antwort|Arbeitsannahme/);
+  assert.match(variantRoutes.find(route => route.id === 'uebertragen').examples[0].limit, /keine dauerhafte Beherrschung/);
+});
+
+test('all variant source indexes resolve to titled HTTPS primary-source links', () => {
+  assert.ok(variantSources.length);
+  const urls = new Set();
+  for (const source of variantSources) {
+    assert.ok(typeof source.title === 'string' && source.title.trim());
+    const url = new URL(source.url);
+    assert.equal(url.protocol, 'https:');
+    assert.ok(url.hostname === 'dzlm.de' || url.hostname.endsWith('.dzlm.de'), url.hostname);
+    assert.ok(!urls.has(source.url), source.url);
+    urls.add(source.url);
+  }
+  for (const route of variantRoutes) {
+    assert.ok(Array.isArray(route.sources) && route.sources.length, route.id);
+    assert.equal(new Set(route.sources).size, route.sources.length, route.id);
+    for (const index of route.sources) assert.ok(Number.isInteger(index) && index >= 0 && index < variantSources.length, route.id + ': ' + index);
+  }
+});
+
+test('variant rendering separates fixed examples from selected-context prompts', () => {
+  const source = read('handouts.js');
+  const render = source.slice(source.indexOf('  function renderVariantRoutes()'), source.indexOf('  function openFormat('));
+  const nodes = {variantRoutes: {innerHTML: ''}, variantSources: {innerHTML: ''}};
+  const state = C.empty(), before = clone(state);
+  const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  vm.runInNewContext('"use strict";\n' + render + '\nrenderVariantRoutes();', {
+    window: {HANDOUT_VARIANT_ROUTES: variantRoutes, HANDOUT_VARIANT_SOURCES: variantSources},
+    library: [...formats, ...extras], state, $: id => nodes[id], esc
+  });
+  assert.equal((nodes.variantRoutes.innerHTML.match(/class="variant-route"/g) || []).length, 6);
+  assert.equal((nodes.variantRoutes.innerHTML.match(/class="route-example"/g) || []).length, variantRoutes.reduce((sum, route) => sum + route.examples.length, 0));
+  assert.equal((nodes.variantRoutes.innerHTML.match(/data-open-format=/g) || []).length, variantRoutes.reduce((sum, route) => sum + route.formats.length, 0));
+  for (const route of variantRoutes) for (const id of route.formats) assert.ok(nodes.variantRoutes.innerHTML.includes('data-open-format="' + id + '"'));
+  assert.match(nodes.variantRoutes.innerHTML, /das Beispiel oben wird nicht übernommen/);
+  for (const item of variantSources) assert.ok(nodes.variantSources.innerHTML.includes(esc(item.url)));
+  assert.deepEqual(state, before);
+});
+
+test('opening a route format preserves selected context and an existing prompt, result and notes in every mode', () => {
+  const source = read('handouts.js');
+  const open = source.slice(source.indexOf('  function openFormat('), source.indexOf('  function renderLibrary()'));
+  const ensure = source.slice(source.indexOf('  async function ensureLibrary('), source.indexOf('  function filterLibrary()'));
+  assert.doesNotMatch(open, /state\s*(?:=|\.)|Object\.assign|\.mode\s*=|data-trial/);
+  const id = formats[0].id;
+  for (const mode of ['blank','own','sample','diagnostic','builder']) {
+    const state = C.empty();
+    Object.assign(state.library, {mode, grade: '7', task: 'Eigene Aufgabe', goal: 'Eigenes Ziel', baseline: unicode});
+    state.library.drafts[id] = {text: 'Eigener Prompt', source: 'Voriger Kontext', result: 'Eigenes Ergebnis', notes: unicode};
+    const before = clone(state);
+    const nodes = {libraryFilter: {value: 'examples'}, promptSearch: {value: 'Suche'}};
+    for (const prefix of ['library-','trial-result-','trial-notes-']) nodes[prefix + id] = {value: ''};
+    let focusCount = 0, scrollCount = 0, filterCount = 0;
+    const item = {dataset: {format: id}, open: false, querySelector: () => ({focus: () => focusCount++}), scrollIntoView: () => scrollCount++};
+    const fail = () => {throw new Error('Opening must not regenerate or replace an existing draft');};
+    vm.runInNewContext('"use strict";\n' + open + ensure + '\nopenFormat(' + JSON.stringify(id) + ');', {
+      state, library: [...formats, ...extras], all: () => [item], $: key => nodes[key],
+      filterLibrary: () => filterCount++, announce: () => {}, updateLibraryContext: () => {}, renderImportedLibraries: () => {},
+      C: {refillLibraryDraft: fail, fillTemplate: fail}, save: fail, ask: fail, libraryContext: fail, librarySource: fail
+    });
+    assert.deepEqual(state, before, mode);
+    assert.equal(nodes['library-' + id].value, before.library.drafts[id].text);
+    assert.equal(nodes['trial-result-' + id].value, before.library.drafts[id].result);
+    assert.equal(nodes['trial-notes-' + id].value, before.library.drafts[id].notes);
+    assert.equal(item.open, true);
+    assert.equal(nodes.libraryFilter.value, 'all');
+    assert.equal(nodes.promptSearch.value, '');
+    assert.deepEqual([focusCount, scrollCount, filterCount], [1,1,1]);
+  }
+});
+
+test('opening an unknown format is a no-op rather than a context change', () => {
+  const source = read('handouts.js');
+  const open = source.slice(source.indexOf('  function openFormat('), source.indexOf('  function renderLibrary()'));
+  const fail = () => {throw new Error('Unknown format must not change UI or state');};
+  vm.runInNewContext('"use strict";\n' + open + '\nopenFormat("unknown-format");', {
+    all: () => [], $: fail, ensureLibrary: fail, filterLibrary: fail, announce: fail
+  });
+});
+
+test('H1 visibly permits starting without a task goal before the optional AI proposal', () => {
+  const first = html.slice(html.indexOf('id="hypothesen"'), html.indexOf('id="foerderbaustein"'));
+  assert.match(first, /kann nach der KI-Antwort ergänzt werden/);
+  assert.match(first, /Lassen Sie das Feld zunächst leer/);
+  assert.match(first, /aufgabenbezogenen Zielvorschlag/);
+  assert.doesNotMatch(first, /(?:darf|muss).*erst nach der KI-Arbeit ausgefüllt/);
 });
 
 test('the common trial context is explicitly fictitious and fills each example prompt without inventing evidence', () => {

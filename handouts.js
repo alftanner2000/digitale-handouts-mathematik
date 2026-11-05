@@ -161,6 +161,17 @@
     const e=f.example;
     return `<details class="format-example"><summary>Konkretes Beispiel zur Bruchaddition</summary><dl><dt>Ausgangslage und Zweck</dt><dd>${esc(e.context)}</dd><dt>Aufgabe beziehungsweise Impuls</dt><dd>${esc(e.task)}</dd></dl><details class="example-solution"><summary>Lösung und didaktische Prüfung</summary><dl><dt>Lösung beziehungsweise erwartbare Antwort</dt><dd>${esc(e.solution)}</dd><dt>Beobachtungskriterium</dt><dd>${esc(e.criterion)}</dd><dt>Was daraus noch nicht folgt</dt><dd>${esc(e.limit)}</dd></dl></details><p class="field-hint">Dieses feste Beispiel dient der Orientierung. Der folgende Prompt verwendet den oben gewählten Kontext, nicht automatisch den Beispielfall.</p></details>`;
   }
+  function renderVariantRoutes() {
+    const sources=window.HANDOUT_VARIANT_SOURCES||[];
+    $('variantRoutes').innerHTML=(window.HANDOUT_VARIANT_ROUTES||[]).map(route=>`<details class="variant-route"><summary><span class="route-phase">${esc(route.phase)}</span>${esc(route.title)}</summary><div class="route-detail"><p><strong>Wann passend?</strong> ${esc(route.condition)}</p><p><strong>Didaktischer Zweck:</strong> ${esc(route.purpose)}</p>${route.examples.map(e=>`<section class="route-example"><h4>${esc(e.title)}</h4><p class="preserve-lines">${esc(e.task)}</p><details><summary>Lösung, Beobachtung und Grenze</summary><p><strong>Fachliche Lösung:</strong> ${esc(e.solution)}</p><p><strong>Worauf achten?</strong> ${esc(e.criterion)}</p><p><strong>Was daraus noch nicht folgt:</strong> ${esc(e.limit)}</p></details></section>`).join('')}<p class="field-hint">Passende Prompts für Ihren ausgewählten Kontext – das Beispiel oben wird nicht übernommen:</p><div class="button-row">${route.formats.map(id=>{const f=library.find(item=>item.id===id);return f?`<button class="button" type="button" data-open-format="${esc(id)}">${esc(f.title)}</button>`:'';}).join('')}</div><p class="route-reference">Prinzipien: ${route.sources.map(i=>`<a href="${esc(sources[i].url)}" target="_blank" rel="noopener noreferrer">${esc(sources[i].title)}</a>`).join(' · ')}</p></div></details>`).join('');
+    $('variantSources').innerHTML=sources.map(s=>`<p><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a></p>`).join('');
+  }
+  function openFormat(id) {
+    const item=all('.prompt-item').find(el=>el.dataset.format===id);if(!item)return;
+    $('libraryFilter').value='all';$('promptSearch').value='';filterLibrary();
+    item.open=true;ensureLibrary(id);item.querySelector('summary').focus();item.scrollIntoView({block:'start',behavior:'smooth'});
+    announce('Format geöffnet. Der Prompt verwendet den gewählten Kontext; ein bereits bearbeiteter Prompt bleibt erhalten.');
+  }
   function renderLibrary() {
     $('promptList').innerHTML=library.map((f,i)=>`<details class="prompt-item" data-format="${esc(f.id)}" data-category="${i<formats.length?f.category:'extra'}"><summary>${String(i+1).padStart(2,'0')} · ${esc(f.title)}${f.example?' · mit Aufgabenbeispiel':''}</summary><div class="prompt-detail"><dl><dt>Didaktischer Zweck</dt><dd>${esc(f.purpose)}</dd><dt>Geeigneter Einsatz</dt><dd>${esc(f.when)}</dd><dt>Gewünschte Ausgabe</dt><dd>${esc(f.output)}</dd><dt>Fachliche Prüffrage</dt><dd>${esc(f.check)}</dd></dl>${exampleMarkup(f)}<label for="library-${esc(f.id)}">Bearbeitbarer Prompt</label><textarea id="library-${esc(f.id)}" data-library-prompt="${esc(f.id)}"></textarea><p class="library-warning context-alert" data-format="${esc(f.id)}"></p><div class="button-row"><button class="button" type="button" data-refill="${esc(f.id)}">Mit aktuellem Kontext neu befüllen</button><button class="button primary" type="button" data-copy="library-${esc(f.id)}">Prompt kopieren</button></div><div class="trial-inputs"><label for="trial-result-${esc(f.id)}">KI-Ergebnis oder eigene Ausarbeitung · ${esc(f.title)}</label><textarea id="trial-result-${esc(f.id)}" data-library-result="${esc(f.id)}" class="library-result" placeholder="Aufgaben, Darstellungen oder Hinweise einfügen. Noch ungeprüfte Aussagen als Entwurf behandeln."></textarea><label for="trial-notes-${esc(f.id)}">Meine fachliche Prüfung und Anpassungen · ${esc(f.title)}</label><textarea id="trial-notes-${esc(f.id)}" data-library-notes="${esc(f.id)}" placeholder="Was passt zum Ziel? Welche Rechnung, Darstellung oder Hilfe muss geändert werden?"></textarea></div><div class="button-row"><button class="button" type="button" data-print-format="${esc(f.id)}">Prompt und Erprobung drucken</button></div></div></details>`).join('');
     all('.prompt-item').forEach(item=>item.addEventListener('toggle',()=>{if(item.open)ensureLibrary(item.dataset.format);syncPrintPage();}));
@@ -191,9 +202,9 @@
     catch {$('fallbackText').value=el.value;$('copyFallback').showModal();$('fallbackText').focus();$('fallbackText').select();}
   }
   function download(filename,text,type='text/plain;charset=utf-8') {const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-  function exportAll(){save();const output=JSON.parse(JSON.stringify(state));if(recoveryRaw)output.recoveryRaw=recoveryRaw;download('Mathematik-Handouts-Arbeitsstaende.json',JSON.stringify(output,null,2),'application/json');announce('Dateisicherung erstellt. Sie enthält Ihre lokalen Eingaben – nicht öffentlich weitergeben.');}
+  function exportAll(){save();try{const output=JSON.parse(JSON.stringify(state));if(recoveryRaw)output.recoveryRaw=recoveryRaw;const text=C.serializeBackup(output);download('Mathematik-Handouts-Arbeitsstaende.json',text,'application/json');announce('Dateisicherung erstellt. Sie enthält Ihre lokalen Eingaben – nicht öffentlich weitergeben.');}catch(error){announce('Keine Dateisicherung erstellt: '+error.message+' Ihre Arbeitsstände wurden nicht entfernt.');}}
   async function importFile(file) {
-    if(!file)return;if(file.size>10000000){announce('Datei ist größer als 10 MB. Import nicht ausgeführt.');return;}
+    if(!file)return;if(file.size>C.MAX_BACKUP_BYTES){announce('Datei ist größer als 10 MB. Import nicht ausgeführt.');return;}
     try {const data=C.validate(JSON.parse(await file.text()));const merged=C.mergeImport(state,data);if(!await ask(`${data.diagnostics.length} Fälle und ${data.builders.length} Förderentwürfe zusätzlich importieren? Bestehende Arbeitsstände bleiben erhalten.`))return;state=merged;save();renderDiag();renderBuilder();renderLibrary();announce('Arbeitsstände übernommen. Vorhandene Bearbeitungen bleiben erhalten. Bibliotheksstände finden Sie in Handout 3.');}
     catch(error){announce('Import nicht möglich: '+error.message+' Vorhandene Daten bleiben unverändert.');}
     finally{$('importFile').value='';}
@@ -251,6 +262,7 @@
   all('[data-library]').forEach(el=>el.addEventListener('input',()=>{state.library[el.dataset.library]=el.value;save();updateLibraryContext();}));
   $('promptList').addEventListener('input',e=>{const el=e.target,id=el.dataset.libraryPrompt||el.dataset.libraryResult||el.dataset.libraryNotes;if(!id)return;const key=el.dataset.libraryPrompt?'text':el.dataset.libraryResult?'result':'notes';const d=state.library.drafts[id]||{text:$('library-'+id).value,source:librarySource()};d[key]=el.value;state.library.drafts[id]=d;save();});
   $('promptSearch').addEventListener('input',filterLibrary);$('libraryFilter').addEventListener('change',filterLibrary);
+  $('variantRoutes').addEventListener('click',e=>{const button=e.target.closest('[data-open-format]');if(button)openFormat(button.dataset.openFormat);});
   document.addEventListener('click',e=>{const a=e.target.closest('[data-nav]');if(a){e.preventDefault();go(a.dataset.nav,true);}const c=e.target.closest('[data-copy]');if(c)copy(c.dataset.copy);const r=e.target.closest('[data-refill]');if(r)ensureLibrary(r.dataset.refill,true);const p=e.target.closest('[data-print]');if(p)print(p.dataset.print);const pf=e.target.closest('[data-print-format]');if(pf)print('library',pf.dataset.printFormat);});
   $('closeFallback').addEventListener('click',()=>$('copyFallback').close());
   window.addEventListener('hashchange',()=>go(location.hash.slice(1),true));
@@ -267,5 +279,5 @@
     '3,5 + 12 = 4,7 passt zur Vermutung, dass 12 wie 1,2 verarbeitet wurde. Prüfen Sie die Zuordnung von Einern und Zehnteln und lassen Sie eine stellenwertgerechte Darstellung erklären. Der Einzelfehler allein entscheidet nicht zwischen Versehen und Verständnisproblem.'
   ];
   $('caseDiscussion').innerHTML=C.cases.map((c,i)=>`<h3>${esc(c.title)}</h3><p>${esc(discussions[i])}</p>`).join('');
-  renderDiag();renderBuilder();renderLibrary();updateBuilderEntry();go(location.hash.slice(1));save();
+  renderDiag();renderBuilder();renderLibrary();renderVariantRoutes();updateBuilderEntry();go(location.hash.slice(1));save();
 })();
